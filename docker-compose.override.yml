@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  lexoshub.erp.winthor.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Compose
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - "1337:80"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - mssqltools
+
+  mssql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "!@Lexos_Hub-Admin12"
+      MSSQL_PID: Express
+    ports:
+      - "1433:1433"
+
+  mssqltools:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      - mssql-server
+    volumes:
+      - ./scripts/init.sh:/tmp/init.sh
+      - ./scripts/001.sql:/tmp/001.sql
+    command: /bin/bash /tmp/init.sh

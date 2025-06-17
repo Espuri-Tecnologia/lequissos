@@ -1,0 +1,15 @@
+﻿
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LexosHub.ERP.VarejoOnline.Infra.CrossCutting\LexosHub.ERP.VarejoOnline.Infra.CrossCutting.csproj" />
+    <ProjectReference Include="..\LexosHub.ERP.VarejoOnline.Infra.ErpApi\LexosHub.ERP.VarejoOnline.Infra.ErpApi.csproj" />
+  </ItemGroup>
+</Project>

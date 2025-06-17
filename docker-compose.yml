@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  lexoshub.erp.winthor.api:
+    image: ${DOCKER_REGISTRY-}lexoshuberpwinthorapi
+    build:
+      context: .
+      dockerfile: src/LexosHub.ERP.Winthor.Api/Dockerfile

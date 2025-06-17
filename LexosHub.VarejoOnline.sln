@@ -1,0 +1,88 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32603.155
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Api", "src\LexosHub.ERP.VarejoOnline.Api\LexosHub.ERP.VarejoOnline.Api.csproj", "{D0F04A61-21D9-426A-9D36-EB9EF254DF99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Domain", "src\LexosHub.ERP.VarejoOnline.Domain\LexosHub.ERP.VarejoOnline.Domain.csproj", "{A1F14B51-91A0-4CB2-BF8E-A2EFB2285D01}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Infra.CrossCutting", "src\LexosHub.ERP.VarejoOnline.Infra.CrossCutting\LexosHub.ERP.VarejoOnline.Infra.CrossCutting.csproj", "{B2E24C62-92B1-4DC3-BF8F-B3FFD2396E12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Infra.Data", "src\LexosHub.ERP.VarejoOnline.Infra.Data\LexosHub.ERP.VarejoOnline.Infra.Data.csproj", "{C3F34D73-A3C2-4EC4-BF90-C4FFE34A7F23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Infra.ErpApi", "src\LexosHub.ERP.VarejoOnline.Infra.ErpApi\LexosHub.ERP.VarejoOnline.Infra.ErpApi.csproj", "{D4F45E84-B4D3-4FC5-BF91-D5FFF45B8024}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Api", "1 - Api", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Domain", "2 - Domain", "{F18A8B1B-69FA-4E42-9F34-B1BBDB341A2B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - Infra", "3 - Infra", "{6682B0ED-EDB8-4916-8951-FA55FC50E41E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 - Testes", "4 - Testes", "{8A5BDD3C-3598-4F48-ABDB-936BB40748CA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.1 - Data", "3.1 - Data", "{F4EE09F3-7700-4BCA-97CF-9A6EE6DCD92C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.2 - External", "3.2 - External", "{704F844E-1B5C-4DC8-A5F9-62B0D208B178}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.3 - CrossCutting", "3.3 - CrossCutting", "{DBE1CA98-A913-4570-AFB3-49DC4CC69537}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.4 - Packages", "3.4 - Packages", "{BB053B5A-CCD3-4D16-9B6D-98CDC20C78AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Infra.Data.Migrations", "src\LexosHub.ERP.VarejoOnline.Infra.Data.Migrations\LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.csproj", "{20695E59-1A8A-463D-9AFD-158FD10B556F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens de Solução", "{380A7511-A354-6D7A-0CC0-8FA1F1BA7B6C}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.dcproj = docker-compose.dcproj
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0F04A61-21D9-426A-9D36-EB9EF254DF99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0F04A61-21D9-426A-9D36-EB9EF254DF99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0F04A61-21D9-426A-9D36-EB9EF254DF99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0F04A61-21D9-426A-9D36-EB9EF254DF99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1F14B51-91A0-4CB2-BF8E-A2EFB2285D01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1F14B51-91A0-4CB2-BF8E-A2EFB2285D01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1F14B51-91A0-4CB2-BF8E-A2EFB2285D01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1F14B51-91A0-4CB2-BF8E-A2EFB2285D01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2E24C62-92B1-4DC3-BF8F-B3FFD2396E12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2E24C62-92B1-4DC3-BF8F-B3FFD2396E12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2E24C62-92B1-4DC3-BF8F-B3FFD2396E12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2E24C62-92B1-4DC3-BF8F-B3FFD2396E12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3F34D73-A3C2-4EC4-BF90-C4FFE34A7F23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3F34D73-A3C2-4EC4-BF90-C4FFE34A7F23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3F34D73-A3C2-4EC4-BF90-C4FFE34A7F23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3F34D73-A3C2-4EC4-BF90-C4FFE34A7F23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4F45E84-B4D3-4FC5-BF91-D5FFF45B8024}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4F45E84-B4D3-4FC5-BF91-D5FFF45B8024}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4F45E84-B4D3-4FC5-BF91-D5FFF45B8024}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4F45E84-B4D3-4FC5-BF91-D5FFF45B8024}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20695E59-1A8A-463D-9AFD-158FD10B556F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20695E59-1A8A-463D-9AFD-158FD10B556F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20695E59-1A8A-463D-9AFD-158FD10B556F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20695E59-1A8A-463D-9AFD-158FD10B556F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D0F04A61-21D9-426A-9D36-EB9EF254DF99} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{A1F14B51-91A0-4CB2-BF8E-A2EFB2285D01} = {F18A8B1B-69FA-4E42-9F34-B1BBDB341A2B}
+		{B2E24C62-92B1-4DC3-BF8F-B3FFD2396E12} = {DBE1CA98-A913-4570-AFB3-49DC4CC69537}
+		{C3F34D73-A3C2-4EC4-BF90-C4FFE34A7F23} = {F4EE09F3-7700-4BCA-97CF-9A6EE6DCD92C}
+		{D4F45E84-B4D3-4FC5-BF91-D5FFF45B8024} = {704F844E-1B5C-4DC8-A5F9-62B0D208B178}
+		{F4EE09F3-7700-4BCA-97CF-9A6EE6DCD92C} = {6682B0ED-EDB8-4916-8951-FA55FC50E41E}
+		{704F844E-1B5C-4DC8-A5F9-62B0D208B178} = {6682B0ED-EDB8-4916-8951-FA55FC50E41E}
+		{DBE1CA98-A913-4570-AFB3-49DC4CC69537} = {6682B0ED-EDB8-4916-8951-FA55FC50E41E}
+		{BB053B5A-CCD3-4D16-9B6D-98CDC20C78AF} = {6682B0ED-EDB8-4916-8951-FA55FC50E41E}
+		{20695E59-1A8A-463D-9AFD-158FD10B556F} = {F4EE09F3-7700-4BCA-97CF-9A6EE6DCD92C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9CC72422-F7FA-4102-99D1-E3DFF134F6FF}
+	EndGlobalSection
+EndGlobal
