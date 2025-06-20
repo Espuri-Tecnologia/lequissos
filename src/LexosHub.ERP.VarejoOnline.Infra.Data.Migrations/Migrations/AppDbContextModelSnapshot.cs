@@ -48,7 +48,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Migrations
                     b.Property<DateTime?>("LastSyncDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("RefreshToken")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Settings")
@@ -63,7 +63,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Migrations
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("User")
+                    b.Property<string>("Token")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
