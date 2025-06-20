@@ -32,8 +32,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                                ,[TenantId]
                                ,[HubKey]
                                ,[Url]
-                               ,[User]
-                               ,[Password]
+                               ,[Token]
+                               ,[RefreshToken]
                                ,[IsActive]
                                ,[CreatedDate]
                                ,[UpdatedDate]
@@ -45,8 +45,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                                ,@TenantId
                                ,@HubKey
                                ,@Url
-                               ,@User
-                               ,@Password
+                               ,@Token
+                               ,@RefreshToken
                                ,@IsActive
                                ,GETDATE()
                                ,GETDATE()
@@ -57,8 +57,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                         integration.TenantId,
                         integration.HubKey,
                         integration.Url,
-                        integration.User,
-                        integration.Password,
+                        integration.Token,
+                        integration.RefreshToken,
                         integration.IsActive,
                         integration.Id
                     }
@@ -82,8 +82,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                                Integration
                            SET
                                 [Url] = @Url
-                               ,[User] = @User
-                               ,[Password] = @Password
+                               ,[Token] = @Token
+                               ,[RefreshToken] = @RefreshToken
                                ,[IsActive] = @IsActive
                                ,[LastSyncDate] = @LastSyncDate
                                ,[HasValidVersion] = @HasValidVersion
@@ -92,8 +92,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                     param: new
                     {
                         integration.Url,
-                        integration.User,
-                        integration.Password,
+                        integration.Token,
+                        integration.RefreshToken,
                         integration.IsActive,
                         integration.LastSyncDate,
                         integration.Id,
@@ -139,8 +139,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                                ,[TenantId]
                                ,[HubKey]
                                ,[Url]
-                               ,[User]
-                               ,[Password]
+                               ,[Token]
+                               ,[RefreshToken]
                                ,[IsActive]
                                ,[CreatedDate]
                                ,[UpdatedDate]
@@ -174,8 +174,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                           ,I.[TenantId]
                           ,I.[HubKey]
                           ,I.[Url]
-                          ,I.[User]
-                          ,I.[Password]
+                          ,I.[Token]
+                          ,I.[RefreshToken]
                           ,I.[IsActive]
                           ,I.[CreatedDate]
                           ,I.[UpdatedDate]
@@ -219,8 +219,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                            ,[TenantId]
                            ,[HubKey]
                            ,[Url]
-                           ,[User]
-                           ,[Password]
+                           ,[Token]
+                           ,[RefreshToken]
                            ,[IsActive]
                            ,[CreatedDate]
                            ,[UpdatedDate]
@@ -252,8 +252,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                            ,[TenantId]
                            ,[HubKey]
                            ,[Url]
-                           ,[User]
-                           ,[Password]
+                           ,[Token]
+                           ,[RefreshToken]
                            ,[IsActive]
                            ,[CreatedDate]
                            ,[UpdatedDate]
@@ -282,8 +282,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                            ,[TenantId]
                            ,[HubKey]
                            ,[Url]
-                           ,[User]
-                           ,[Password]
+                           ,[Token]
+                           ,[RefreshToken]
                            ,[IsActive]
                            ,[CreatedDate]
                            ,[UpdatedDate]

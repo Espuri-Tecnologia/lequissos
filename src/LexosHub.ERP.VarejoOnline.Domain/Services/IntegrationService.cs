@@ -47,19 +47,18 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Services
 
             await _integrationRepo.AddAsync(integration);
 
+            integration.RefreshToken = string.Empty;
             return new Response<IntegrationDto>(integration);
         }
 
         public async Task<Response<IntegrationDto>> UpdateIntegrationAsync(IntegrationDto integrationDto, HubIntegracaoDto item)
         {
             integrationDto.Url = string.Empty;
-            integrationDto.User = string.Empty;
-            integrationDto.Password = string.Empty;
             integrationDto.IsActive = item.Habilitado;
-
 
             await _integrationRepo.UpdateAsync(integrationDto);
 
+            integrationDto.RefreshToken = string.Empty;
             return new Response<IntegrationDto>(integrationDto);
         }
     }
