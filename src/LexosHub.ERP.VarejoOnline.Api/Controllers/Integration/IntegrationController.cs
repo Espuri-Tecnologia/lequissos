@@ -35,7 +35,11 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Integration
                 if (!result.IsSuccess)
                     return new BadRequestObjectResult(result);
 
+                // Never return sensitive authentication data to the client
+                // Tokens are cleared before sending the response
                 result.Result.Password = string.Empty;
+                result.Result.RefreshToken = string.Empty;
+                result.Result.Token = string.Empty;
 
                 return new OkObjectResult(result);
             }
