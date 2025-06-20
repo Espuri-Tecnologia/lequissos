@@ -35,7 +35,8 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Integration
                 if (!result.IsSuccess)
                     return new BadRequestObjectResult(result);
 
-                result.Result.Password = string.Empty;
+                result.Result.Token = string.Empty;
+                result.Result.RefreshToken = string.Empty;
 
                 return new OkObjectResult(result);
             }

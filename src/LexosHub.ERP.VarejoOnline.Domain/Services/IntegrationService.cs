@@ -53,8 +53,8 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Services
         public async Task<Response<IntegrationDto>> UpdateIntegrationAsync(IntegrationDto integrationDto, HubIntegracaoDto item)
         {
             integrationDto.Url = string.Empty;
-            integrationDto.User = string.Empty;
-            integrationDto.Password = string.Empty;
+            integrationDto.Token = string.Empty;
+            integrationDto.RefreshToken = string.Empty;
             integrationDto.IsActive = item.Habilitado;
 
 
