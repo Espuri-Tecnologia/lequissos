@@ -4,6 +4,7 @@ using LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250620175843_TokenAndRefreshTokenAdded")]
+    partial class TokenAndRefreshTokenAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,6 +51,9 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Migrations
                     b.Property<DateTime?>("LastSyncDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("RefreshToken")
                         .HasColumnType("nvarchar(max)");
 
@@ -64,6 +70,9 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("User")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
