@@ -12,6 +12,11 @@ using LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Persistence;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Persistence;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Services;
+using Amazon.SQS;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Diagnostics;
@@ -46,6 +51,11 @@ try
     builder.Services.AddFluentValidationAutoValidation(conf => { conf.DisableDataAnnotationsValidation = true; });
 
     builder.Services.AddOptions<VarejoOnlineApiSettings>().Bind(builder.Configuration.GetSection(nameof(VarejoOnlineApiSettings)));
+
+    builder.Services.AddAWSService<IAmazonSQS>();
+    builder.Services.AddSingleton<IEventDispatcher, EventDispatcher>();
+    builder.Services.AddTransient<IEventHandler<OrderCreatedEvent>, OrderCreatedEventHandler>();
+    builder.Services.AddHostedService<SqsListenerService>();
 
     var app = builder.Build().SetupMiddlewares();
 
