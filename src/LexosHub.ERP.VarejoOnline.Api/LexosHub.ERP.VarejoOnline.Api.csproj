@@ -32,6 +32,7 @@
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
     <PackageReference Include="Serilog.Sinks.Datadog.Logs" Version="0.5.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,7 +50,8 @@
     <ProjectReference Include="..\LexosHub.ERP.VarejoOnline.Infra.CrossCutting\LexosHub.ERP.VarejoOnline.Infra.CrossCutting.csproj" />
     <ProjectReference Include="..\LexosHub.ERP.VarejoOnline.Infra.Data.Migrations\LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.csproj" />
     <ProjectReference Include="..\LexosHub.ERP.VarejoOnline.Infra.Data\LexosHub.ERP.VarejoOnline.Infra.Data.csproj" />
-    
+    <ProjectReference Include="..\LexosHub.ERP.VarejoOnline.Infra.Messaging\LexosHub.ERP.VarejoOnline.Infra.Messaging.csproj" />
+
   </ItemGroup>
 
 </Project>
