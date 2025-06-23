@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using LexosHub.ERP.Winthor.Infra.Messaging.Events;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 
 namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
 {
