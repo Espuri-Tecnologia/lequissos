@@ -1,6 +1,5 @@
 using Amazon.SQS;
 using Amazon.SQS.Model;
-using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Messaging;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +9,7 @@ using System.Text.Json;
 
 namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
 {
-    public class SqsListenerService : BackgroundService, ISqsListenerService
+    public class SqsListenerService : BackgroundService
     {
         private readonly IAmazonSQS _sqsClient;
         private readonly ILogger<SqsListenerService> _logger;
