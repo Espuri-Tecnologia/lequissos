@@ -31,12 +31,14 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                                [HubIntegrationId]
                                ,[TenantId]
                                ,[HubKey]
+                               ,[Cnpj]
                                ,[Url]
                                ,[Token]
                                ,[RefreshToken]
                                ,[IsActive]
                                ,[CreatedDate]
                                ,[UpdatedDate]
+                               ,[HasValidVersion]
                            )
                            OUTPUT INSERTED.Id
                            VALUES
@@ -44,23 +46,27 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                                @HubIntegrationId
                                ,@TenantId
                                ,@HubKey
+                               ,@Cnpj
                                ,@Url
                                ,@Token
                                ,@RefreshToken
                                ,@IsActive
                                ,GETDATE()
                                ,GETDATE()
+                               ,@HasValidVersion
                            );",
                     param: new
                     {
                         integration.HubIntegrationId,
                         integration.TenantId,
                         integration.HubKey,
+                        integration.Cnpj,
                         integration.Url,
                         integration.Token,
                         integration.RefreshToken,
                         integration.IsActive,
-                        integration.Id
+                        integration.Id,
+                        integration.HasValidVersion
                     }
                 );
 
@@ -131,7 +137,6 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
         {
             try
             {
-
                 return await _readDbConnection.QueryFirstOrDefaultAsync<IntegrationDto>(
                     sql: @"SELECT
                                [Id]
@@ -161,11 +166,44 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
             }
         }
 
-        public async Task<IntegrationDto> GetByIdWithLastOrderDateAsync(int id)
+
+    public async Task<IntegrationDto> GetByDocument(string cnpj)
+    {
+      try
+      {
+        return await _readDbConnection.QueryFirstOrDefaultAsync<IntegrationDto>(
+            sql: @"SELECT
+                               [Id]
+                               ,[HubIntegrationId]
+                               ,[TenantId]
+                               ,[HubKey]
+                               ,[Url]
+                               ,[Token]
+                               ,[RefreshToken]
+                               ,[IsActive]
+                               ,[CreatedDate]
+                               ,[UpdatedDate]
+                               ,[LastSyncDate]
+                               ,[HasValidVersion]
+                           FROM
+                               [Integration] NOLOCK
+                           WHERE
+                               [Cnpj] = @Cnpj
+                           ORDER BY
+                               [CreatedDate] DESC",
+            param: new { Cnpj = cnpj });
+      }
+      catch (Exception e)
+      {
+        _logger.LogError("----- IntegrationRepository -> Error on GetByDocument {integrationId} - {error} ----", cnpj, e.Message + "INNER EX: " + e.InnerException);
+        throw;
+      }
+    }
+
+    public async Task<IntegrationDto> GetByIdWithLastOrderDateAsync(int id)
         {
             try
             {
-
                 return await _readDbConnection.QueryFirstOrDefaultAsync<IntegrationDto>(
                     sql: @"SELECT TOP 1
                            SP.ReferenceDate AS LastOrderSyncDate
@@ -211,7 +249,6 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
         {
             try
             {
-
                 return await _readDbConnection.QueryFirstOrDefaultAsync<IntegrationDto>(
                     sql: @"SELECT TOP 1
                            [Id]
@@ -219,6 +256,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                            ,[TenantId]
                            ,[HubKey]
                            ,[Url]
+                           ,[Cnpj]
                            ,[Token]
                            ,[RefreshToken]
                            ,[IsActive]
@@ -228,8 +266,6 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                            ,[HasValidVersion]
                        FROM
                            [Integration] NOLOCK
-                       WHERE
-                           [HubKey] = @HubKey
                        ORDER BY
                            [CreatedDate] DESC",
                     param: new { HubKey = key });

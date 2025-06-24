@@ -17,5 +17,6 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Interfaces.Repositories.Integration
         Task<IntegrationDto> UpdateAsync(IntegrationDto integration);
         Task<IntegrationDto> GetNextToFirstSync();
         Task<IntegrationDto> GetByIdWithLastOrderDateAsync(int id);
-    }
+    Task<IntegrationDto> GetByDocument(string cnpj);
+  }
 }

@@ -20,7 +20,9 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
         {
             _sqsClient = sqsClient;
             _logger = logger;
-            _queueUrl = configuration["AWS:SQS:QueueUrl"];
+            var baseUrl = configuration["AWS:ServiceURL"]?.TrimEnd('/');
+            var queuePath = configuration["AWS:SQSQueues:IntegrationQueue"]?.TrimStart('/');
+            _queueUrl = $"{baseUrl}/{queuePath}";
             _dispatcher = dispatcher;
         }
 
@@ -30,9 +32,11 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
 
             while (!stoppingToken.IsCancellationRequested)
             {
+                var queueUrlResponse = await _sqsClient.GetQueueUrlAsync("integration-created-sync-varejoonline-dev");
+
                 var request = new ReceiveMessageRequest
                 {
-                    QueueUrl = _queueUrl,
+                    QueueUrl = queueUrlResponse.QueueUrl,
                     MaxNumberOfMessages = 10,
                     WaitTimeSeconds = 10
                 };

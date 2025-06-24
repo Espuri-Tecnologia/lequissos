@@ -1,5 +1,6 @@
 
 using LexosHub.ERP.VarejoOnline.Domain.DTOs.Integration;
+using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Default;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,38 +11,38 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Auth;
 [ApiController]
 public class AuthController : Controller
 {
-    private readonly IVarejoOnlineApiService _varejoOnlineApiService;
-    private readonly IConfiguration _configuration;
+  private readonly IAuthService _authService;
+  private readonly IConfiguration _configuration;
 
-    public AuthController(IConfiguration configuration,
-        IVarejoOnlineApiService varejoOnlineApiService)
+  public AuthController(IConfiguration configuration,
+      IAuthService authService)
+  {
+    _configuration = configuration;
+    _authService = authService;
+  }
+  [HttpPost]
+  [Route("authUrl")]
+  public async Task<IActionResult> GetOAuthUrl()
+  {
+    try
     {
-        _configuration = configuration;
-        _varejoOnlineApiService = varejoOnlineApiService;
+      var result = await _authService.GetAuthUrl();
+
+      return new OkObjectResult(result);
     }
-    [HttpPost]
-    [Route("authUrl")]
-    public async Task<IActionResult> GetOAuthUrl()
+    catch (Exception e)
     {
-        try
-        {
-            var result = await _varejoOnlineApiService.GetAuthUrl();
-
-            return new OkObjectResult(result);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(new Response<HubIntegracaoDto> { Error = new ErrorResult(e.Message) });
-        }
+      return BadRequest(new Response<HubIntegracaoDto> { Error = new ErrorResult(e.Message) });
     }
-    [HttpGet("callback")]
-    public async Task<IActionResult> Callback([FromQuery] string code)
-    {
-        if (string.IsNullOrEmpty(code))
-            return BadRequest("Código não informado.");
+  }
+  [HttpGet("callback")]
+  public async Task<IActionResult> Callback([FromQuery] string code)
+  {
+    if (string.IsNullOrEmpty(code))
+      return BadRequest("Código não informado.");
 
-        var tokenResponse = await _varejoOnlineApiService.ExchangeCodeForTokenAsync(code);
+    var tokenResponse = await _authService.EnableTokenIntegrationAsync(code);
 
-        return Ok("Token salvo com sucesso!");
-    }
+    return Ok("Token salvo com sucesso!");
+  }
 }

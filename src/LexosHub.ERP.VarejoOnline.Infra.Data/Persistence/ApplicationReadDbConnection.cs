@@ -4,29 +4,31 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
-namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Persistence;
-
-public class ApplicationReadDbConnection : IApplicationReadDbConnection, IDisposable
+public class ApplicationReadDbConnection : IApplicationReadDbConnection
 {
-    private readonly IDbConnection _connection;
+    private readonly IConfiguration _configuration;
 
     public ApplicationReadDbConnection(IConfiguration configuration)
     {
-        _connection = new SqlConnection(configuration.GetConnectionString("ErpDBConn"));
+        _configuration = configuration;
+    }
+
+    public IDbConnection CreateConnection()
+    {
+        var conn = new SqlConnection(_configuration.GetConnectionString("ErpDBConn"));
+        conn.Open();
+        return conn;
     }
 
     public async Task<T> QueryFirstOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     {
-        return await _connection.QueryFirstOrDefaultAsync<T>(sql, param, transaction);
+        using var conn = CreateConnection();
+        return await conn.QueryFirstOrDefaultAsync<T>(sql, param, transaction);
     }
 
     public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     {
-        return await _connection.QueryAsync<T>(sql, param, transaction);
-    }
-
-    public void Dispose()
-    {
-        _connection.Dispose();
+        using var conn = CreateConnection();
+        return await conn.QueryAsync<T>(sql, param, transaction);
     }
 }

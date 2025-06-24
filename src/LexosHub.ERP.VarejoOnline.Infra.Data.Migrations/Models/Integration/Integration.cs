@@ -8,6 +8,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Models.Integration
         public int HubIntegrationId { get; set; }
         public int TenantId { get; set; }
         public string? HubKey { get; set; }
+        public string? Cnpj { get; set; }
         public string? Url { get; set; }
         public string? Token { get; set; }
         public string? RefreshToken { get; set; }

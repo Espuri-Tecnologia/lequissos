@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,17 @@ namespace LexosHub.ERP.VarejoOnline.Infra.ErpApi.Responses.Auth
 {
     public class TokenResponse
     {
-        public string AccessToken { get; set; } = string.Empty;
-        public int ExpiresIn { get; set; }
-        public string RefreshToken { get; set; } = string.Empty;
-        public string CnpjEmpresa { get; set; } = string.Empty;
-        public string IdTerceiro { get; set; } = string.Empty;
-        public string NomeTerceiro { get; set; } = string.Empty;
+    [JsonProperty("access_token")]
+    public string AccessToken { get; set; } = string.Empty;
+    [JsonProperty("expires_in")]
+    public int ExpiresIn { get; set; }
+    [JsonProperty("refresh_token")]
+    public string RefreshToken { get; set; } = string.Empty;
+    [JsonProperty("cnpj_empresa")] 
+    public string CnpjEmpresa { get; set; } = string.Empty; 
+    [JsonProperty("id_terceiro")]
+    public string IdTerceiro { get; set; } = string.Empty; 
+    [JsonProperty("nome_terceiro")]
+    public string NomeTerceiro { get; set; } = string.Empty;
     }
 }

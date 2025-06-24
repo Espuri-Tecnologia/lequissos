@@ -38,4 +38,11 @@ public class ApplicationWriteDbConnection : IApplicationWriteDbConnection
         await using var conn = new SqlConnection(_configuration.GetConnectionString("ErpDBConn"));
         return await conn.QueryAsync<T>(sql, param, transaction);
     }
+
+    public IDbConnection CreateConnection()
+    {
+        var conn = new SqlConnection(_configuration.GetConnectionString("ErpDBConn"));
+        conn.Open();
+        return conn;
+    }
 }

@@ -1,3 +1,4 @@
+using Amazon.SQS;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using LexosHub.ERP.VarejoOnline.Domain.DTOs.Integration;
@@ -8,15 +9,13 @@ using LexosHub.ERP.VarejoOnline.Domain.Services;
 using LexosHub.ERP.VarejoOnline.Domain.Validators;
 using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Context;
-using LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Persistence;
-using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Persistence;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Services;
-using Amazon.SQS;
+using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Diagnostics;
@@ -41,9 +40,10 @@ try
     builder.Services.AddScoped<IValidator<HubIntegracaoDto>, HubIntegracaoDtoValidator>();
 
     builder.Services.AddTransient<IIntegrationService, IntegrationService>();
+    builder.Services.AddTransient<IAuthService, AuthService>();
     builder.Services.AddTransient<IVarejoOnlineApiService, VarejoOnlineApiService>();
 
-    builder.Services.AddTransient<IIntegrationRepository, IntegrationRepository>();
+    builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
 
     builder.Services.AddScoped<IApplicationWriteDbConnection, ApplicationWriteDbConnection>();
     builder.Services.AddScoped<IApplicationReadDbConnection, ApplicationReadDbConnection>();
@@ -52,9 +52,19 @@ try
 
     builder.Services.AddOptions<VarejoOnlineApiSettings>().Bind(builder.Configuration.GetSection(nameof(VarejoOnlineApiSettings)));
 
-    builder.Services.AddAWSService<IAmazonSQS>();
+    builder.Services.AddSingleton<IAmazonSQS>(sp =>
+    {
+        var config = sp.GetRequiredService<IConfiguration>();
+
+        var sqsConfig = new AmazonSQSConfig
+        {
+            ServiceURL = config["AWS:ServiceURL"]
+        };
+
+        return new AmazonSQSClient("test", "test", sqsConfig);
+    });
     builder.Services.AddSingleton<IEventDispatcher, EventDispatcher>();
-    builder.Services.AddTransient<IEventHandler<OrderCreatedEvent>, OrderCreatedEventHandler>();
+    builder.Services.AddTransient<IEventHandler<IntegrationCreated>, IntegrationCreatedEventHandler>();
     builder.Services.AddHostedService<SqsListenerService>();
 
     var app = builder.Build().SetupMiddlewares();
