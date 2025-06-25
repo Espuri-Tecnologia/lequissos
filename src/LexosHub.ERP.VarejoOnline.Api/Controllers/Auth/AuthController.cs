@@ -11,38 +11,38 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Auth;
 [ApiController]
 public class AuthController : Controller
 {
-  private readonly IAuthService _authService;
-  private readonly IConfiguration _configuration;
+    private readonly IAuthService _authService;
+    private readonly IConfiguration _configuration;
 
-  public AuthController(IConfiguration configuration,
-      IAuthService authService)
-  {
-    _configuration = configuration;
-    _authService = authService;
-  }
-  [HttpPost]
-  [Route("authUrl")]
-  public async Task<IActionResult> GetOAuthUrl()
-  {
-    try
+    public AuthController(IConfiguration configuration,
+        IAuthService authService)
     {
-      var result = await _authService.GetAuthUrl();
-
-      return new OkObjectResult(result);
+        _configuration = configuration;
+        _authService = authService;
     }
-    catch (Exception e)
+    [HttpPost]
+    [Route("authUrl")]
+    public async Task<IActionResult> GetOAuthUrl()
     {
-      return BadRequest(new Response<HubIntegracaoDto> { Error = new ErrorResult(e.Message) });
+        try
+        {
+            var result = await _authService.GetAuthUrl();
+
+            return new OkObjectResult(result);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new Response<HubIntegracaoDto> { Error = new ErrorResult(e.Message) });
+        }
     }
-  }
-  [HttpGet("callback")]
-  public async Task<IActionResult> Callback([FromQuery] string code)
-  {
-    if (string.IsNullOrEmpty(code))
-      return BadRequest("Código não informado.");
+    [HttpGet("callback")]
+    public async Task<IActionResult> Callback([FromQuery] string code)
+    {
+        if (string.IsNullOrEmpty(code))
+            return BadRequest("Código não informado.");
 
-    var tokenResponse = await _authService.EnableTokenIntegrationAsync(code);
+        var tokenResponse = await _authService.EnableTokenIntegrationAsync(code);
 
-    return Ok("Token salvo com sucesso!");
-  }
+        return Ok("Token salvo com sucesso!");
+    }
 }

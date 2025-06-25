@@ -7,7 +7,7 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services
     public interface IIntegrationService
     {
         Task<Response<IntegrationDto>> AddOrUpdateIntegrationAsync(HubIntegracaoDto item);
-    Task<Response<IntegrationDto>> GetIntegrationByDocument(string cnpj);
-    Task<Response<IntegrationDto>> UpdateTokenAsync(IntegrationDto integrationDto, TokenResponse tokenResponse);
-  }
+        Task<Response<IntegrationDto>> GetIntegrationByDocument(string cnpj);
+        Task<Response<IntegrationDto>> UpdateTokenAsync(IntegrationDto integrationDto, TokenResponse tokenResponse);
+    }
 }
