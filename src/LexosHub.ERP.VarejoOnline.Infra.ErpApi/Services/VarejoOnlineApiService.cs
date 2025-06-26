@@ -74,8 +74,6 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         {
             var restRequest = new RestRequest("empresas", Method.Get);
 
-            restRequest.AddHeader("Authorization", $"Bearer {accessToken}");
-
             if (request.Inicio.HasValue)
                 restRequest.AddQueryParameter("inicio", request.Inicio.Value.ToString());
 
