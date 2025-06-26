@@ -70,7 +70,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         #endregion
 
         #region Empresas
-        public async Task<Response<List<EmpresaResponse>>> GetEmpresasAsync(EmpresaRequest request)
+        public async Task<Response<List<EmpresaResponse>>> GetEmpresasAsync(string token, EmpresaRequest request)
         {
             var restRequest = new RestRequest("empresas", Method.Get);
 
@@ -95,14 +95,14 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
             if (!string.IsNullOrWhiteSpace(request.Cnpj))
                 restRequest.AddQueryParameter("cnpj", request.Cnpj);
 
-            return await ExecuteAsync<List<EmpresaResponse>>(restRequest);
+            return await ExecuteAsync<List<EmpresaResponse>>(restRequest, token);
         }
 
         #endregion
 
         #region Prices
 
-        public async Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(int? inicio = null, int? quantidade = null, string? alteradoApos = null, string? entidades = null)
+        public async Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, int? inicio = null, int? quantidade = null, string? alteradoApos = null, string? entidades = null)
         {
             var request = new RestRequest("tabelas-preco", Method.Get);
 
@@ -118,12 +118,12 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
             if (!string.IsNullOrWhiteSpace(entidades))
                 request.AddQueryParameter("entidades", entidades);
 
-            return await ExecuteAsync<List<TabelaPrecoListResponse>>(request);
+            return await ExecuteAsync<List<TabelaPrecoListResponse>>(request, token);
         }
         #endregion
 
         #region Produtos
-        public async Task<Response<List<ProdutoResponse>>> GetProdutosAsync(ProdutoRequest request)
+        public async Task<Response<List<ProdutoResponse>>> GetProdutosAsync(string token, ProdutoRequest request)
         {
             var resource = request.Id.HasValue ? $"produtos/{request.Id.Value}" : "produtos";
             var restRequest = new RestRequest(resource, Method.Get);
@@ -188,12 +188,12 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
             if (!string.IsNullOrWhiteSpace(request.IdsTabelasPrecos))
                 restRequest.AddQueryParameter("idsTabelasPrecos", request.IdsTabelasPrecos);
 
-            return await ExecuteAsync<List<ProdutoResponse>>(restRequest);
+            return await ExecuteAsync<List<ProdutoResponse>>(restRequest, token);
         }
         #endregion
 
         #region Estoques
-        public async Task<Response<List<EstoqueResponse>>> GetEstoquesAsync(EstoqueRequest request)
+        public async Task<Response<List<EstoqueResponse>>> GetEstoquesAsync(string token, EstoqueRequest request)
         {
             var restRequest = new RestRequest("saldos-mercadorias", Method.Get);
 
@@ -221,16 +221,18 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
             if (request.SomenteMarketplace.HasValue)
                 restRequest.AddQueryParameter("somenteMarketplace", request.SomenteMarketplace.Value.ToString().ToLower());
 
-            return await ExecuteAsync<List<EstoqueResponse>>(restRequest);
+            return await ExecuteAsync<List<EstoqueResponse>>(restRequest, token);
         }
         #endregion
 
         #region Utils
-        private async Task<Response<T>> ExecuteAsync<T>(RestRequest request)
+        private async Task<Response<T>> ExecuteAsync<T>(RestRequest request, string? token = null)
         {
             try
             {
                 request.AddHeader("Content-Type", "application/json");
+                if (!string.IsNullOrWhiteSpace(token))
+                    request.AddHeader("Authorization", $"Bearer {token}");
 
                 var response = await _client.ExecuteAsync(request);
 
