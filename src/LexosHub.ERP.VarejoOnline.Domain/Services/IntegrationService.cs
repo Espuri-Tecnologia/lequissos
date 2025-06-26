@@ -75,5 +75,11 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Services
         {
             return await _integrationRepo.GetByDocument(cnpj);
         }
+
+        public async Task<Response<IntegrationDto>> GetIntegrationByKeyAsync(string hubKey)
+        {
+            var integration = await _integrationRepo.GetByKeyAsync(hubKey);
+            return integration;
+        }
     }
 }

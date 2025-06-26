@@ -8,6 +8,7 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services
     {
         Task<Response<IntegrationDto>> AddOrUpdateIntegrationAsync(HubIntegracaoDto item);
         Task<Response<IntegrationDto>> GetIntegrationByDocument(string cnpj);
+        Task<Response<IntegrationDto>> GetIntegrationByKeyAsync(string hubKey);
         Task<Response<IntegrationDto>> UpdateTokenAsync(IntegrationDto integrationDto, TokenResponse tokenResponse);
     }
 }
