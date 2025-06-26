@@ -122,6 +122,109 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         }
         #endregion
 
+        #region Produtos
+        public async Task<Response<List<ProdutoResponse>>> GetProdutosAsync(ProdutoRequest request)
+        {
+            var resource = request.Id.HasValue ? $"produtos/{request.Id.Value}" : "produtos";
+            var restRequest = new RestRequest(resource, Method.Get);
+
+            if (request.Inicio.HasValue)
+                restRequest.AddQueryParameter("inicio", request.Inicio.Value.ToString());
+
+            if (request.Quantidade.HasValue)
+                restRequest.AddQueryParameter("quantidade", request.Quantidade.Value.ToString());
+
+            if (!string.IsNullOrWhiteSpace(request.AlteradoApos))
+                restRequest.AddQueryParameter("alteradoApos", request.AlteradoApos);
+
+            if (!string.IsNullOrWhiteSpace(request.Categoria))
+                restRequest.AddQueryParameter("categoria", request.Categoria);
+
+            if (request.ProdutoBase.HasValue)
+                restRequest.AddQueryParameter("produtoBase", request.ProdutoBase.Value.ToString());
+
+            if (!string.IsNullOrWhiteSpace(request.Descricao))
+                restRequest.AddQueryParameter("descricao", request.Descricao);
+
+            if (!string.IsNullOrWhiteSpace(request.CodigoBarras))
+                restRequest.AddQueryParameter("codigoBarras", request.CodigoBarras);
+
+            if (!string.IsNullOrWhiteSpace(request.CodigoInterno))
+                restRequest.AddQueryParameter("codigoInterno", request.CodigoInterno);
+
+            if (!string.IsNullOrWhiteSpace(request.CodigoSistema))
+                restRequest.AddQueryParameter("codigoSistema", request.CodigoSistema);
+
+            if (request.SomenteAtivos.HasValue)
+                restRequest.AddQueryParameter("somenteAtivos", request.SomenteAtivos.Value.ToString().ToLower());
+
+            if (request.SomenteComFotos.HasValue)
+                restRequest.AddQueryParameter("somenteComFotos", request.SomenteComFotos.Value.ToString().ToLower());
+
+            if (request.SomenteEcommerce.HasValue)
+                restRequest.AddQueryParameter("somenteEcommerce", request.SomenteEcommerce.Value.ToString().ToLower());
+
+            if (request.SomenteMarketplace.HasValue)
+                restRequest.AddQueryParameter("somenteMarketplace", request.SomenteMarketplace.Value.ToString().ToLower());
+
+            if (request.AmostraGratis.HasValue)
+                restRequest.AddQueryParameter("amostraGratis", request.AmostraGratis.Value.ToString().ToLower());
+
+            if (!string.IsNullOrWhiteSpace(request.AlteracaoDesde))
+                restRequest.AddQueryParameter("alteracaoDesde", request.AlteracaoDesde);
+
+            if (!string.IsNullOrWhiteSpace(request.AlteracaoAte))
+                restRequest.AddQueryParameter("alteracaoAte", request.AlteracaoAte);
+
+            if (!string.IsNullOrWhiteSpace(request.CriacaoDesde))
+                restRequest.AddQueryParameter("criacaoDesde", request.CriacaoDesde);
+
+            if (!string.IsNullOrWhiteSpace(request.CriacaoAte))
+                restRequest.AddQueryParameter("criacaoAte", request.CriacaoAte);
+
+            if (!string.IsNullOrWhiteSpace(request.IdsProdutos))
+                restRequest.AddQueryParameter("idsProdutos", request.IdsProdutos);
+
+            if (!string.IsNullOrWhiteSpace(request.IdsTabelasPrecos))
+                restRequest.AddQueryParameter("idsTabelasPrecos", request.IdsTabelasPrecos);
+
+            return await ExecuteAsync<List<ProdutoResponse>>(restRequest);
+        }
+        #endregion
+
+        #region Estoques
+        public async Task<Response<List<EstoqueResponse>>> GetEstoquesAsync(EstoqueRequest request)
+        {
+            var restRequest = new RestRequest("saldos-mercadorias", Method.Get);
+
+            if (!string.IsNullOrWhiteSpace(request.Produtos))
+                restRequest.AddQueryParameter("produtos", request.Produtos);
+
+            if (!string.IsNullOrWhiteSpace(request.Entidades))
+                restRequest.AddQueryParameter("entidades", request.Entidades);
+
+            if (request.Inicio.HasValue)
+                restRequest.AddQueryParameter("inicio", request.Inicio.Value.ToString());
+
+            if (request.Quantidade.HasValue)
+                restRequest.AddQueryParameter("quantidade", request.Quantidade.Value.ToString());
+
+            if (!string.IsNullOrWhiteSpace(request.AlteradoApos))
+                restRequest.AddQueryParameter("alteradoApos", request.AlteradoApos);
+
+            if (!string.IsNullOrWhiteSpace(request.Data))
+                restRequest.AddQueryParameter("data", request.Data);
+
+            if (request.SomenteEcommerce.HasValue)
+                restRequest.AddQueryParameter("somenteEcommerce", request.SomenteEcommerce.Value.ToString().ToLower());
+
+            if (request.SomenteMarketplace.HasValue)
+                restRequest.AddQueryParameter("somenteMarketplace", request.SomenteMarketplace.Value.ToString().ToLower());
+
+            return await ExecuteAsync<List<EstoqueResponse>>(restRequest);
+        }
+        #endregion
+
         #region Utils
         private async Task<Response<T>> ExecuteAsync<T>(RestRequest request)
         {

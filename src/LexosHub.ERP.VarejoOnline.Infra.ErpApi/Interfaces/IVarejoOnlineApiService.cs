@@ -10,4 +10,6 @@ public interface IVarejoOnlineApiService
     Task<string> GetAuthUrl();
     Task<Response<List<EmpresaResponse>>> GetEmpresasAsync(EmpresaRequest request);
     public Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(int? inicio = null, int? quantidade = null, string? alteradoApos = null, string? entidades = null);
+    Task<Response<List<ProdutoResponse>>> GetProdutosAsync(ProdutoRequest request);
+    Task<Response<List<EstoqueResponse>>> GetEstoquesAsync(EstoqueRequest request);
 }
