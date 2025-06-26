@@ -264,10 +264,12 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                            ,[UpdatedDate]
                            ,[LastSyncDate]
                            ,[HasValidVersion]
-                       FROM
-                           [Integration] NOLOCK
-                       ORDER BY
-                           [CreatedDate] DESC",
+                        FROM
+                            [Integration] NOLOCK
+                        WHERE
+                            [HubKey] = @HubKey
+                        ORDER BY
+                            [CreatedDate] DESC",
                     param: new { HubKey = key });
             }
             catch (Exception e)
