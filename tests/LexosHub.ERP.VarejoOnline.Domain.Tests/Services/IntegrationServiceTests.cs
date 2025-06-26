@@ -82,5 +82,18 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Services
             Assert.True(response.IsSuccess);
             _repo.Verify(r => r.UpdateAsync(existing), Times.Once);
         }
+
+        [Fact]
+        public async Task GetIntegrationByKeyAsync_ShouldReturnIntegration()
+        {
+            var integration = new IntegrationDto { HubKey = "key" };
+            _repo.Setup(r => r.GetByKeyAsync("key")).ReturnsAsync(integration);
+            var service = CreateService();
+
+            var response = await service.GetIntegrationByKeyAsync("key");
+
+            Assert.Same(integration, response.Result);
+            _repo.Verify(r => r.GetByKeyAsync("key"), Times.Once);
+        }
     }
 }
