@@ -1,14 +1,14 @@
-using System.Threading;
-using System.Threading.Tasks;
-using Moq;
-using Xunit;
-using Microsoft.Extensions.Logging;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Default;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Request;
+using Microsoft.Extensions.Logging;
+using Moq;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
