@@ -16,7 +16,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
             _integrationService = integrationService;
         }
 
-        public Task HandleAsync(IntegrationCreated @event, CancellationToken cancellationToken)
+        public async Task HandleAsync(IntegrationCreated @event, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Pedido criado: {@event.HubIntegrationId}, Cliente: {@event.Cnpj}");
             var dto = new HubIntegracaoDto
@@ -29,8 +29,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
                 TenantId = @event.TenantId
             };
 
-            _integrationService.AddOrUpdateIntegrationAsync(dto);
-            return Task.CompletedTask;
+            await _integrationService.AddOrUpdateIntegrationAsync(dto);
         }
     }
 }
