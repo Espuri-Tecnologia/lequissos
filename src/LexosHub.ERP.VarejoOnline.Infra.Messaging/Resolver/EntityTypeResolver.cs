@@ -9,7 +9,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher
         private static readonly Dictionary<string, Type> EventTypeMap = new()
         {
             { "IntegrationCreated", typeof(IntegrationCreated) },
-            { "ProductsRequested", typeof(ProductsRequested) }
+            { "ProductsRequested", typeof(ProductsRequested) },
+            { "ProductsPageProcessed", typeof(ProductsPageProcessed) }
             // Adicione outros eventos aqui
         };
 
@@ -22,3 +23,4 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher
         }
     }
 }
+
