@@ -28,12 +28,14 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Services
             var service = CreateService();
 
             _repo.Setup(r => r.AddAsync(It.IsAny<IntegrationDto>()))
+                .Callback<IntegrationDto>(i => i.Id = 10)
                 .ReturnsAsync((IntegrationDto i) => i);
 
             var response = await service.AddIntegrationAsync(dto);
 
             Assert.True(response.IsSuccess);
             Assert.Equal(dto.Chave, response.Result?.HubKey);
+            Assert.Equal(10, response.Result?.Id);
             _repo.Verify(r => r.AddAsync(It.IsAny<IntegrationDto>()), Times.Once);
         }
 
