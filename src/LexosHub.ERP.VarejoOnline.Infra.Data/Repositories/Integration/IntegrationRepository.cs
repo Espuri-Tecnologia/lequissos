@@ -25,7 +25,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
         {
             try
             {
-                await _writeDbConnection.ExecuteAsync(
+                var id = await _writeDbConnection.ExecuteScalarAsync<int>(
                     sql: @"INSERT INTO [Integration]
                            (
                                [HubIntegrationId]
@@ -65,10 +65,10 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration
                         integration.Token,
                         integration.RefreshToken,
                         integration.IsActive,
-                        integration.Id,
                         integration.HasValidVersion
                     }
                 );
+                integration.Id = id;
 
                 return integration;
             }
