@@ -32,7 +32,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var queueUrlResponse = await _sqsClient.GetQueueUrlAsync("integration-created-sync-varejoonline-dev");
+                var queueUrlResponse = await _sqsClient.GetQueueUrlAsync("products-sync-varejoonline-dev");
 
                 var request = new ReceiveMessageRequest
                 {

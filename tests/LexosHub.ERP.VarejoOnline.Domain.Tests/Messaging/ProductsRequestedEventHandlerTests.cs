@@ -11,6 +11,8 @@ using Moq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
@@ -20,9 +22,10 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
         private readonly Mock<IIntegrationService> _integrationService = new();
         private readonly Mock<IVarejoOnlineApiService> _apiService = new();
         private readonly Mock<IEventDispatcher> _dispatcher = new();
+        private readonly Mock<IConfiguration> _configuration = new();
 
         private ProductsRequestedEventHandler CreateHandler() =>
-            new ProductsRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object, _dispatcher.Object);
+            new ProductsRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object, _dispatcher.Object, _configuration.Object);
 
         [Fact]
         public async Task HandleAsync_ShouldFetchIntegrationAndCallApiService()

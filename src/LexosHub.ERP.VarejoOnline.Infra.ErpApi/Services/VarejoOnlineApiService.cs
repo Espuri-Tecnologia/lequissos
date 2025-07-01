@@ -125,13 +125,13 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         #region Produtos
         public async Task<Response<List<ProdutoResponse>>> GetProdutosAsync(string token, ProdutoRequest request)
         {
-            var resource = request.Id.HasValue ? $"produtos/{request.Id.Value}" : "produtos";
+            var resource = request.Id.HasValue ? $"apps/api/produtos/{request.Id.Value}" : "apps/api/produtos";
             var restRequest = new RestRequest(resource, Method.Get);
 
             if (request.Inicio.HasValue)
                 restRequest.AddQueryParameter("inicio", request.Inicio.Value.ToString());
 
-            if (request.Quantidade.HasValue)
+            if (request.Quantidade.HasValue && request.Quantidade.Value > 0)
                 restRequest.AddQueryParameter("quantidade", request.Quantidade.Value.ToString());
 
             if (!string.IsNullOrWhiteSpace(request.AlteradoApos))
@@ -231,8 +231,9 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
             try
             {
                 request.AddHeader("Content-Type", "application/json");
+
                 if (!string.IsNullOrWhiteSpace(token))
-                    request.AddHeader("Authorization", $"Bearer {token}");
+                    request.AddQueryParameter("token", token);
 
                 var response = await _client.ExecuteAsync(request);
 
