@@ -42,7 +42,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         #region Auth
         public async Task<Response<TokenResponse?>> ExchangeCodeForTokenAsync(string code)
         {
-            _client = new RestClient(_erpApiSettings.OAuthGetTokenUrl);
+            _client = new RestClient(_oAuthGetTokenUrl);
 
             var request = new RestRequest("/apps/oauth/token", Method.Post)
                 .AddHeader("Content-Type", "application/json");
@@ -65,7 +65,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         }
         public Task<string> GetAuthUrl()
         {
-            return Task.FromResult<string>($"{_erpApiSettings.BaseUrl}{_erpApiSettings.OAuthUrl}client_id={_clientId}&redirect_uri={_oAuthRedirectUrl}");
+            return Task.FromResult<string>($"{_erpApiSettings.BaseUrl}{_oAuthUrl}client_id={_clientId}&redirect_uri={_oAuthRedirectUrl}");
         }
         #endregion
 

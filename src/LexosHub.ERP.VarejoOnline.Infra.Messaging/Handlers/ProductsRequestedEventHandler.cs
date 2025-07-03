@@ -1,4 +1,3 @@
-using Amazon.Runtime.Internal;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
@@ -43,35 +42,37 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
                 : _defaultPageSize;
 
             int count;
-            var request = new ProdutoRequest
-            {
-                Id = @event.Id,
-                Inicio = start,
-                Quantidade = pageSize,
-                AlteradoApos = @event.AlteradoApos,
-                Categoria = @event.Categoria,
-                ProdutoBase = @event.ProdutoBase,
-                Descricao = @event.Descricao,
-                CodigoBarras = @event.CodigoBarras,
-                CodigoInterno = @event.CodigoInterno,
-                CodigoSistema = @event.CodigoSistema,
-                SomenteAtivos = @event.SomenteAtivos,
-                SomenteComFotos = @event.SomenteComFotos,
-                SomenteEcommerce = @event.SomenteEcommerce,
-                SomenteMarketplace = @event.SomenteMarketplace,
-                AmostraGratis = @event.AmostraGratis,
-                AlteracaoDesde = @event.AlteracaoDesde,
-                AlteracaoAte = @event.AlteracaoAte,
-                CriacaoDesde = @event.CriacaoDesde,
-                CriacaoAte = @event.CriacaoAte,
-                IdsProdutos = @event.IdsProdutos,
-                IdsTabelasPrecos = @event.IdsTabelasPrecos
-            };
 
-            var response = await _apiService.GetProdutosAsync(token, request);
-            count = response.Result?.Count ?? 0;
             do
             {
+                var request = new ProdutoRequest
+                {
+                    Id = @event.Id,
+                    Inicio = start,
+                    Quantidade = pageSize,
+                    AlteradoApos = @event.AlteradoApos,
+                    Categoria = @event.Categoria,
+                    ProdutoBase = @event.ProdutoBase,
+                    Descricao = @event.Descricao,
+                    CodigoBarras = @event.CodigoBarras,
+                    CodigoInterno = @event.CodigoInterno,
+                    CodigoSistema = @event.CodigoSistema,
+                    SomenteAtivos = @event.SomenteAtivos,
+                    SomenteComFotos = @event.SomenteComFotos,
+                    SomenteEcommerce = @event.SomenteEcommerce,
+                    SomenteMarketplace = @event.SomenteMarketplace,
+                    AmostraGratis = @event.AmostraGratis,
+                    AlteracaoDesde = @event.AlteracaoDesde,
+                    AlteracaoAte = @event.AlteracaoAte,
+                    CriacaoDesde = @event.CriacaoDesde,
+                    CriacaoAte = @event.CriacaoAte,
+                    IdsProdutos = @event.IdsProdutos,
+                    IdsTabelasPrecos = @event.IdsTabelasPrecos
+                };
+
+                var response = await _apiService.GetProdutosAsync(token, request);
+                count = response.Result?.Count ?? 0;
+
                 _logger.LogInformation(
                     "Página processada. Hub: {HubKey}, Início: {Start}, Quantidade: {PageSize}, Retornados: {Count}",
                     @event.HubKey, start, pageSize, count
