@@ -66,6 +66,7 @@ try
     builder.Services.AddSingleton<IEventDispatcher, EventDispatcher>();
     builder.Services.AddTransient<IEventHandler<IntegrationCreated>, IntegrationCreatedEventHandler>();
     builder.Services.AddTransient<IEventHandler<ProductsRequested>, ProductsRequestedEventHandler>();
+    builder.Services.AddTransient<IEventHandler<ProductsPageProcessed>, ProductsPageProcessedEventHandler>();
     builder.Services.AddHostedService<SqsListenerService>();
 
     var app = builder.Build().SetupMiddlewares();
