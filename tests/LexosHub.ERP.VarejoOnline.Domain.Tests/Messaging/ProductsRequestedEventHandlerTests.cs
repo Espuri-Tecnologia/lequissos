@@ -83,11 +83,11 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
                 ), Times.Once);
 
             _dispatcher.Verify(d => d.DispatchAsync(
-                    It.Is<ProductsPageProcessed>(p => p.Start == 0 && p.PageSize == 2 && p.ProcessedCount == 2 && p.HubKey == "key"),
+                    It.Is<ProductsPageProcessed>(p => p.Start == 0 && p.PageSize == 2 && p.ProcessedCount == 2 && p.HubKey == "key" && p.Produtos == firstPage),
                     It.IsAny<CancellationToken>()), Times.Once);
 
             _dispatcher.Verify(d => d.DispatchAsync(
-                    It.Is<ProductsPageProcessed>(p => p.Start == 2 && p.PageSize == 2 && p.ProcessedCount == 1 && p.HubKey == "key"),
+                    It.Is<ProductsPageProcessed>(p => p.Start == 2 && p.PageSize == 2 && p.ProcessedCount == 1 && p.HubKey == "key" && p.Produtos == secondPage),
                     It.IsAny<CancellationToken>()), Times.Once);
         }
     }

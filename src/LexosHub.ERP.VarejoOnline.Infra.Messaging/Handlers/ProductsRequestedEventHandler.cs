@@ -74,7 +74,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
                 count = response.Result?.Count ?? 0;
 
                 _logger.LogInformation(
-                    "Página processada. Hub: {HubKey}, Início: {Start}, Quantidade: {PageSize}, Retornados: {Count}",
+                    ProcessedCount = count,
+                    Produtos = response.Result
                     @event.HubKey, start, pageSize, count
                 );
 
