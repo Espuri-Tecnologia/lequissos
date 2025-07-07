@@ -6,6 +6,7 @@ using Moq;
 using Xunit;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
+using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Responses;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
@@ -24,7 +25,8 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
                 HubKey = "key",
                 Start = 1,
                 PageSize = 2,
-                ProcessedCount = 2
+                ProcessedCount = 2,
+                Produtos = new List<ProdutoResponse> { new(), new() }
             };
 
             await CreateHandler().HandleAsync(evt, CancellationToken.None);
