@@ -13,7 +13,6 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher
             { "ProductsPageProcessed", typeof(ProductsPageProcessed) },
             { "CompaniesRequested", typeof(CompaniesRequested) },
             { "InitialSync", typeof(InitialSync) }
-            // Adicione outros eventos aqui
         };
 
         public static Type Resolve(string eventType)

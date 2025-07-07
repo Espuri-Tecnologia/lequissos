@@ -4,7 +4,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Events
     {
         public string EventType { get; private set; } = null!;
 
-        protected BaseEvent()
+        public BaseEvent()
         {
             EventType = GetType().Name;
         }
