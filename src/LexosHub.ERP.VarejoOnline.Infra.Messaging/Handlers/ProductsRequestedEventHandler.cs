@@ -73,17 +73,12 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
                 var response = await _apiService.GetProdutosAsync(token, request);
                 count = response.Result?.Count ?? 0;
 
-                _logger.LogInformation(
-                    ProcessedCount = count,
-                    Produtos = response.Result
-                    @event.HubKey, start, pageSize, count
-                );
-
                 var pageEvent = new ProductsPageProcessed
                 {
                     HubKey = @event.HubKey,
                     Start = start,
                     PageSize = pageSize,
+                    Produtos = response.Result,
                     ProcessedCount = count
                 };
 

@@ -8,6 +8,9 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Lexos.Hub.Sync" Version="1.0.42" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\LexosHub.ERP.VarejoOnline.Infra.CrossCutting\LexosHub.ERP.VarejoOnline.Infra.CrossCutting.csproj" />
     <ProjectReference Include="..\LexosHub.ERP.VarejoOnline.Infra.ErpApi\LexosHub.ERP.VarejoOnline.Infra.ErpApi.csproj" />
   </ItemGroup>

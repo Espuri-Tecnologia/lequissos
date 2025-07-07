@@ -7,6 +7,7 @@ using Xunit;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Responses;
+using System.Collections.Generic;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
