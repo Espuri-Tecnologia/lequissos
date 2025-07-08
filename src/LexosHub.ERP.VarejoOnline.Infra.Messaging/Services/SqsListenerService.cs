@@ -1,5 +1,6 @@
 using Amazon.SQS;
 using Amazon.SQS.Model;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
         private readonly ILogger<SqsListenerService> _logger;
         private readonly IEventDispatcher _dispatcher;
         private readonly IReadOnlyList<string> _queueUrls;
+        private readonly JsonSerializerOptions _jsonOptions;
 
         public SqsListenerService(IAmazonSQS sqsClient, IConfiguration configuration, ILogger<SqsListenerService> logger, IEventDispatcher dispatcher)
         {
@@ -25,6 +27,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
             var queuePaths = configuration.GetSection("AWS:SQSQueues").Get<string[]>() ?? Array.Empty<string>();
             _queueUrls = queuePaths.Select(q => $"{baseUrl}/{q.TrimStart('/')}").ToList();
             _dispatcher = dispatcher;
+            _jsonOptions = new JsonSerializerOptions();
+            _jsonOptions.Converters.Add(new BaseEventJsonConverter());
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -50,9 +54,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
                         {
                             _logger.LogInformation($"Mensagem recebida: {message.Body}");
 
-                            var eventEnvelope = JsonSerializer.Deserialize<BaseEvent>(message.Body);
-                            var actualType = EventTypeResolver.Resolve(eventEnvelope.EventType);
-                            var typedEvent = (BaseEvent)JsonSerializer.Deserialize(message.Body, actualType)!;
+                            var typedEvent = JsonSerializer.Deserialize<BaseEvent>(message.Body, _jsonOptions)!;
 
                             await _dispatcher.DispatchAsync(typedEvent, stoppingToken);
 

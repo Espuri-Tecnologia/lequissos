@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using Xunit;
@@ -29,9 +30,10 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
         public void EventTypeResolver_Should_Deserialize_To_Correct_Type(BaseEvent evt)
         {
             var json = JsonSerializer.Serialize(evt);
-            var envelope = JsonSerializer.Deserialize<BaseEvent>(json);
-            var actualType = EventTypeResolver.Resolve(envelope!.EventType);
-            var deserialized = (BaseEvent)JsonSerializer.Deserialize(json, actualType)!;
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new BaseEventJsonConverter());
+
+            var deserialized = JsonSerializer.Deserialize<BaseEvent>(json, options)!;
 
             Assert.IsType(evt.GetType(), deserialized);
             Assert.Equal(evt.EventType, deserialized.EventType);
