@@ -7,6 +7,7 @@ using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
