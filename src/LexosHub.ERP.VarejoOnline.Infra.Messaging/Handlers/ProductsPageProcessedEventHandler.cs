@@ -1,7 +1,7 @@
+using Lexos.Hub.Sync.Models;
+using Lexos.Hub.Sync.Models.Produto;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using Microsoft.Extensions.Logging;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
 {

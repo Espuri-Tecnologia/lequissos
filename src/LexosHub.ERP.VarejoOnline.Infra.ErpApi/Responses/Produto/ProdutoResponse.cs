@@ -54,7 +54,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Responses
         public bool? AmostraGratis { get; set; }
         public bool? DefinirPrecoVendaPelaFichaTecnica { get; set; }
         public List<ComponenteResponse>? Componentes { get; set; }
-        public DescontoProgressivoResponse? DescontoProgressivo { get; set; }
+        public List<DescontoProgressivoResponse>? DescontoProgressivo { get; set; }
         public List<AtributoProdutoResponse>? AtributosProduto { get; set; }
         public List<PrecoPorTabelaResponse>? PrecosPorTabelas { get; set; }
     }

@@ -6,9 +6,8 @@ using LexosHub.ERP.VarejoOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Request;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Responses;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using RestSharp;
-
+using System.Text.Json;
 
 namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
 {
@@ -22,21 +21,26 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         private string _clientSecret;
         private string _oAuthUrl;
 
+        // JsonSerializerOptions global para System.Text.Json
+        private static readonly JsonSerializerOptions DefaultJsonOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true
+        };
+
         public VarejoOnlineApiService(IOptions<VarejoOnlineApiSettings> erpApiSettings)
         {
-            _erpApiSettings = erpApiSettings.Value;
+            _erpApiSettings = erpApiSettings.Value ?? throw new ArgumentNullException(nameof(erpApiSettings.Value));
 
-            if (string.IsNullOrEmpty(_erpApiSettings?.BaseUrl))
-            {
+            if (string.IsNullOrEmpty(_erpApiSettings.BaseUrl))
                 throw new ArgumentNullException(nameof(_erpApiSettings.BaseUrl));
-            }
 
             _client = new RestClient(_erpApiSettings.BaseUrl);
-            _oAuthGetTokenUrl = _erpApiSettings?.OAuthGetTokenUrl ?? string.Empty;
-            _oAuthRedirectUrl = _erpApiSettings?.OAuthRedirectUrl ?? string.Empty;
-            _clientId = _erpApiSettings?.ClientId ?? string.Empty;
-            _clientSecret = _erpApiSettings?.ClientSecret ?? string.Empty;
-            _oAuthUrl = _erpApiSettings?.OAuthUrl ?? string.Empty;
+            _oAuthGetTokenUrl = _erpApiSettings.OAuthGetTokenUrl ?? string.Empty;
+            _oAuthRedirectUrl = _erpApiSettings.OAuthRedirectUrl ?? string.Empty;
+            _clientId = _erpApiSettings.ClientId ?? string.Empty;
+            _clientSecret = _erpApiSettings.ClientSecret ?? string.Empty;
+            _oAuthUrl = _erpApiSettings.OAuthUrl ?? string.Empty;
         }
 
         #region Auth
@@ -55,17 +59,14 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                 Code = code
             };
 
-            var json = JsonConvert.SerializeObject(tokenRequest, Formatting.Indented);
-
-            request
-              .AddHeader("Content-Type", "application/json")
-              .AddJsonBody(json);
+            request.AddJsonBody(tokenRequest);
 
             return await ExecuteAsync<TokenResponse?>(request);
         }
+
         public Task<string> GetAuthUrl()
         {
-            return Task.FromResult<string>($"{_erpApiSettings.BaseUrl}{_oAuthUrl}client_id={_clientId}&redirect_uri={_oAuthRedirectUrl}");
+            return Task.FromResult($"{_erpApiSettings.BaseUrl}{_oAuthUrl}client_id={_clientId}&redirect_uri={_oAuthRedirectUrl}");
         }
         #endregion
 
@@ -97,11 +98,9 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
 
             return await ExecuteAsync<List<EmpresaResponse>>(restRequest, token);
         }
-
         #endregion
 
         #region Prices
-
         public async Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, int? inicio = null, int? quantidade = null, string? alteradoApos = null, string? entidades = null)
         {
             var request = new RestRequest("tabelas-preco", Method.Get);
@@ -141,7 +140,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                 restRequest.AddQueryParameter("categoria", request.Categoria);
 
             if (request.ProdutoBase.HasValue)
-                restRequest.AddQueryParameter("produtoBase", request.ProdutoBase.Value.ToString());
+                request.ProdutoBase.Value.ToString();
 
             if (!string.IsNullOrWhiteSpace(request.Descricao))
                 restRequest.AddQueryParameter("descricao", request.Descricao);
@@ -240,7 +239,9 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                 if (!response.IsSuccessStatusCode)
                     return new Response<T> { Error = GetErrorMessageResponse(response) };
 
-                return new Response<T>(JsonConvert.DeserializeObject<T>(response.Content!)!);
+                var result = JsonSerializer.Deserialize<T>(response.Content!, DefaultJsonOptions);
+
+                return new Response<T>(result!);
             }
             catch (Exception ex)
             {
@@ -252,16 +253,19 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         {
             try
             {
-                var badRequestResponse = JsonConvert.DeserializeObject<BadRequestResponse>(response.Content);
+                var badRequestResponse = JsonSerializer.Deserialize<BadRequestResponse>(response.Content!, DefaultJsonOptions);
 
                 if (badRequestResponse != null)
                 {
                     string errorMesssage = $"{badRequestResponse.code} - {badRequestResponse.message} - {badRequestResponse.detailedMessage}";
 
-                    if (badRequestResponse.details.Any())
+                    if (badRequestResponse.details != null && badRequestResponse.details.Any())
                     {
                         errorMesssage += "\nDetalhes:\n";
-                        badRequestResponse.details.ForEach(error => { errorMesssage += $"{error.code} - {error.message} - {error.detailedMessage} \n"; });
+                        badRequestResponse.details.ForEach(error =>
+                        {
+                            errorMesssage += $"{error.code} - {error.message} - {error.detailedMessage} \n";
+                        });
                     }
 
                     return new ErrorResult(errorMesssage);
@@ -274,7 +278,6 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                 return new ErrorResult($"{response.StatusDescription} - {response.ResponseUri} - {response.Content}");
             }
         }
-
         #endregion
     }
 }
