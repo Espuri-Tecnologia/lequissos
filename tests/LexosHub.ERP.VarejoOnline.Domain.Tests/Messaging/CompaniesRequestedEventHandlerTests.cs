@@ -17,9 +17,10 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
         private readonly Mock<ILogger<CompaniesRequestedEventHandler>> _logger = new();
         private readonly Mock<IIntegrationService> _integrationService = new();
         private readonly Mock<IVarejoOnlineApiService> _apiService = new();
+        private readonly Mock<IEventDispatcher> _dispatcher = new();
 
         private CompaniesRequestedEventHandler CreateHandler() =>
-            new CompaniesRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object);
+            new CompaniesRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object, _dispatcher.Object);
 
         [Fact]
         public async Task HandleAsync_ShouldFetchIntegrationAndCallApiService()
@@ -49,6 +50,10 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
                         r.Cnpj == evt.Cnpj
                     )
                 ), Times.Once);
+
+            _dispatcher.Verify(d => d.DispatchAsync(
+                    It.Is<ProductsRequested>(p => p.HubKey == evt.HubKey),
+                    It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }
