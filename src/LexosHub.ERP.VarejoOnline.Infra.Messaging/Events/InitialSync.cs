@@ -8,5 +8,6 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Events
 {
     public class InitialSync : BaseEvent
     {
+        public string HubKey { get; set; } = null!;
     }
 }

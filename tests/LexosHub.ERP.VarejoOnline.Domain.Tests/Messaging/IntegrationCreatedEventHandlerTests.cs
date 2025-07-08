@@ -14,9 +14,10 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
     {
         private readonly Mock<ILogger<IntegrationCreatedEventHandler>> _logger = new();
         private readonly Mock<IIntegrationService> _integrationService = new();
+        private readonly Mock<IEventDispatcher> _dispatcher = new();
 
         private IntegrationCreatedEventHandler CreateHandler()
-            => new IntegrationCreatedEventHandler(_logger.Object, _integrationService.Object);
+            => new IntegrationCreatedEventHandler(_logger.Object, _integrationService.Object, _dispatcher.Object);
 
         [Fact]
         public async Task HandleAsync_ShouldCallAddOrUpdateIntegration()
@@ -40,6 +41,10 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
                     d.Habilitado &&
                     d.Excluido == false
                 )), Times.Once);
+
+            _dispatcher.Verify(d => d.DispatchAsync(
+                    It.Is<InitialSync>(i => i.HubKey == evt.HubKey),
+                    It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }
