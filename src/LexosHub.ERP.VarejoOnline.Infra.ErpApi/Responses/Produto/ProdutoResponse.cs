@@ -14,6 +14,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Responses
         public string Descricao { get; set; } = string.Empty;
         public string? DescricaoSimplificada { get; set; }
         public string? Especificacao { get; set; }
+        public string CodigoSku { get; set; }
         public decimal? Peso { get; set; }
         public decimal? Altura { get; set; }
         public decimal? Comprimento { get; set; }

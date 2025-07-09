@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Lexos.Hub.Sync.Models.Produto;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers.Produto;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Responses;
 using Xunit;
 
@@ -33,7 +33,7 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Mappers
                 }
             };
 
-            var result = ProdutoViewMapper.Map(source);
+            var result = source.Map();
 
             Assert.Single(result);
             var item = result[0];

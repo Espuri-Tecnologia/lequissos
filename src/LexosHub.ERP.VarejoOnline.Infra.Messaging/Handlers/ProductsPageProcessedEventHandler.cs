@@ -1,7 +1,9 @@
 using Lexos.Hub.Sync.Models;
 using Lexos.Hub.Sync.Models.Produto;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers.Produto;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
 {
@@ -23,6 +25,11 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
                 @event.PageSize,
                 @event.ProcessedCount,
                 @event.Produtos?.Count ?? 0);
+
+            if (@event.Produtos.Count > 0)
+            {
+                var mapped = @event.Produtos.Map();
+            }
 
             return Task.CompletedTask;
         }
