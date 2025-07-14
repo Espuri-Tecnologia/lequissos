@@ -9,7 +9,8 @@
   <ItemGroup>
     <PackageReference Include="AWSSDK.SQS" Version="3.7.100.1" />
     <PackageReference Include="Lexos.Hub.Sync" Version="1.0.42" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
+	<PackageReference Include="Lexos.SQS" Version="1.0.12" />
+	<PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
   </ItemGroup>
 

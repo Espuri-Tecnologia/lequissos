@@ -1,6 +1,8 @@
 using Amazon.SQS;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Lexos.SQS;
+using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejoOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Persistence;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Repositories.Integration;
@@ -42,6 +44,7 @@ try
     builder.Services.AddTransient<IIntegrationService, IntegrationService>();
     builder.Services.AddTransient<IAuthService, AuthService>();
     builder.Services.AddTransient<IVarejoOnlineApiService, VarejoOnlineApiService>();
+    builder.Services.AddTransient<ISqsRepository, SqsRepository>();
 
     builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
 

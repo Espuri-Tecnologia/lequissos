@@ -8,15 +8,19 @@ using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Responses;
 using System.Collections.Generic;
+using Lexos.SQS.Interface;
+using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Repositories.Integration;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
     public class ProductsPageProcessedEventHandlerTests
     {
         private readonly Mock<ILogger<ProductsPageProcessedEventHandler>> _logger = new();
+        private readonly Mock<ISqsRepository> _sqsRepository = new();
+        private readonly Mock<IIntegrationRepository> _integrationRepository = new();
 
         private ProductsPageProcessedEventHandler CreateHandler() =>
-            new ProductsPageProcessedEventHandler(_logger.Object);
+            new ProductsPageProcessedEventHandler(_logger.Object, _sqsRepository.Object);
 
         [Fact]
         public async Task HandleAsync_ShouldLogInformation()

@@ -1,19 +1,22 @@
-using Lexos.Hub.Sync.Models;
-using Lexos.Hub.Sync.Models.Produto;
+using Lexos.Hub.Sync;
+using Lexos.Hub.Sync.Enums;
+using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers.Produto;
 using Microsoft.Extensions.Logging;
-using System.Linq;
+using Newtonsoft.Json;
 
 namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
 {
     public class ProductsPageProcessedEventHandler : IEventHandler<ProductsPageProcessed>
     {
         private readonly ILogger<ProductsPageProcessedEventHandler> _logger;
+        private readonly ISqsRepository _syncOutSqsRepository;
 
-        public ProductsPageProcessedEventHandler(ILogger<ProductsPageProcessedEventHandler> logger)
+        public ProductsPageProcessedEventHandler(ILogger<ProductsPageProcessedEventHandler> logger, ISqsRepository syncOutSqsRepository)
         {
             _logger = logger;
+            _syncOutSqsRepository = syncOutSqsRepository;
         }
 
         public Task HandleAsync(ProductsPageProcessed @event, CancellationToken cancellationToken)
@@ -26,11 +29,23 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
                 @event.ProcessedCount,
                 @event.Produtos?.Count ?? 0);
 
-            if (@event.Produtos.Count > 0)
+            if (@event is not null && @event.Produtos.Any())
             {
                 var mapped = @event.Produtos.Map();
-            }
 
+                if (mapped is not null)
+                {
+                    var notificacao = new NotificacaoAtualizacaoModel()
+                    {
+                        Chave = @event.HubKey,
+                        DataHora = DateTime.Now,
+                        Json = JsonConvert.SerializeObject(mapped),
+                        TipoProcesso = TipoProcessoAtualizacao.Produto,
+                        PlataformaId = 41
+                    };
+                    _syncOutSqsRepository.AdicionarMensagemFilaFifo(notificacao, $"notificacao-syncout-{notificacao.Chave}");
+                }
+            }
             return Task.CompletedTask;
         }
     }
