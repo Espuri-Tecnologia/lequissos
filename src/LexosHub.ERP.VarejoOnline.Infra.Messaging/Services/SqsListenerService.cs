@@ -15,11 +15,11 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
     {
         private readonly IAmazonSQS _sqsClient;
         private readonly ILogger<SqsListenerService> _logger;
-        private readonly IEventDispatcher _dispatcher;
+        private readonly EventDispatcher _dispatcher;
         private readonly IReadOnlyList<string> _queueUrls;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public SqsListenerService(IAmazonSQS sqsClient, IConfiguration configuration, ILogger<SqsListenerService> logger, IEventDispatcher dispatcher)
+        public SqsListenerService(IAmazonSQS sqsClient, IConfiguration configuration, ILogger<SqsListenerService> logger, EventDispatcher dispatcher)
         {
             _sqsClient = sqsClient;
             _logger = logger;
