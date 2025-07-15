@@ -235,36 +235,21 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
     WebhookRequest payload,
     CancellationToken cancellationToken = default)
         {
-            //if (string.IsNullOrWhiteSpace(token))
-            //    throw new ArgumentException("Token is required", nameof(token));
+            var request = new RestRequest(_webHookEnpoint, Method.Post)
+                .AddHeader("Content-Type", "application/json")
+                .AddJsonBody(payload);
 
-            //if (payload == null)
-            //    throw new ArgumentNullException(nameof(payload));
+            var apiResponse = await ExecuteAsync<WebhookOperationResponse>(request);
 
-            //var request = new HttpRequestMessage(HttpMethod.Post, _webHookEnpoint)
-            //{
-            //    Content = JsonContent.Create(payload)
-            //};
-            //request.Headers.Authorization =
-            //    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            //try
-            //{
-            //    using var response = await _httpClient.SendAsync(
-            //        request, cancellationToken);
-
-            //    var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            var body = apiResponse.IsSuccess
+                ? JsonSerializer.Serialize(apiResponse.Result, DefaultJsonOptions)
+                : JsonSerializer.Serialize(apiResponse.Error, DefaultJsonOptions);
 
             return new WebhookResponse
             {
-                StatusCode = System.Net.HttpStatusCode.Accepted,
-                Body = ""
+                StatusCode = apiResponse.StatusCode,
+                Body = body
             };
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw;
-            //}
         }
         #endregion
 
@@ -281,11 +266,11 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                 var response = await _client.ExecuteAsync(request);
 
                 if (!response.IsSuccessStatusCode)
-                    return new Response<T> { Error = GetErrorMessageResponse(response) };
+                    return new Response<T> { Error = GetErrorMessageResponse(response), StatusCode = response.StatusCode };
 
                 var result = JsonSerializer.Deserialize<T>(response.Content!, DefaultJsonOptions);
 
-                return new Response<T>(result!);
+                return new Response<T>(result!) { StatusCode = response.StatusCode };
             }
             catch (Exception ex)
             {

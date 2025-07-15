@@ -4,6 +4,7 @@
     {
         public TResponse? Result { get; set; }
         public ErrorResult? Error { get; set; }
+        public System.Net.HttpStatusCode StatusCode { get; set; }
         public bool IsSuccess
         {
             get
