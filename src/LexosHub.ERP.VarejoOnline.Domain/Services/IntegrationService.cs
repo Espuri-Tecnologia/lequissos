@@ -11,16 +11,13 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Services
     public class IntegrationService : IIntegrationService
     {
         private readonly IIntegrationRepository _integrationRepo;
-        private readonly IVarejoOnlineApiService _varejoOnlineApiService;
         private readonly IValidator<HubIntegracaoDto> _validator;
         private readonly ILogger<IntegrationService> _logger;
         public IntegrationService(IIntegrationRepository integrationRepo,
                                   IValidator<HubIntegracaoDto> validator,
-                                  IVarejoOnlineApiService varejoOnlineApiService,
                                   ILogger<IntegrationService> logger)
         {
             _integrationRepo = integrationRepo;
-            _varejoOnlineApiService = varejoOnlineApiService;
             _validator = validator;
             _logger = logger;
         }

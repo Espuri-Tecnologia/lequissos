@@ -46,7 +46,6 @@ try
 
     builder.Services.AddTransient<IIntegrationService, IntegrationService>();
     builder.Services.AddTransient<IAuthService, AuthService>();
-    builder.Services.AddTransient<IProdutoService, ProdutoService>();
     builder.Services.AddTransient<IVarejoOnlineApiService, VarejoOnlineApiService>();
     builder.Services.AddTransient<ISqsRepository, SqsRepository>();
 

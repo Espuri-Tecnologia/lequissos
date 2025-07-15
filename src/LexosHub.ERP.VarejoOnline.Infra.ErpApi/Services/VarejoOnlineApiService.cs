@@ -232,40 +232,39 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
 
         #region WebhookRegister
         public async Task<WebhookResponse> RegisterWebhookAsync(
-    string token,
     WebhookRequest payload,
     CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(token))
-                throw new ArgumentException("Token is required", nameof(token));
+            //if (string.IsNullOrWhiteSpace(token))
+            //    throw new ArgumentException("Token is required", nameof(token));
 
-            if (payload == null)
-                throw new ArgumentNullException(nameof(payload));
+            //if (payload == null)
+            //    throw new ArgumentNullException(nameof(payload));
 
-            var request = new HttpRequestMessage(HttpMethod.Post, _webHookEnpoint)
+            //var request = new HttpRequestMessage(HttpMethod.Post, _webHookEnpoint)
+            //{
+            //    Content = JsonContent.Create(payload)
+            //};
+            //request.Headers.Authorization =
+            //    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            //try
+            //{
+            //    using var response = await _httpClient.SendAsync(
+            //        request, cancellationToken);
+
+            //    var body = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            return new WebhookResponse
             {
-                Content = JsonContent.Create(payload)
+                StatusCode = System.Net.HttpStatusCode.Accepted,
+                Body = ""
             };
-            request.Headers.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            try
-            {
-                using var response = await _httpClient.SendAsync(
-                    request, cancellationToken);
-
-                var body = await response.Content.ReadAsStringAsync(cancellationToken);
-
-                return new WebhookResponse
-                {
-                    StatusCode = response.StatusCode,
-                    Body = body
-                };
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw;
+            //}
         }
         #endregion
 

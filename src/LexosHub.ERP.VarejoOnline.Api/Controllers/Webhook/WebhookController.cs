@@ -1,5 +1,6 @@
 using LexosHub.ERP.VarejoOnline.Domain.DTOs.Produto;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
+using LexosHub.ERP.VarejoOnline.Infra.ErpApi.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
@@ -9,20 +10,20 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
     [ApiController]
     public class WebhookController : Controller
     {
-        private readonly IProdutoService _produtoService;
+        private readonly IVarejoOnlineApiService _varejoOnlineApiService;
 
-        public WebhookController(IProdutoService produtoService)
+        public WebhookController(IVarejoOnlineApiService varejoOnlineApiService)
         {
-            _produtoService = produtoService;
+            _varejoOnlineApiService = varejoOnlineApiService;
         }
 
         [HttpPost("webhook/produto")]
-        public async Task<IActionResult> Produto([FromBody] ProdutoWebhookDto produtoDto)
+        public async Task<IActionResult> Produto([FromBody] WebhookRequest produtoDto)
         {
             if (produtoDto == null)
                 return BadRequest();
 
-            await _produtoService.ProcessWebhookAsync(produtoDto);
+            await _varejoOnlineApiService.RegisterWebhookAsync(produtoDto);
             return Ok();
         }
     }

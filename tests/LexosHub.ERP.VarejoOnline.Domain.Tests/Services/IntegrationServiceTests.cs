@@ -16,10 +16,9 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Services
     {
         private readonly Mock<IIntegrationRepository> _repo = new();
         private readonly Mock<IValidator<HubIntegracaoDto>> _validator = new();
-        private readonly Mock<IVarejoOnlineApiService> _apiService = new();
         private readonly Mock<ILogger<IntegrationService>> _logger = new();
 
-        private IntegrationService CreateService() => new IntegrationService(_repo.Object, _validator.Object, _apiService.Object, _logger.Object);
+        private IntegrationService CreateService() => new IntegrationService(_repo.Object, _validator.Object, _logger.Object);
 
         [Fact]
         public async Task AddIntegrationAsync_ShouldReturnResponseWithIntegration()
