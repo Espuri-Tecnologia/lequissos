@@ -31,19 +31,27 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
         }
 
         [HttpPost("webhook")]
-        public async Task<IActionResult> Produto([FromBody] WebhookRequest produtoDto)
+        public async Task<IActionResult> Produto([FromBody] WebhookDto webhookDto)
         {
-            if (produtoDto == null)
+            if (webhookDto == null)
                 return BadRequest();
 
-            var integrationResponse = await _integrationService.GetIntegrationByKeyAsync(produtoDto.HubKey);
+            var integrationResponse = await _integrationService.GetIntegrationByKeyAsync(webhookDto.HubKey);
 
             if (integrationResponse == null)
                 return BadRequest("integrationNotFound");
 
             var token = integrationResponse.Result?.Token ?? string.Empty;
 
-            var result = await _varejoOnlineApiService.RegisterWebhookAsync(token, produtoDto);
+
+            var request = new WebhookRequest
+            {
+                Event = webhookDto.Event,
+                url = webhookDto.Url,
+                types = new List<string> { webhookDto.Method }
+            };
+
+            var result = await _varejoOnlineApiService.RegisterWebhookAsync(token, request);
             return Ok();
         }
 

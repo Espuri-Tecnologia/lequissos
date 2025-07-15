@@ -71,7 +71,14 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
                 };
 
                 var response = await _apiService.GetProdutosAsync(token, request);
-                count = response.Result?.Count ?? 0;
+                var produtos = response.Result;
+                count = produtos?.Count ?? 0;
+
+                if (produtos == null || count == 0)
+                {
+                    _logger.LogInformation("Nenhum produto retornado. Encerrando processamento.");
+                    break;
+                }
 
                 var pageEvent = new ProductsPageProcessed
                 {
