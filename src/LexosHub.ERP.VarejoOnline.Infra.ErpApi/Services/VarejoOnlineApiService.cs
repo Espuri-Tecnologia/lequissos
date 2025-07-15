@@ -231,7 +231,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         #endregion
 
         #region WebhookRegister
-        public async Task<WebhookResponse> RegisterWebhookAsync(
+        public async Task<Response<WebhookResponse>> RegisterWebhookAsync(
     WebhookRequest payload,
     CancellationToken cancellationToken = default)
         {
@@ -239,17 +239,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                 .AddHeader("Content-Type", "application/json")
                 .AddJsonBody(payload);
 
-            var apiResponse = await ExecuteAsync<WebhookOperationResponse>(request);
-
-            var body = apiResponse.IsSuccess
-                ? JsonSerializer.Serialize(apiResponse.Result, DefaultJsonOptions)
-                : JsonSerializer.Serialize(apiResponse.Error, DefaultJsonOptions);
-
-            return new WebhookResponse
-            {
-                StatusCode = apiResponse.StatusCode,
-                Body = body
-            };
+            return await ExecuteAsync<WebhookResponse>(request);
         }
         #endregion
 

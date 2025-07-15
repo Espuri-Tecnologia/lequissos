@@ -26,5 +26,15 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
             await _varejoOnlineApiService.RegisterWebhookAsync(produtoDto);
             return Ok();
         }
+
+        [HttpPost("webhook")]
+        public async Task<IActionResult> Webhook([FromBody] WebhookRequest produtoDto)
+        {
+            if (produtoDto == null)
+                return BadRequest();
+
+            await _varejoOnlineApiService.RegisterWebhookAsync(produtoDto);
+            return Ok();
+        }
     }
 }
