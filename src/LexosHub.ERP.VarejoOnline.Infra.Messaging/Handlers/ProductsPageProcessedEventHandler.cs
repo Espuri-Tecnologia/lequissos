@@ -1,9 +1,11 @@
 using Lexos.Hub.Sync;
 using Lexos.Hub.Sync.Enums;
 using Lexos.SQS.Interface;
+using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers.Produto;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
@@ -13,10 +15,12 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
         private readonly ILogger<ProductsPageProcessedEventHandler> _logger;
         private readonly ISqsRepository _syncOutSqsRepository;
 
-        public ProductsPageProcessedEventHandler(ILogger<ProductsPageProcessedEventHandler> logger, ISqsRepository syncOutSqsRepository)
+        public ProductsPageProcessedEventHandler(ILogger<ProductsPageProcessedEventHandler> logger, ISqsRepository syncOutSqsRepository, IOptions<SyncOutConfig> syncOutSqsConfig)
         {
             _logger = logger;
             _syncOutSqsRepository = syncOutSqsRepository;
+            var syncOutConfig = syncOutSqsConfig.Value;
+            _syncOutSqsRepository.IniciarFila($"{syncOutConfig.SQSBaseUrl}{syncOutConfig.SQSAccessKeyId}/{syncOutConfig.SQSName}");
         }
 
         public Task HandleAsync(ProductsPageProcessed @event, CancellationToken cancellationToken)

@@ -34,22 +34,11 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers.Produto
             decimal largura = GetNonNegative(source.Largura);
             decimal altura = GetNonNegative(source.Altura);
 
-            var variacoes = source.ValorAtributos?.Select(v => new ProdutoVariacaoView
-            {
-                Nome = v.Nome,
-                Valor = v.Valor,
-                Codigo = v.Codigo
-            }).ToList() ?? new List<ProdutoVariacaoView>();
-
-            // If product type is configuravel ensure at least one variation exists
-            if (source.Classificacao == "configuravel" && !variacoes.Any())
-            {
-                return null;
-            }
-
             return new ProdutoView
             {
                 ProdutoIdGlobal = source.Id,
+                ProdutoId = source.Id,
+                ProdutoTipoId = Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
                 Nome = Trim(source.Descricao, 255),
                 Descricao = Trim(source.Descricao, 255),
                 DescricaoMarketplace = Trim(source.Descricao, 255),
@@ -71,26 +60,18 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers.Produto
                 CategoriaERP = source.Categorias?.FirstOrDefault(x => x.Nivel == "TRIBUTAÇÃO")?.Nome,
                 MetaTitle = Trim(source.Descricao, 60),
                 MetaDescription = Trim(source.DescricaoSimplificada ?? source.Descricao, 160),
-                Variacoes = variacoes,
-                Composicao = source.Componentes?.Select(c => new ProdutoComponenteView
+                Composicao = source.Componentes?.Select(c => new ProdutoComposicaoView
                 {
+                    ProdutoId = c.Produto.Id,
                     ProdutoIdGlobal = c.Produto.Id,
-                    Nome = c.Produto.Descricao,
-                    Ean = c.Produto.CodigoBarras,
-                    CodigoInterno = c.Produto.CodigoInterno,
-                    CodigoSistema = c.Produto.CodigoSistema,
-                    Quantidade = c.Quantidade,
-                    Unidade = Trim(c.Unidade, 10)
-                }).ToList() ?? new List<ProdutoComponenteView>(),
+                    Quantidade = double.Parse(c.Quantidade.ToString())
+                }).ToList() ?? new List<ProdutoComposicaoView>(),
                 Categorias = source.Categorias?.Select(c => new ProdutoCategoriaView
                 {
-                    Id = c.Id,
-                    Nome = c.Nome,
-                    Nivel = c.Nivel
+                    PlataformaId = 41
                 }).ToList() ?? new List<ProdutoCategoriaView>(),
-                Imagens = source.UrlsFotosProduto?.Select(u => new ProdutoImagemView { Url = u }).ToList() ?? new List<ProdutoImagemView>(),
-                ProdutoEanComplemento = source.CodigosBarraAdicionais ?? new List<string>(),
-                ReferenciasOutrasPlataformas = new List<string>()
+                Imagens = new ProdutoImagemView(),
+                ProdutoEanComplemento = source.CodigosBarraAdicionais ?? new List<string>()
             };
         }
 

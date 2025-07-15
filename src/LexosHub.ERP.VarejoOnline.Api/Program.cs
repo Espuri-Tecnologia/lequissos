@@ -41,6 +41,9 @@ try
     builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
     builder.Services.AddScoped<IValidator<HubIntegracaoDto>, HubIntegracaoDtoValidator>();
 
+    builder.Services.AddOptions<SyncOutConfig>().Bind(builder.Configuration.GetSection(nameof(SyncOutConfig)));
+    builder.Services.AddOptions<SyncInConfig>().Bind(builder.Configuration.GetSection(nameof(SyncInConfig)));
+
     builder.Services.AddTransient<IIntegrationService, IntegrationService>();
     builder.Services.AddTransient<IAuthService, AuthService>();
     builder.Services.AddTransient<IVarejoOnlineApiService, VarejoOnlineApiService>();

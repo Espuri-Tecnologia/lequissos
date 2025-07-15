@@ -1,15 +1,17 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Xunit;
+using Lexos.SQS.Interface;
+using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Repositories.Integration;
+using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Responses;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
+using System;
 using System.Collections.Generic;
-using Lexos.SQS.Interface;
-using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Repositories.Integration;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
@@ -18,9 +20,10 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
         private readonly Mock<ILogger<ProductsPageProcessedEventHandler>> _logger = new();
         private readonly Mock<ISqsRepository> _sqsRepository = new();
         private readonly Mock<IIntegrationRepository> _integrationRepository = new();
+        private readonly Mock<IOptions<SyncOutConfig>> _syncOutSqsConfigMock = new();
 
         private ProductsPageProcessedEventHandler CreateHandler() =>
-            new ProductsPageProcessedEventHandler(_logger.Object, _sqsRepository.Object);
+            new ProductsPageProcessedEventHandler(_logger.Object, _sqsRepository.Object, _syncOutSqsConfigMock.Object);
 
         [Fact]
         public async Task HandleAsync_ShouldLogInformation()
