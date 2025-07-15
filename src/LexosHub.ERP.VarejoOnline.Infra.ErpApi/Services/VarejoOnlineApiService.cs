@@ -3,10 +3,13 @@ using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejoOnline.Infra.ErpApi.Request;
 using LexosHub.ERP.VarejoOnline.Infra.ErpApi.Responses.Auth;
 using LexosHub.ERP.VarejoOnline.Infra.ErpApi.Responses.Prices;
+using LexosHub.ERP.VarejoOnline.Infra.ErpApi.Responses.Webhook;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Request;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Responses;
 using Microsoft.Extensions.Options;
 using RestSharp;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
@@ -20,6 +23,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         private string _clientId;
         private string _clientSecret;
         private string _oAuthUrl;
+        private string _webHookEnpoint;
 
         // JsonSerializerOptions global para System.Text.Json
         private static readonly JsonSerializerOptions DefaultJsonOptions = new()
@@ -41,6 +45,8 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
             _clientId = _erpApiSettings.ClientId ?? string.Empty;
             _clientSecret = _erpApiSettings.ClientSecret ?? string.Empty;
             _oAuthUrl = _erpApiSettings.OAuthUrl ?? string.Empty;
+            _oAuthUrl = _erpApiSettings.OAuthUrl ?? string.Empty;
+            _webHookEnpoint = _erpApiSettings.WebhookEnpoint ?? string.Empty;
         }
 
         #region Auth
@@ -221,6 +227,45 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                 restRequest.AddQueryParameter("somenteMarketplace", request.SomenteMarketplace.Value.ToString().ToLower());
 
             return await ExecuteAsync<List<EstoqueResponse>>(restRequest, token);
+        }
+        #endregion
+
+        #region WebhookRegister
+        public async Task<WebhookResponse> RegisterWebhookAsync(
+    string token,
+    WebhookRequest payload,
+    CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                throw new ArgumentException("Token is required", nameof(token));
+
+            if (payload == null)
+                throw new ArgumentNullException(nameof(payload));
+
+            var request = new HttpRequestMessage(HttpMethod.Post, _webHookEnpoint)
+            {
+                Content = JsonContent.Create(payload)
+            };
+            request.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            try
+            {
+                using var response = await _httpClient.SendAsync(
+                    request, cancellationToken);
+
+                var body = await response.Content.ReadAsStringAsync(cancellationToken);
+
+                return new WebhookResponse
+                {
+                    StatusCode = response.StatusCode,
+                    Body = body
+                };
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
         #endregion
 

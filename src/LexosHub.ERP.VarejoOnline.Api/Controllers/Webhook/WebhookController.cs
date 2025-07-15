@@ -2,22 +2,22 @@ using LexosHub.ERP.VarejoOnline.Domain.DTOs.Produto;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Produto
+namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
 {
     [Produces("application/json")]
     [Route("api/produto")]
     [ApiController]
-    public class ProdutoController : Controller
+    public class WebhookController : Controller
     {
         private readonly IProdutoService _produtoService;
 
-        public ProdutoController(IProdutoService produtoService)
+        public WebhookController(IProdutoService produtoService)
         {
             _produtoService = produtoService;
         }
 
-        [HttpPost("webhook")]
-        public async Task<IActionResult> Webhook([FromBody] ProdutoWebhookDto produtoDto)
+        [HttpPost("webhook/produto")]
+        public async Task<IActionResult> Produto([FromBody] ProdutoWebhookDto produtoDto)
         {
             if (produtoDto == null)
                 return BadRequest();
