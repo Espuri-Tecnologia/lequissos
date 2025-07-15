@@ -9,36 +9,46 @@ using Microsoft.AspNetCore.Mvc;
 namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
 {
     [Produces("application/json")]
-    [Route("api/produto")]
+    [Route("api")]
     [ApiController]
     public class WebhookController : Controller
     {
         private readonly IVarejoOnlineApiService _varejoOnlineApiService;
+        private readonly IIntegrationService _integrationService;
         private readonly IEventDispatcher _dispatcher;
         private readonly ILogger<WebhookController> _logger;
 
         public WebhookController(
             IVarejoOnlineApiService varejoOnlineApiService,
             IEventDispatcher dispatcher,
-            ILogger<WebhookController> logger)
+            ILogger<WebhookController> logger,
+            IIntegrationService integrationService)
         {
             _varejoOnlineApiService = varejoOnlineApiService;
             _dispatcher = dispatcher;
             _logger = logger;
+            _integrationService = integrationService;
         }
 
-        [HttpPost("webhook/produto")]
+        [HttpPost("webhook")]
         public async Task<IActionResult> Produto([FromBody] WebhookRequest produtoDto)
         {
             if (produtoDto == null)
                 return BadRequest();
 
-            await _varejoOnlineApiService.RegisterWebhookAsync(produtoDto);
+            var integrationResponse = await _integrationService.GetIntegrationByKeyAsync(produtoDto.HubKey);
+
+            if (integrationResponse == null)
+                return BadRequest("integrationNotFound");
+
+            var token = integrationResponse.Result?.Token ?? string.Empty;
+
+            var result = await _varejoOnlineApiService.RegisterWebhookAsync(token, produtoDto);
             return Ok();
         }
 
-        [HttpPost("webhook/produtos")]
-        public async Task<IActionResult> Produtos([FromBody] WebhookNotificationDto notification, CancellationToken cancellationToken)
+        [HttpPost("{hubkey}/produto")]
+        public async Task<IActionResult> Produtos([FromBody] WebhookNotificationDto notification, [FromRoute] string hubkey, CancellationToken cancellationToken)
         {
             if (notification == null)
                 return BadRequest();
@@ -57,7 +67,7 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
 
             var evt = new ProductsRequested
             {
-                HubKey = notification.ContractId ?? string.Empty,
+                HubKey = hubkey ?? string.Empty,
                 Id = productId
             };
 

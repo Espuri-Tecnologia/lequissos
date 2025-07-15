@@ -46,7 +46,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
             _clientSecret = _erpApiSettings.ClientSecret ?? string.Empty;
             _oAuthUrl = _erpApiSettings.OAuthUrl ?? string.Empty;
             _oAuthUrl = _erpApiSettings.OAuthUrl ?? string.Empty;
-            _webHookEnpoint = _erpApiSettings.WebhookEnpoint ?? string.Empty;
+            _webHookEnpoint = _erpApiSettings.WebhookEndpoint ?? string.Empty;
         }
 
         #region Auth
@@ -231,7 +231,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         #endregion
 
         #region WebhookRegister
-        public async Task<Response<WebhookResponse>> RegisterWebhookAsync(
+        public async Task<Response<WebhookResponse>> RegisterWebhookAsync(string token,
     WebhookRequest payload,
     CancellationToken cancellationToken = default)
         {
@@ -239,7 +239,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                 .AddHeader("Content-Type", "application/json")
                 .AddJsonBody(payload);
 
-            return await ExecuteAsync<WebhookResponse>(request);
+            return await ExecuteAsync<WebhookResponse>(request, token);
         }
         #endregion
 
@@ -276,14 +276,14 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
 
                 if (badRequestResponse != null)
                 {
-                    string errorMesssage = $"{badRequestResponse.code} - {badRequestResponse.message} - {badRequestResponse.detailedMessage}";
+                    string errorMesssage = $"{badRequestResponse.code} - {badRequestResponse.mensagem} - {badRequestResponse.detalhes}";
 
                     if (badRequestResponse.details != null && badRequestResponse.details.Any())
                     {
                         errorMesssage += "\nDetalhes:\n";
                         badRequestResponse.details.ForEach(error =>
                         {
-                            errorMesssage += $"{error.code} - {error.message} - {error.detailedMessage} \n";
+                            errorMesssage += $"{error.code} - {error.mensagem} - {error.detalhes} \n";
                         });
                     }
 
