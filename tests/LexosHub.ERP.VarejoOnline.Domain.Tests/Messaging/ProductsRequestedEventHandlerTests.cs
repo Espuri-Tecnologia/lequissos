@@ -13,6 +13,10 @@ using System.Threading.Tasks;
 using Xunit;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using Amazon.SQS;
+using Amazon.SQS.Model;
+using System.Text.Json;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
@@ -21,11 +25,21 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
         private readonly Mock<ILogger<ProductsRequestedEventHandler>> _logger = new();
         private readonly Mock<IIntegrationService> _integrationService = new();
         private readonly Mock<IVarejoOnlineApiService> _apiService = new();
-        private readonly Mock<IEventDispatcher> _dispatcher = new();
+        private readonly Mock<IAmazonSQS> _sqs = new();
         private readonly Mock<IConfiguration> _configuration = new();
 
-        private ProductsRequestedEventHandler CreateHandler() =>
-            new ProductsRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object, _dispatcher.Object, _configuration.Object);
+        private ProductsRequestedEventHandler CreateHandler()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    {"AWS:ServiceURL", "http://localhost"},
+                    {"AWS:SQSQueues:ProductsPageProcessed", "queue/page"}
+                })
+                .Build();
+            var dispatcher = new SqsEventDispatcher(_sqs.Object, config);
+            return new ProductsRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object, dispatcher, _configuration.Object);
+        }
 
         [Fact]
         public async Task HandleAsync_ShouldFetchIntegrationAndCallApiService()
@@ -82,12 +96,16 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
                     It.Is<ProdutoRequest>(r => r.Inicio == 2 && r.Quantidade == 2)
                 ), Times.Once);
 
-            _dispatcher.Verify(d => d.DispatchAsync(
-                    It.Is<ProductsPageProcessed>(p => p.Start == 0 && p.PageSize == 2 && p.ProcessedCount == 2 && p.HubKey == "key" && p.Produtos == firstPage),
+            _sqs.Verify(s => s.SendMessageAsync(
+                    It.Is<SendMessageRequest>(r =>
+                        r.QueueUrl == "http://localhost/queue/page" &&
+                        JsonSerializer.Deserialize<BaseEvent>(r.MessageBody, new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }) is ProductsPageProcessed p && p.Start == 0 && p.PageSize == 2 && p.ProcessedCount == 2 && p.HubKey == "key" && p.Produtos == firstPage),
                     It.IsAny<CancellationToken>()), Times.Once);
 
-            _dispatcher.Verify(d => d.DispatchAsync(
-                    It.Is<ProductsPageProcessed>(p => p.Start == 2 && p.PageSize == 2 && p.ProcessedCount == 1 && p.HubKey == "key" && p.Produtos == secondPage),
+            _sqs.Verify(s => s.SendMessageAsync(
+                    It.Is<SendMessageRequest>(r =>
+                        r.QueueUrl == "http://localhost/queue/page" &&
+                        JsonSerializer.Deserialize<BaseEvent>(r.MessageBody, new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }) is ProductsPageProcessed p && p.Start == 2 && p.PageSize == 2 && p.ProcessedCount == 1 && p.HubKey == "key" && p.Produtos == secondPage),
                     It.IsAny<CancellationToken>()), Times.Once);
         }
     }

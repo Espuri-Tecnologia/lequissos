@@ -4,6 +4,11 @@ using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Default;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
+using Amazon.SQS;
+using Microsoft.Extensions.Configuration;
+using Amazon.SQS.Model;
+using System.Text.Json;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Request;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -18,10 +23,20 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
         private readonly Mock<ILogger<CompaniesRequestedEventHandler>> _logger = new();
         private readonly Mock<IIntegrationService> _integrationService = new();
         private readonly Mock<IVarejoOnlineApiService> _apiService = new();
-        private readonly Mock<IEventDispatcher> _dispatcher = new();
+        private readonly Mock<IAmazonSQS> _sqs = new();
+        private readonly IConfiguration _configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string>
+            {
+                {"AWS:ServiceURL", "http://localhost"},
+                {"AWS:SQSQueues:ProductsRequested", "queue/products"}
+            })
+            .Build();
 
-        private CompaniesRequestedEventHandler CreateHandler() =>
-            new CompaniesRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object, _dispatcher.Object);
+        private CompaniesRequestedEventHandler CreateHandler()
+        {
+            var dispatcher = new SqsEventDispatcher(_sqs.Object, _configuration);
+            return new CompaniesRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object, dispatcher);
+        }
 
         [Fact]
         public async Task HandleAsync_ShouldFetchIntegrationAndCallApiService()
@@ -52,8 +67,10 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
                     )
                 ), Times.Once);
 
-            _dispatcher.Verify(d => d.DispatchAsync(
-                    It.Is<ProductsRequested>(p => p.HubKey == evt.HubKey),
+            _sqs.Verify(s => s.SendMessageAsync(
+                    It.Is<SendMessageRequest>(r =>
+                        r.QueueUrl == "http://localhost/queue/products" &&
+                        JsonSerializer.Deserialize<BaseEvent>(r.MessageBody, new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }) is ProductsRequested p && p.HubKey == evt.HubKey),
                     It.IsAny<CancellationToken>()), Times.Once);
         }
     }

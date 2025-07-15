@@ -69,7 +69,8 @@ try
 
         return new AmazonSQSClient("test", "test", sqsConfig);
     });
-    builder.Services.AddSingleton<IEventDispatcher, EventDispatcher>();
+    builder.Services.AddSingleton<EventDispatcher>();
+    builder.Services.AddSingleton<IEventDispatcher, SqsEventDispatcher>();
     builder.Services.AddTransient<IEventHandler<IntegrationCreated>, IntegrationCreatedEventHandler>();
     builder.Services.AddTransient<IEventHandler<InitialSync>, InitialSyncEventHandler>();
     builder.Services.AddTransient<IEventHandler<ProductsRequested>, ProductsRequestedEventHandler>();
