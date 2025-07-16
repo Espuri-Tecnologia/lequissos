@@ -260,14 +260,11 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
 
                 var content = response.Content!;
 
-                // Detecta se T é uma lista
                 var type = typeof(T);
                 if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type) && type.IsGenericType)
                 {
-                    // Verifica se o JSON começa com '[' (é array)
                     if (!content.TrimStart().StartsWith("["))
                     {
-                        // Não é array, tenta desserializar como item único e colocar numa lista
                         var itemType = type.GetGenericArguments()[0];
                         var singleItem = JsonSerializer.Deserialize(content, itemType, DefaultJsonOptions);
 
@@ -278,8 +275,6 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                         return new Response<T>((T)list) { StatusCode = response.StatusCode };
                     }
                 }
-
-                // Caso normal: deserializa direto para T
                 var result = JsonSerializer.Deserialize<T>(content, DefaultJsonOptions);
                 return new Response<T>(result!) { StatusCode = response.StatusCode };
             }

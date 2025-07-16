@@ -42,6 +42,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Domain.Tests", "tests\LexosHub.ERP.VarejoOnline.Domain.Tests\LexosHub.ERP.VarejoOnline.Domain.Tests.csproj", "{39EB45A5-3A8B-4D3A-961F-846B6D9A702E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexos.Hub.Sync", "src\Lexos.Hub.Sync\Lexos.Hub.Sync.csproj", "{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{39EB45A5-3A8B-4D3A-961F-846B6D9A702E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39EB45A5-3A8B-4D3A-961F-846B6D9A702E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39EB45A5-3A8B-4D3A-961F-846B6D9A702E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +104,7 @@ Global
 		{FE4F49AB-CFAF-439E-85DB-F4B8933FC08D} = {6682B0ED-EDB8-4916-8951-FA55FC50E41E}
 		{9A12B248-8FE6-A395-2D23-41519DD58DC4} = {FE4F49AB-CFAF-439E-85DB-F4B8933FC08D}
 		{39EB45A5-3A8B-4D3A-961F-846B6D9A702E} = {8A5BDD3C-3598-4F48-ABDB-936BB40748CA}
+		{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F} = {BB053B5A-CCD3-4D16-9B6D-98CDC20C78AF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9CC72422-F7FA-4102-99D1-E3DFF134F6FF}
