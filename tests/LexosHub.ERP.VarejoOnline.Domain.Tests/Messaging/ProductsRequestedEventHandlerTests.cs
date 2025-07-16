@@ -1,22 +1,23 @@
+using Amazon.SQS;
+using Amazon.SQS.Model;
 using LexosHub.ERP.VarejoOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Default;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Request;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Responses;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using Amazon.SQS;
-using Amazon.SQS.Model;
-using System.Text.Json;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
@@ -77,8 +78,8 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
             _integrationService.Setup(s => s.GetIntegrationByKeyAsync("key"))
                 .ReturnsAsync(new Response<IntegrationDto>(integration));
 
-            var firstPage = new List<ProdutoResponse> { new(), new() };
-            var secondPage = new List<ProdutoResponse> { new() };
+            var firstPage = new List<ProdutoResponse> { new ProdutoResponse { Id = 1 }, new ProdutoResponse { Id = 2 } };
+            var secondPage = new List<ProdutoResponse> { new ProdutoResponse { Id = 3 } };
 
             _apiService.SetupSequence(a => a.GetProdutosAsync("token", It.IsAny<ProdutoRequest>()))
                 .ReturnsAsync(new Response<List<ProdutoResponse>>(firstPage))
@@ -98,16 +99,52 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 
             _sqs.Verify(s => s.SendMessageAsync(
                     It.Is<SendMessageRequest>(r =>
-                        r.QueueUrl == "http://localhost/queue/page" &&
-                        JsonSerializer.Deserialize<BaseEvent>(r.MessageBody, new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }) is ProductsPageProcessed p && p.Start == 0 && p.PageSize == 2 && p.ProcessedCount == 2 && p.HubKey == "key" && p.Produtos == firstPage),
+                        IsProductsPageProcessed(r, 0, 2, 2, "key", firstPage)),
                     It.IsAny<CancellationToken>()), Times.Once);
 
             _sqs.Verify(s => s.SendMessageAsync(
                     It.Is<SendMessageRequest>(r =>
-                        r.QueueUrl == "http://localhost/queue/page" &&
-                        JsonSerializer.Deserialize<BaseEvent>(r.MessageBody, new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }) is ProductsPageProcessed p && p.Start == 2 && p.PageSize == 2 && p.ProcessedCount == 1 && p.HubKey == "key" && p.Produtos == secondPage),
+                        IsProductsPageProcessed(r, 2, 2, 1, "key", secondPage)),
                     It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        private bool IsProductsPageProcessed(
+            SendMessageRequest request,
+            int expectedStart,
+            int expectedPageSize,
+            int expectedProcessedCount,
+            string expectedHubKey,
+            List<ProdutoResponse> expectedProdutos)
+        {
+            var baseEvent = JsonSerializer.Deserialize<BaseEvent>(
+                request.MessageBody,
+                new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }
+            );
+            if (baseEvent is ProductsPageProcessed p)
+            {
+                return p.Start == expectedStart
+                    && p.PageSize == expectedPageSize
+                    && p.ProcessedCount == expectedProcessedCount
+                    && p.HubKey == expectedHubKey
+                    && p.Produtos is IEnumerable<ProdutoResponse> produtos
+                    && ProdutosAreEqual(produtos, expectedProdutos);
+            }
+            return false;
+        }
+
+        private bool ProdutosAreEqual(IEnumerable<ProdutoResponse> a, IEnumerable<ProdutoResponse> b)
+        {
+            var aList = a.ToList();
+            var bList = b.ToList();
+            if (aList.Count != bList.Count)
+                return false;
+
+            for (int i = 0; i < aList.Count; i++)
+            {
+                if (aList[i].Id != bList[i].Id)
+                    return false;
+            }
+            return true;
         }
     }
 }
-

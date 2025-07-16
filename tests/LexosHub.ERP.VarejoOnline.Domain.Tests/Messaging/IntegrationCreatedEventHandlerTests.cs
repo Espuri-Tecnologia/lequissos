@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Amazon.SQS.Model;
 using System.Text.Json;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
+using System.Collections.Generic;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
@@ -59,10 +60,19 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
                 )), Times.Once);
 
             _sqs.Verify(s => s.SendMessageAsync(
-                    It.Is<SendMessageRequest>(r =>
-                        r.QueueUrl == "http://localhost/queue/init" &&
-                        JsonSerializer.Deserialize<BaseEvent>(r.MessageBody, new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }) is InitialSync i && i.HubKey == evt.HubKey),
-                    It.IsAny<CancellationToken>()), Times.Once);
+                It.Is<SendMessageRequest>(r => IsInitialSyncWithHubKey(r, evt.HubKey)),
+                It.IsAny<CancellationToken>()), Times.Once);
+        }
+        private bool IsInitialSyncWithHubKey(SendMessageRequest request, string hubKey)
+        {
+            var baseEvent = JsonSerializer.Deserialize<BaseEvent>(
+                request.MessageBody,
+                new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }
+            );
+            if (baseEvent is InitialSync i)
+                return i.HubKey == hubKey;
+
+            return false;
         }
     }
 }

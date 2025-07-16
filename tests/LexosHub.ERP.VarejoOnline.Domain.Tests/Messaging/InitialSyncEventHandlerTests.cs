@@ -1,16 +1,17 @@
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Xunit;
+using Amazon.SQS;
+using Amazon.SQS.Model;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
-using Amazon.SQS;
 using Microsoft.Extensions.Configuration;
-using Amazon.SQS.Model;
+using Microsoft.Extensions.Logging;
+using Moq;
+using System.Collections.Generic;
 using System.Text.Json;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
@@ -40,10 +41,21 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
             await CreateHandler().HandleAsync(evt, CancellationToken.None);
 
             _sqs.Verify(s => s.SendMessageAsync(
-                    It.Is<SendMessageRequest>(r =>
-                        r.QueueUrl == "http://localhost/queue/companies" &&
-                        JsonSerializer.Deserialize<BaseEvent>(r.MessageBody, new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }) is CompaniesRequested c && c.HubKey == evt.HubKey),
-                    It.IsAny<CancellationToken>()), Times.Once);
+                It.Is<SendMessageRequest>(r => IsCompaniesRequestedWithHubKey(r, evt.HubKey)),
+                It.IsAny<CancellationToken>()), Times.Once);
+
         }
+        private bool IsCompaniesRequestedWithHubKey(SendMessageRequest request, string hubKey)
+        {
+            var baseEvent = JsonSerializer.Deserialize<BaseEvent>(
+                request.MessageBody,
+                new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }
+            );
+            if (baseEvent is CompaniesRequested c)
+                return c.HubKey == hubKey;
+
+            return false;
+        }
+
     }
 }

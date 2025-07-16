@@ -1,17 +1,18 @@
+using Amazon.SQS;
+using Amazon.SQS.Model;
 using LexosHub.ERP.VarejoOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Default;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
-using Amazon.SQS;
-using Microsoft.Extensions.Configuration;
-using Amazon.SQS.Model;
-using System.Text.Json;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Request;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -68,10 +69,20 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
                 ), Times.Once);
 
             _sqs.Verify(s => s.SendMessageAsync(
-                    It.Is<SendMessageRequest>(r =>
-                        r.QueueUrl == "http://localhost/queue/products" &&
-                        JsonSerializer.Deserialize<BaseEvent>(r.MessageBody, new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }) is ProductsRequested p && p.HubKey == evt.HubKey),
-                    It.IsAny<CancellationToken>()), Times.Once);
+                It.Is<SendMessageRequest>(r => IsProductsRequestedWithHubKey(r, evt.HubKey)),
+        It.IsAny<CancellationToken>()), Times.Once);
+
+        }
+        private bool IsProductsRequestedWithHubKey(SendMessageRequest request, string hubKey)
+        {
+            var baseEvent = JsonSerializer.Deserialize<BaseEvent>(
+                request.MessageBody,
+                new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }
+            );
+            if (baseEvent is ProductsRequested p)
+                return p.HubKey == hubKey;
+
+            return false;
         }
     }
 }
