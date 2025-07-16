@@ -44,7 +44,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers.Produto
                 DescricaoMarketplace = Trim(source.Descricao, 255),
                 DescricaoResumida = Trim(source.DescricaoSimplificada ?? $"{source.Descricao} - {source.CodigoSku}", 255),
                 Ean = Trim(source.CodigoBarras, 50),
-                Sku = Trim(source.CodigoSku, 50),
+                Sku = Trim(source.CodigoSistema, 50),
                 Peso = peso,
                 Comprimento = comprimento,
                 Largura = largura,
@@ -64,14 +64,19 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers.Produto
                 {
                     ProdutoId = c.Produto.Id,
                     ProdutoIdGlobal = c.Produto.Id,
-                    Quantidade = double.Parse(c.Quantidade.ToString())
+                    Quantidade = double.Parse(c.Quantidade.ToString()),                    
                 }).ToList() ?? new List<ProdutoComposicaoView>(),
                 Categorias = source.Categorias?.Select(c => new ProdutoCategoriaView
                 {
                     PlataformaId = 41
                 }).ToList() ?? new List<ProdutoCategoriaView>(),
                 Imagens = new ProdutoImagemView(),
-                ProdutoEanComplemento = source.CodigosBarraAdicionais ?? new List<string>()
+                ProdutoEanComplemento = source.CodigosBarraAdicionais ?? new List<string>(),
+                ProdutoImposto = new ProdutoImpostoView 
+                { 
+                    NCM = source.CodigoNcm, 
+                    Origem = source.Origem.HasValue ? (short)source.Origem.Value : short.MinValue
+                }                
             };
         }
 
@@ -90,7 +95,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers.Produto
             List<ProdutoPrecoView> produtoPrecoViewList = new();
 
             if (produto.PrecosPorTabelas is null || !produto.PrecosPorTabelas.Any())
-                return new List<ProdutoPrecoView>();
+                return new List<ProdutoPrecoView>{ new ProdutoPrecoView { Preco = produto.Preco.Value, ProdutoId = produto.Id} };
 
             foreach (PrecoPorTabelaResponse priceResponse in produto.PrecosPorTabelas)
                 produtoPrecoViewList.Add(priceResponse.NewProdutoPrecoView(produto.CodigoSku, produtoTipoId: produtoTipoId, codigo: CodigoProdutoPrecoVenda));

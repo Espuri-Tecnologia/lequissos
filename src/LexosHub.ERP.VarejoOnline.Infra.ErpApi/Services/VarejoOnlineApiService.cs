@@ -258,8 +258,29 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                 if (!response.IsSuccessStatusCode)
                     return new Response<T> { Error = GetErrorMessageResponse(response), StatusCode = response.StatusCode };
 
-                var result = JsonSerializer.Deserialize<T>(response.Content!, DefaultJsonOptions);
+                var content = response.Content!;
 
+                // Detecta se T é uma lista
+                var type = typeof(T);
+                if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type) && type.IsGenericType)
+                {
+                    // Verifica se o JSON começa com '[' (é array)
+                    if (!content.TrimStart().StartsWith("["))
+                    {
+                        // Não é array, tenta desserializar como item único e colocar numa lista
+                        var itemType = type.GetGenericArguments()[0];
+                        var singleItem = JsonSerializer.Deserialize(content, itemType, DefaultJsonOptions);
+
+                        var list = (System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType))!;
+                        if (singleItem != null)
+                            list.Add(singleItem);
+
+                        return new Response<T>((T)list) { StatusCode = response.StatusCode };
+                    }
+                }
+
+                // Caso normal: deserializa direto para T
+                var result = JsonSerializer.Deserialize<T>(content, DefaultJsonOptions);
                 return new Response<T>(result!) { StatusCode = response.StatusCode };
             }
             catch (Exception ex)
@@ -267,6 +288,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
                 return new Response<T> { Error = new ErrorResult($"{ex.Message}") };
             }
         }
+
 
         private ErrorResult GetErrorMessageResponse(RestResponse response)
         {
