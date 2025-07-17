@@ -1,9 +1,5 @@
 using LexosHub.ERP.VarejoOnline.Domain.DTOs.Produto;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
-using LexosHub.ERP.VarejoOnline.Domain.DTOs.Webhook;
-using LexosHub.ERP.VarejoOnline.Infra.ErpApi.Responses.Webhook;
-using System.Text.Json;
-using LexosHub.ERP.VarejoOnline.Infra.ErpApi.Request;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using Microsoft.Extensions.Logging;
@@ -16,23 +12,17 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
     [ApiController]
     public class WebhookController : Controller
     {
-        private readonly IVarejoOnlineApiService _varejoOnlineApiService;
-        private readonly IIntegrationService _integrationService;
         private readonly IWebhookService _webhookService;
         private readonly IEventDispatcher _dispatcher;
         private readonly ILogger<WebhookController> _logger;
 
         public WebhookController(
-            IVarejoOnlineApiService varejoOnlineApiService,
             IEventDispatcher dispatcher,
             ILogger<WebhookController> logger,
-            IIntegrationService integrationService,
             IWebhookService webhookService)
         {
-            _varejoOnlineApiService = varejoOnlineApiService;
             _dispatcher = dispatcher;
             _logger = logger;
-            _integrationService = integrationService;
             _webhookService = webhookService;
         }
 
@@ -42,38 +32,7 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
             if (webhookDto == null)
                 return BadRequest();
 
-            var integrationResponse = await _integrationService.GetIntegrationByKeyAsync(webhookDto.HubKey);
-
-            if (integrationResponse == null)
-                return BadRequest("integrationNotFound");
-
-            var token = integrationResponse.Result?.Token ?? string.Empty;
-
-
-            var request = new WebhookRequest
-            {
-                Event = webhookDto.Event,
-                url = webhookDto.Url,
-                types = new List<string> { webhookDto.Method }
-            };
-
-            var result = await _varejoOnlineApiService.RegisterWebhookAsync(token, request);
-
-            if (result.IsSuccess && result.Result is not null)
-            {
-                var operation = (WebhookOperationResponse)result.Result;
-                if (operation != null && !string.IsNullOrWhiteSpace(operation.IdRecurso))
-                {
-                    await _webhookService.AddAsync(new WebhookRecordDto
-                    {
-                        IntegrationId = integrationResponse.Result!.Id,
-                        Event = webhookDto.Event,
-                        Method = webhookDto.Method,
-                        Url = webhookDto.Url,
-                        Uuid = operation.IdRecurso
-                    });
-                }
-            }
+            await _webhookService.RegisterAsync(webhookDto);
 
             return Ok();
         }
