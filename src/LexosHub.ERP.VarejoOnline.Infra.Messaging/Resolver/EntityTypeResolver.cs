@@ -11,7 +11,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher
             { "IntegrationCreated", typeof(IntegrationCreated) },
             { "ProductsRequested", typeof(ProductsRequested) },
             { "ProductsPageProcessed", typeof(ProductsPageProcessed) },
-            { "PriceTablesPageProcessed", typeof(PriceTablesPageProcessed) },
+            { "PriceTablesRequested", typeof(PriceTablesRequested) },
             { "CompaniesRequested", typeof(CompaniesRequested) },
             { "InitialSync", typeof(InitialSync) }
         };

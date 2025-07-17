@@ -2,7 +2,7 @@ using LexosHub.ERP.VarejoOnline.Infra.ErpApi.Responses.Prices;
 
 namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Events
 {
-    public class PriceTablesPageProcessed : BaseEvent
+    public class PriceTablesRequested : BaseEvent
     {
         public string HubKey { get; set; } = null!;
         public int Start { get; set; }

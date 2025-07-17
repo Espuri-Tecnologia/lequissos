@@ -107,15 +107,13 @@ namespace LexosHub.ERP.VarejoOnline.Infra.VarejoOnlineApi.Services
         #endregion
 
         #region Prices
-        public async Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, int? inicio = null, int? quantidade = null, string? alteradoApos = null, string? entidades = null)
+        public async Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, int inicio = 0, int quantidade = 10, string? alteradoApos = null, string? entidades = null)
         {
             var request = new RestRequest("tabelas-preco", Method.Get);
 
-            if (inicio.HasValue)
-                request.AddQueryParameter("inicio", inicio.Value.ToString());
+            request.AddQueryParameter("inicio", inicio.ToString());
 
-            if (quantidade.HasValue)
-                request.AddQueryParameter("quantidade", quantidade.Value.ToString());
+            request.AddQueryParameter("quantidade", quantidade.ToString());
 
             if (!string.IsNullOrWhiteSpace(alteradoApos))
                 request.AddQueryParameter("alteradoApos", alteradoApos);
