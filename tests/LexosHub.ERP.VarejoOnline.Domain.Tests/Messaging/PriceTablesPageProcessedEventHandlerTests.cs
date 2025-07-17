@@ -1,5 +1,4 @@
 using Lexos.SQS.Interface;
-using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Repositories.Integration;
 using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers;
@@ -12,30 +11,22 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
-using Microsoft.Extensions.Configuration;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 
 namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
 {
     public class PriceTablesPageProcessedEventHandlerTests
     {
-        private readonly Mock<ILogger<PriceTablesRequestedEventHandler>> _logger = new();
+        private readonly Mock<ILogger<PriceTablesPageProcessedEventHandler>> _logger = new();
         private readonly Mock<ISqsRepository> _sqsRepository = new();
-        private readonly Mock<IIntegrationRepository> _integrationRepository = new();
         private readonly Mock<IOptions<SyncOutConfig>> _syncOutSqsConfigMock = new();
-        private readonly Mock<IVarejoOnlineApiService> _varejoOnlineApiService = new();
-        private readonly Mock<IIntegrationService> _integrationService = new();
-        private readonly Mock<IEventDispatcher> _dispatcher = new();
-        private readonly Mock<IConfiguration> _configuration = new();
 
-        private PriceTablesRequestedEventHandler CreateHandler() =>
-            new PriceTablesRequestedEventHandler(_logger.Object, _sqsRepository.Object, _syncOutSqsConfigMock.Object, _varejoOnlineApiService.Object, _integrationService.Object, _configuration.Object, _dispatcher.Object);
+        private PriceTablesPageProcessedEventHandler CreateHandler() =>
+            new PriceTablesPageProcessedEventHandler(_logger.Object, _sqsRepository.Object, _syncOutSqsConfigMock.Object);
 
         [Fact]
         public async Task HandleAsync_ShouldLogInformation()
         {
-            var evt = new PriceTablesRequested
+            var evt = new PriceTablesPageProcessed
             {
                 HubKey = "key",
                 Start = 1,

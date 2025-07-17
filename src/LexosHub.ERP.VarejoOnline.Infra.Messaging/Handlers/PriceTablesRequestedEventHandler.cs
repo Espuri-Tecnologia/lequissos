@@ -67,7 +67,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Handlers
                     break;
                 }
 
-                var pageEvent = new PriceTablesRequested
+                var pageEvent = new PriceTablesPageProcessed
                 {
                     HubKey = @event.HubKey,
                     Start = start,

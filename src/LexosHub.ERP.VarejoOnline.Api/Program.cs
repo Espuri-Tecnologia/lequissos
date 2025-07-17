@@ -76,6 +76,7 @@ try
     builder.Services.AddTransient<IEventHandler<ProductsRequested>, ProductsRequestedEventHandler>();
     builder.Services.AddTransient<IEventHandler<ProductsPageProcessed>, ProductsPageProcessedEventHandler>();
     builder.Services.AddTransient<IEventHandler<PriceTablesRequested>, PriceTablesRequestedEventHandler>();
+    builder.Services.AddTransient<IEventHandler<PriceTablesPageProcessed>, PriceTablesPageProcessedEventHandler>();
     builder.Services.AddTransient<IEventHandler<CompaniesRequested>, CompaniesRequestedEventHandler>();
     builder.Services.AddHostedService<SqsListenerService>();
 
