@@ -3,7 +3,7 @@ using Lexos.Hub.Sync.Enums;
 using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers.Preco;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Mappers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
