@@ -59,9 +59,9 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
 
             var result = await _varejoOnlineApiService.RegisterWebhookAsync(token, request);
 
-            if (result.IsSuccess && !string.IsNullOrWhiteSpace(result.Result?.Body))
+            if (result.IsSuccess && result.Result is not null)
             {
-                var operation = JsonSerializer.Deserialize<WebhookOperationResponse>(result.Result.Body);
+                var operation = (WebhookOperationResponse)result.Result;
                 if (operation != null && !string.IsNullOrWhiteSpace(operation.IdRecurso))
                 {
                     await _webhookService.AddAsync(new WebhookRecordDto
@@ -105,6 +105,35 @@ namespace LexosHub.ERP.VarejoOnline.Api.Controllers.Webhook
             await _dispatcher.DispatchAsync(evt, cancellationToken);
 
             _logger.LogInformation("Dispatched ProductsRequested event for product {ProductId}", productId);
+
+            return Ok();
+        }
+        [HttpPost("{hubkey}/precoproduto")]
+        public async Task<IActionResult> PrecoProduto([FromBody] WebhookNotificationDto notification, [FromRoute] string hubkey, CancellationToken cancellationToken)
+        {
+            if (notification == null)
+                return BadRequest();
+
+            //_logger.LogInformation("Webhook payload received: {@payload}", notification);
+
+            //long? productId = null;
+            //if (!string.IsNullOrWhiteSpace(notification.Object))
+            //{
+            //    var lastSegment = notification.Object.TrimEnd('/')
+            //        .Split('/', StringSplitOptions.RemoveEmptyEntries)
+            //        .LastOrDefault();
+            //    if (long.TryParse(lastSegment, out var parsed))
+            //        productId = parsed;
+            //}
+
+            //var evt = new ProductsRequested
+            //{
+            //    HubKey = hubkey ?? string.Empty,
+            //    Id = productId
+            //};
+
+            //await _dispatcher.DispatchAsync(evt, cancellationToken);
+
 
             return Ok();
         }
