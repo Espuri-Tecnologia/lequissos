@@ -16,6 +16,7 @@ namespace LexosHub.ERP.VarejoOnline.Domain.Tests.Messaging
             new object[] { new ProductsRequested() },
             new object[] { new ProductsPageProcessed() },
             new object[] { new PriceTablesRequested() },
+            new object[] { new PriceTablesPageProcessed() },
             new object[] { new InitialSync() }
         };
 
