@@ -6,12 +6,14 @@ using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejoOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Persistence;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Repositories.Integration;
+using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Repositories.Webhook;
 using LexosHub.ERP.VarejoOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejoOnline.Domain.Services;
 using LexosHub.ERP.VarejoOnline.Domain.Validators;
 using LexosHub.ERP.VarejoOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Context;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Integration;
+using LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Webhook;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Repositories.Persistence;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejoOnline.Infra.Messaging.Events;
@@ -48,8 +50,10 @@ try
     builder.Services.AddTransient<IAuthService, AuthService>();
     builder.Services.AddTransient<IVarejoOnlineApiService, VarejoOnlineApiService>();
     builder.Services.AddTransient<ISqsRepository, SqsRepository>();
+    builder.Services.AddTransient<IWebhookService, WebhookService>();
 
     builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
+    builder.Services.AddScoped<IWebhookRepository, WebhookRepository>();
 
     builder.Services.AddScoped<IApplicationWriteDbConnection, ApplicationWriteDbConnection>();
     builder.Services.AddScoped<IApplicationReadDbConnection, ApplicationReadDbConnection>();

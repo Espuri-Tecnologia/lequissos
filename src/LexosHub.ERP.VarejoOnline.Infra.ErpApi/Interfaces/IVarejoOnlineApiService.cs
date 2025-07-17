@@ -13,6 +13,6 @@ public interface IVarejoOnlineApiService
     Task<Response<List<EmpresaResponse>>> GetEmpresasAsync(string token, EmpresaRequest request);
     Task<Response<List<ProdutoResponse>>> GetProdutosAsync(string token, ProdutoRequest request);
     Task<Response<List<EstoqueResponse>>> GetEstoquesAsync(string token, EstoqueRequest request);
-    Task<Response<WebhookResponse>> RegisterWebhookAsync(string token, WebhookRequest payload, CancellationToken cancellationToken = default);
+    Task<Response<WebhookOperationResponse>> RegisterWebhookAsync(string token, WebhookRequest payload, CancellationToken cancellationToken = default);
     Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, int inicio = 0, int quantidade = 10, string? alteradoApos = null, string? entidades = null);
 }
