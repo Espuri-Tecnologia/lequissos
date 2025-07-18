@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Authors>Lexos</Authors>
     <Version>1.0.42</Version>
     <Description>Modelos para a sincronização de pedidos, produtos, atualizações de estoque e preço do Hub</Description>
