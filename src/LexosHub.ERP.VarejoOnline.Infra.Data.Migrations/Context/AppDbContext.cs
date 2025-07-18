@@ -1,6 +1,7 @@
 ﻿using LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Models.Base;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Models.Integration;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Models.Webhook;
+using LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Models.SyncProcess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +18,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Context
 
         public DbSet<Integration> Integration => Set<Integration>();
         public DbSet<Webhook> Webhook => Set<Webhook>();
+        public DbSet<SyncProcess> SyncProcess => Set<SyncProcess>();
         public IDbConnection Connection => Database.GetDbConnection();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

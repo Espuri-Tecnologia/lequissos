@@ -2,6 +2,7 @@
 using System;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Context;
 using LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Models.Webhook;
+using LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Models.SyncProcess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -110,6 +111,49 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Webhook");
+                });
+
+            modelBuilder.Entity("LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.Models.SyncProcess.SyncProcess", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AdditionalInfo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("InitialSync")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("IntegrationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Page")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PageSize")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReferenceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SyncProcess");
                 });
 #pragma warning restore 612, 618
         }
