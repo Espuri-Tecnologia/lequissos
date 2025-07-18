@@ -1,3 +1,5 @@
+using LexosHub.ERP.VarejoOnline.Domain.Enums;
+
 namespace LexosHub.ERP.VarejoOnline.Domain.DTOs.SyncProcess
 {
     public class SyncProcessDto
