@@ -8,8 +8,6 @@ using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Options;
 using RestSharp;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
