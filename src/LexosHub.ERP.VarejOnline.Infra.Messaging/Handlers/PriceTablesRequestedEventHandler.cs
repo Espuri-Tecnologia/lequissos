@@ -42,6 +42,8 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
             var integrationResponse = await _integrationService.GetIntegrationByKeyAsync(@event.HubKey);
             var token = integrationResponse.Result?.Token ?? string.Empty;
 
+            var ids = new List<long>();
+
             _logger.LogInformation(
                 "Página de tabelas de preço processada. Hub: {HubKey}, Início: {Start}, Quantidade: {PageSize}, Processados: {ProcessedCount}, Tabelas: {PriceTableCount}",
                 @event.HubKey,
@@ -67,6 +69,8 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                     break;
                 }
 
+                ids.AddRange(produtos.Select(p => p.Id));
+
                 var pageEvent = new PriceTablePageProcessed
                 {
                     HubKey = @event.HubKey,
@@ -81,6 +85,17 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                 start += pageSize;
 
             } while (count >= pageSize);
+
+            if (ids.Any())
+            {
+                var productsEvent = new ProductsRequested
+                {
+                    HubKey = @event.HubKey,
+                    IdsTabelasPrecos = string.Join(',', ids)
+                };
+
+                await _dispatcher.DispatchAsync(productsEvent, cancellationToken);
+            }
             return;
         }
     }
