@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32603.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Api", "src\LexosHub.ERP.VarejoOnline.Api\LexosHub.ERP.VarejoOnline.Api.csproj", "{D0F04A61-21D9-426A-9D36-EB9EF254DF99}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Api", "src\LexosHub.ERP.VarejOnline.Api\LexosHub.ERP.VarejOnline.Api.csproj", "{D0F04A61-21D9-426A-9D36-EB9EF254DF99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Domain", "src\LexosHub.ERP.VarejoOnline.Domain\LexosHub.ERP.VarejoOnline.Domain.csproj", "{A1F14B51-91A0-4CB2-BF8E-A2EFB2285D01}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Domain", "src\LexosHub.ERP.VarejOnline.Domain\LexosHub.ERP.VarejOnline.Domain.csproj", "{A1F14B51-91A0-4CB2-BF8E-A2EFB2285D01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Infra.CrossCutting", "src\LexosHub.ERP.VarejoOnline.Infra.CrossCutting\LexosHub.ERP.VarejoOnline.Infra.CrossCutting.csproj", "{B2E24C62-92B1-4DC3-BF8F-B3FFD2396E12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Infra.CrossCutting", "src\LexosHub.ERP.VarejOnline.Infra.CrossCutting\LexosHub.ERP.VarejOnline.Infra.CrossCutting.csproj", "{B2E24C62-92B1-4DC3-BF8F-B3FFD2396E12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Infra.Data", "src\LexosHub.ERP.VarejoOnline.Infra.Data\LexosHub.ERP.VarejoOnline.Infra.Data.csproj", "{C3F34D73-A3C2-4EC4-BF90-C4FFE34A7F23}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Infra.Data", "src\LexosHub.ERP.VarejOnline.Infra.Data\LexosHub.ERP.VarejOnline.Infra.Data.csproj", "{C3F34D73-A3C2-4EC4-BF90-C4FFE34A7F23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Infra.ErpApi", "src\LexosHub.ERP.VarejoOnline.Infra.ErpApi\LexosHub.ERP.VarejoOnline.Infra.ErpApi.csproj", "{D4F45E84-B4D3-4FC5-BF91-D5FFF45B8024}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Infra.ErpApi", "src\LexosHub.ERP.VarejOnline.Infra.ErpApi\LexosHub.ERP.VarejOnline.Infra.ErpApi.csproj", "{D4F45E84-B4D3-4FC5-BF91-D5FFF45B8024}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Api", "1 - Api", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.3 - CrossCutting", "3.3 -
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.4 - Packages", "3.4 - Packages", "{BB053B5A-CCD3-4D16-9B6D-98CDC20C78AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Infra.Data.Migrations", "src\LexosHub.ERP.VarejoOnline.Infra.Data.Migrations\LexosHub.ERP.VarejoOnline.Infra.Data.Migrations.csproj", "{20695E59-1A8A-463D-9AFD-158FD10B556F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Infra.Data.Migrations", "src\LexosHub.ERP.VarejOnline.Infra.Data.Migrations\LexosHub.ERP.VarejOnline.Infra.Data.Migrations.csproj", "{20695E59-1A8A-463D-9AFD-158FD10B556F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens de Solução", "{380A7511-A354-6D7A-0CC0-8FA1F1BA7B6C}"
 	ProjectSection(SolutionItems) = preProject
@@ -38,9 +38,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.5 - Messaging", "3.5 - Messaging", "{FE4F49AB-CFAF-439E-85DB-F4B8933FC08D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Infra.Messaging", "src\LexosHub.ERP.VarejoOnline.Infra.Messaging\LexosHub.ERP.VarejoOnline.Infra.Messaging.csproj", "{9A12B248-8FE6-A395-2D23-41519DD58DC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Infra.Messaging", "src\LexosHub.ERP.VarejOnline.Infra.Messaging\LexosHub.ERP.VarejOnline.Infra.Messaging.csproj", "{9A12B248-8FE6-A395-2D23-41519DD58DC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejoOnline.Domain.Tests", "tests\LexosHub.ERP.VarejoOnline.Domain.Tests\LexosHub.ERP.VarejoOnline.Domain.Tests.csproj", "{39EB45A5-3A8B-4D3A-961F-846B6D9A702E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Domain.Tests", "tests\LexosHub.ERP.VarejOnline.Domain.Tests\LexosHub.ERP.VarejOnline.Domain.Tests.csproj", "{39EB45A5-3A8B-4D3A-961F-846B6D9A702E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexos.Hub.Sync", "src\Lexos.Hub.Sync\Lexos.Hub.Sync.csproj", "{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}"
 EndProject

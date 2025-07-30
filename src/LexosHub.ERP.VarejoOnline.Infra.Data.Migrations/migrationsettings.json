@@ -1,8 +1,0 @@
-{
-  "ConnectionStrings": {
-    //"ErpDBConn": "data source=10.8.145.178;initial catalog=LexosHub_VarejoOnline_prod;persist security info=True;user id=lexos_hangfire;password=Lexos2009HangF1r3",
-    //"ErpDBConn": "Server=localhost,1433;Initial Catalog=LexosHub-VarejoOnline-Dev;User Id=sa; Password=!@Lexos_Hub-Admin12;Trusted_Connection=SSPI;Encrypt=false;TrustServerCertificate=true",
-    "ErpDBConn": "Server=localhost,1433;Initial Catalog=LexosHub-VarejoOnline-Dev;User Id=sa;Password=!@Lexos_Hub-Admin12;Encrypt=false;TrustServerCertificate=true"
-
-  }
-}
