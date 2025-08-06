@@ -1,0 +1,105 @@
+using Lexos.Hub.Sync;
+using Lexos.Hub.Sync.Enums;
+using Lexos.Hub.Sync.Models.Produto;
+using Lexos.SQS.Interface;
+using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
+using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto;
+using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
+using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using System.Linq;
+
+namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
+
+public class CriarProdutosConfiguraveisEventHandler : IEventHandler<CriarProdutosConfiguraveis>
+{
+    private readonly ILogger<CriarProdutosConfiguraveisEventHandler> _logger;
+    private readonly IIntegrationService _integrationService;
+    private readonly IVarejOnlineApiService _apiService;
+    private readonly ISqsRepository _syncOutSqsRepository;
+
+    public CriarProdutosConfiguraveisEventHandler(
+        ILogger<CriarProdutosConfiguraveisEventHandler> logger,
+        IIntegrationService integrationService,
+        IVarejOnlineApiService apiService,
+        ISqsRepository syncOutSqsRepository,
+        IOptions<SyncOutConfig> syncOutSqsConfig)
+    {
+        _logger = logger;
+        _integrationService = integrationService;
+        _apiService = apiService;
+        _syncOutSqsRepository = syncOutSqsRepository;
+
+        var syncOutConfig = syncOutSqsConfig.Value;
+        _syncOutSqsRepository.IniciarFila($"{syncOutConfig.SQSBaseUrl}{syncOutConfig.SQSAccessKeyId}/{syncOutConfig.SQSName}");
+    }
+
+    public async Task HandleAsync(CriarProdutosConfiguraveis @event, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Produtos configuráveis recebidos para hub {HubKey}", @event.HubKey);
+
+        var integrationResponse = await _integrationService.GetIntegrationByKeyAsync(@event.HubKey);
+        var token = integrationResponse.Result?.Token ?? string.Empty;
+
+        var produtosView = new List<ProdutoView>();
+
+        if (@event.Produtos != null)
+        {
+            foreach (var produto in @event.Produtos)
+            {
+                var produtoView = ProdutoSimplesViewMapper.Map(produto);
+                if (produtoView == null)
+                    continue;
+
+                var request = new ProdutoRequest { ProdutoBase = produto.Id };
+                var response = await _apiService.GetProdutosAsync(token, request);
+                var variacoes = response.Result ?? new List<ProdutoResponse>();
+
+                foreach (var variacao in variacoes)
+                {
+                    produtoView.Variacoes.Add(MapVariacao(variacao));
+                }
+
+                produtosView.Add(produtoView);
+            }
+        }
+
+        if (produtosView.Any())
+        {
+            var notificacao = new NotificacaoAtualizacaoModel
+            {
+                Chave = @event.HubKey,
+                DataHora = DateTime.Now,
+                Json = JsonConvert.SerializeObject(produtosView),
+                TipoProcesso = TipoProcessoAtualizacao.Produto,
+                PlataformaId = 41
+            };
+
+            _syncOutSqsRepository.AdicionarMensagemFilaFifo(notificacao, $"notificacao-syncout-{notificacao.Chave}");
+        }
+    }
+
+    private static ProdutoVariacaoView MapVariacao(ProdutoResponse source)
+    {
+        var tamanho = source.ValorAtributos?.FirstOrDefault(a => a.Nome.Equals("TAMANHO", StringComparison.OrdinalIgnoreCase))?.Valor;
+        var cor = source.ValorAtributos?.FirstOrDefault(a => a.Nome.Equals("COR", StringComparison.OrdinalIgnoreCase))?.Valor;
+
+        return new ProdutoVariacaoView
+        {
+            ProdutoIdGlobal = source.Id,
+            ProdutoId = source.Id,
+            Sku = source.CodigoSistema?.Trim(),
+            EAN = source.CodigoBarras,
+            Tamanho = tamanho,
+            Cor = cor,
+            Deleted = !source.Ativo,
+            OutrasVariacoes = new List<OutraVariacao>(),
+            ReferenciasOutrasPlataformas = new List<ProdutoReferenciaView>()
+        };
+    }
+}
+
