@@ -10,7 +10,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
         {
             { "IntegrationCreated", typeof(IntegrationCreated) },
             { "ProductsRequested", typeof(ProductsRequested) },
-            { "ProductsPageProcessed", typeof(ProductsPageProcessed) },
+            { "CriarProdutosSimples", typeof(CriarProdutosSimples) },
             { "PriceTablesRequested", typeof(PriceTablesRequested) },
             { "PriceTablePageProcessed", typeof(PriceTablePageProcessed) },
             { "CompaniesRequested", typeof(CompaniesRequested) },

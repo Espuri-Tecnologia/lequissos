@@ -1,6 +1,7 @@
 using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using Microsoft.Extensions.Configuration;
@@ -58,8 +59,12 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
             int count = 0;
             do
             {
-
-                var response = await _apiService.GetPriceTablesAsync(token, count, pageSize);
+                var priceRequest = new TabelaPrecoRequest
+                {
+                    Inicio = count,
+                    Quantidade = pageSize
+                };
+                var response = await _apiService.GetPriceTablesAsync(token, priceRequest);
                 var produtos = response.Result;
                 count = produtos?.Count ?? 0;
 
@@ -68,8 +73,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                     _logger.LogInformation("Nenhum produto retornado. Encerrando processamento.");
                     break;
                 }
-
-                ids.AddRange(produtos.Select(p => p.Id));
 
                 var pageEvent = new PriceTablePageProcessed
                 {
@@ -85,17 +88,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                 start += pageSize;
 
             } while (count >= pageSize);
-
-            if (ids.Any())
-            {
-                var productsEvent = new ProductsRequested
-                {
-                    HubKey = @event.HubKey,
-                    IdsTabelasPrecos = string.Join(',', ids)
-                };
-
-                await _dispatcher.DispatchAsync(productsEvent, cancellationToken);
-            }
             return;
         }
     }

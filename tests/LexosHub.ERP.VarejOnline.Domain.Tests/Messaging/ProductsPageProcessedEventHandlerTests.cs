@@ -17,18 +17,18 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
 {
     public class ProductsPageProcessedEventHandlerTests
     {
-        private readonly Mock<ILogger<ProductsPageProcessedEventHandler>> _logger = new();
+        private readonly Mock<ILogger<CriarProdutosSimplesEventHandler>> _logger = new();
         private readonly Mock<ISqsRepository> _sqsRepository = new();
         private readonly Mock<IIntegrationRepository> _integrationRepository = new();
         private readonly Mock<IOptions<SyncOutConfig>> _syncOutSqsConfigMock = new();
 
-        private ProductsPageProcessedEventHandler CreateHandler() =>
-            new ProductsPageProcessedEventHandler(_logger.Object, _sqsRepository.Object, _syncOutSqsConfigMock.Object);
+        private CriarProdutosSimplesEventHandler CreateHandler() =>
+            new CriarProdutosSimplesEventHandler(_logger.Object, _sqsRepository.Object, _syncOutSqsConfigMock.Object);
 
         [Fact]
         public async Task HandleAsync_ShouldLogInformation()
         {
-            var evt = new ProductsPageProcessed
+            var evt = new CriarProdutosSimples
             {
                 HubKey = "key",
                 Start = 1,

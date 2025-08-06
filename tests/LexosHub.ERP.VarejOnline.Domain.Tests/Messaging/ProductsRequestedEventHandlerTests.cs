@@ -120,7 +120,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                 request.MessageBody,
                 new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }
             );
-            if (baseEvent is ProductsPageProcessed p)
+            if (baseEvent is CriarProdutosSimples p)
             {
                 return p.Start == expectedStart
                     && p.PageSize == expectedPageSize

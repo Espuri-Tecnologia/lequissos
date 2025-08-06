@@ -8,12 +8,12 @@ namespace LexosHub.ERP.VarejOnline.Api.Controllers.Integration
     [Produces("application/json")]
     [Route("api/integracao")]
     [ApiController]
-    public class IntegrationController : Controller
+    public class IntegracaoController : Controller
     {
         private readonly IIntegrationService _integrationService;
         private readonly IConfiguration _configuration;
 
-        public IntegrationController(IIntegrationService integrationService,
+        public IntegracaoController(IIntegrationService integrationService,
             IConfiguration configuration)
         {
             _integrationService = integrationService;

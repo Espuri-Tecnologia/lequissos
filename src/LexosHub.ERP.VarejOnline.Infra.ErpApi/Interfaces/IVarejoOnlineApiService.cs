@@ -1,5 +1,6 @@
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook;
@@ -14,5 +15,5 @@ public interface IVarejOnlineApiService
     Task<Response<List<ProdutoResponse>>> GetProdutosAsync(string token, ProdutoRequest request);
     Task<Response<List<EstoqueResponse>>> GetEstoquesAsync(string token, EstoqueRequest request);
     Task<Response<WebhookOperationResponse>> RegisterWebhookAsync(string token, WebhookRequest payload, CancellationToken cancellationToken = default);
-    Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, int inicio = 0, int quantidade = 10, string? alteradoApos = null, string? entidades = null);
+    Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, TabelaPrecoRequest request);
 }

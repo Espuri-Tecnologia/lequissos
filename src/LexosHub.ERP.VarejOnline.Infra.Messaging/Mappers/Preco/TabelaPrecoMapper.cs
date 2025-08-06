@@ -5,7 +5,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Preco
 {
     public static class TabelaPrecoMapper
     {
-        private const string CodigoProdutoPrefixoPrecoRegiao = "preco_regiao_";
+        private const string CodigoProdutoPrefixoPrecoRegiao = "preco_venda";
 
         public static ProdutoPrecoView? Map(this TabelaPrecoListResponse? source)
         {

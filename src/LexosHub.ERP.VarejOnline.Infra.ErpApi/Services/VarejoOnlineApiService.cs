@@ -1,6 +1,7 @@
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook;
@@ -105,28 +106,24 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         #endregion
 
         #region Prices
-        public async Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, int inicio = 0, int quantidade = 10, string? alteradoApos = null, string? entidades = null)
+        public async Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, TabelaPrecoRequest request)
         {
-            var request = new RestRequest("apps/api/tabelas-preco", Method.Get);
+            var resource = request.Id.HasValue ? $"apps/api/tabelas-preco/{request.Id.Value}" : "apps/api/tabelas-preco";
+            var restRequest = new RestRequest(resource, Method.Get);
 
-            request.AddQueryParameter("inicio", inicio.ToString());
+            restRequest.AddQueryParameter("inicio", request.Inicio.ToString());
 
-            request.AddQueryParameter("quantidade", quantidade.ToString());
+            restRequest.AddQueryParameter("quantidade", request.Quantidade.ToString());
 
-            if (!string.IsNullOrWhiteSpace(alteradoApos))
-                request.AddQueryParameter("alteradoApos", alteradoApos);
-
-            if (!string.IsNullOrWhiteSpace(entidades))
-                request.AddQueryParameter("entidades", entidades);
-
-            return await ExecuteAsync<List<TabelaPrecoListResponse>>(request, token);
+            return await ExecuteAsync<List<TabelaPrecoListResponse>>(restRequest, token);
         }
         #endregion
 
         #region Produtos
         public async Task<Response<List<ProdutoResponse>>> GetProdutosAsync(string token, ProdutoRequest request)
         {
-            var resource = request.Id.HasValue ? $"apps/api/produtos/{request.Id.Value}" : "apps/api/produtos";
+            //var resource = request.Id.HasValue ? $"apps/api/produtos/{request.Id.Value}" : "apps/api/produtos";
+            var resource = "apps/api/produtos";
             var restRequest = new RestRequest(resource, Method.Get);
 
             if (request.Inicio.HasValue)
@@ -183,8 +180,8 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
             if (!string.IsNullOrWhiteSpace(request.CriacaoAte))
                 restRequest.AddQueryParameter("criacaoAte", request.CriacaoAte);
 
-            if (!string.IsNullOrWhiteSpace(request.IdsProdutos))
-                restRequest.AddQueryParameter("idsProdutos", request.IdsProdutos);
+            if (request.Id.HasValue)
+                restRequest.AddQueryParameter("idsProdutos", request.Id.Value);
 
             if (!string.IsNullOrWhiteSpace(request.IdsTabelasPrecos))
                 restRequest.AddQueryParameter("idsTabelasPrecos", request.IdsTabelasPrecos);

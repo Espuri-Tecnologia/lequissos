@@ -1,8 +1,8 @@
-using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
+﻿using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Events
 {
-    public class ProductsPageProcessed : BaseEvent
+    public class CriarProdutosConfiguraveis : BaseEvent
     {
         public string HubKey { get; set; } = null!;
         public int Start { get; set; }
@@ -11,4 +11,3 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Events
         public List<ProdutoResponse>? Produtos { get; set; }
     }
 }
-

@@ -2,6 +2,7 @@ using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
+using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -40,6 +41,8 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
             var pageSize = (@event.Quantidade.HasValue && @event.Quantidade.Value > 0)
                 ? @event.Quantidade.Value
                 : _defaultPageSize;
+
+            var produtosConfiguraveis = new List<ProdutoResponse>();
 
             int count;
 
@@ -80,7 +83,10 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                     break;
                 }
 
-                var pageEvent = new ProductsPageProcessed
+                var simples = produtos.Where(p => p.MercadoriaBase == false).ToList();
+                var configuraveis = produtos.Where(p => p.MercadoriaBase == true).ToList();
+
+                var pageEvent = new CriarProdutosSimples
                 {
                     HubKey = @event.HubKey,
                     Start = start,
@@ -91,9 +97,22 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 
                 await _dispatcher.DispatchAsync(pageEvent, cancellationToken);
 
+                produtosConfiguraveis.AddRange(configuraveis);
+
                 start += pageSize;
 
             } while (count >= pageSize);
+
+            if (produtosConfiguraveis.Any())
+            {
+                var configuraveisEvent = new CriarProdutosConfiguraveis
+                {
+                    HubKey = @event.HubKey,
+                    Produtos = produtosConfiguraveis,
+                    ProcessedCount = produtosConfiguraveis.Count
+                };
+                await _dispatcher.DispatchAsync(configuraveisEvent, cancellationToken);
+            }
         }
 
     }

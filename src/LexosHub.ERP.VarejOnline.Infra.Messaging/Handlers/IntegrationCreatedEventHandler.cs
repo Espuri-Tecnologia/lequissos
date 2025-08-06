@@ -21,7 +21,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 
         public async Task HandleAsync(IntegrationCreated @event, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"Integra\u00e7\u00e3o criada: {@event.HubIntegrationId}, Cliente: {@event.Cnpj}");
+            _logger.LogInformation($"Integração criada: {@event.HubIntegrationId}, Cliente: {@event.Cnpj}");
             var dto = new HubIntegracaoDto
             {
                 IntegracaoId = @event.HubIntegrationId,

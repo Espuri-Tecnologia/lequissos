@@ -10,12 +10,12 @@ using Newtonsoft.Json;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 {
-    public class ProductsPageProcessedEventHandler : IEventHandler<ProductsPageProcessed>
+    public class CriarProdutosSimplesEventHandler : IEventHandler<CriarProdutosSimples>
     {
-        private readonly ILogger<ProductsPageProcessedEventHandler> _logger;
+        private readonly ILogger<CriarProdutosSimplesEventHandler> _logger;
         private readonly ISqsRepository _syncOutSqsRepository;
 
-        public ProductsPageProcessedEventHandler(ILogger<ProductsPageProcessedEventHandler> logger, ISqsRepository syncOutSqsRepository, IOptions<SyncOutConfig> syncOutSqsConfig)
+        public CriarProdutosSimplesEventHandler(ILogger<CriarProdutosSimplesEventHandler> logger, ISqsRepository syncOutSqsRepository, IOptions<SyncOutConfig> syncOutSqsConfig)
         {
             _logger = logger;
             _syncOutSqsRepository = syncOutSqsRepository;
@@ -23,7 +23,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
             _syncOutSqsRepository.IniciarFila($"{syncOutConfig.SQSBaseUrl}{syncOutConfig.SQSAccessKeyId}/{syncOutConfig.SQSName}");
         }
 
-        public Task HandleAsync(ProductsPageProcessed @event, CancellationToken cancellationToken)
+        public Task HandleAsync(CriarProdutosSimples @event, CancellationToken cancellationToken)
         {
             _logger.LogInformation(
                 "Pgina processada recebida. Hub: {HubKey}, Incio: {Start}, Quantidade: {PageSize}, Processados: {ProcessedCount}, Produtos: {ProductsCount}",

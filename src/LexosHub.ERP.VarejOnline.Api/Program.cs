@@ -78,7 +78,7 @@ try
     builder.Services.AddTransient<IEventHandler<IntegrationCreated>, IntegrationCreatedEventHandler>();
     builder.Services.AddTransient<IEventHandler<InitialSync>, InitialSyncEventHandler>();
     builder.Services.AddTransient<IEventHandler<ProductsRequested>, ProductsRequestedEventHandler>();
-    builder.Services.AddTransient<IEventHandler<ProductsPageProcessed>, ProductsPageProcessedEventHandler>();
+    builder.Services.AddTransient<IEventHandler<CriarProdutosSimples    >, CriarProdutosSimplesEventHandler>();
     builder.Services.AddTransient<IEventHandler<PriceTablesRequested>, PriceTablesRequestedEventHandler>();
     builder.Services.AddTransient<IEventHandler<PriceTablePageProcessed>, PriceTablesPageProcessedEventHandler>();
     builder.Services.AddTransient<IEventHandler<CompaniesRequested>, CompaniesRequestedEventHandler>();

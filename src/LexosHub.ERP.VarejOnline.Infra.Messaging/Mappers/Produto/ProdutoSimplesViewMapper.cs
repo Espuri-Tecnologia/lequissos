@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
 {
-    public static class ProdutoViewMapper
+    public static class ProdutoSimplesViewMapper
     {
         private const string CodigoProdutoPrecoVenda = "preco_venda";
 
@@ -36,9 +36,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
 
             return new ProdutoView
             {
-                ProdutoIdGlobal = source.Id,
-                ProdutoId = source.Id,
-                ProdutoTipoId = Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
+                ProdutoTipoId = source.MercadoriaBase.Value ? Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL : Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
                 Nome = Trim(source.Descricao, 255),
                 Descricao = Trim(source.Descricao, 255),
                 DescricaoMarketplace = Trim(source.Descricao, 255),
@@ -62,7 +60,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 MetaDescription = Trim(source.DescricaoSimplificada ?? source.Descricao, 160),
                 Composicao = source.Componentes?.Select(c => new ProdutoComposicaoView
                 {
-                    ProdutoId = c.Produto.Id,
                     Quantidade = double.Parse(c.Quantidade.ToString()),                    
                 }).ToList() ?? new List<ProdutoComposicaoView>(),
                 Categorias = source.Categorias?.Select(c => new ProdutoCategoriaView
@@ -74,7 +71,8 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 ProdutoImposto = new ProdutoImpostoView
                 {
                     NCM = source.CodigoNcm,
-                    Origem = source.Origem.HasValue ? (short)source.Origem.Value : short.MinValue
+                    Origem = source.Origem.HasValue ? (short)source.Origem.Value : short.MinValue,
+                    Cest = source.CodigoCest
                 }
             };
         }
@@ -101,8 +99,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
             {
                 Imagens = imagens,
                 Sku = produto.CodigoSku,
-                ProdutoId = produto.Id,
-                ProdutoIdGlobal = produto.Id,
                 TipoProdutoId = Lexos.Hub.Sync.Constantes.Produto.SIMPLES
             };
         }
@@ -129,31 +125,26 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 return new List<ProdutoPrecoView> { 
                     new ProdutoPrecoView { 
                         Preco = produto.Preco.Value, 
-                        ProdutoId = produto.Id,
+                        Codigo = "1",
                         Sku = produto.CodigoSistema,
-                        ProdutoIdGlobal = produto.Id
                     } 
                 };
 
-            foreach (PrecoPorTabelaResponse priceResponse in produto.PrecosPorTabelas)
+            foreach (TabelaPrecoResponse priceResponse in produto.PrecosPorTabelas)
                 produtoPrecoViewList.Add(priceResponse.NewProdutoPrecoView(produto.CodigoSistema, produtoTipoId: produtoTipoId, codigo: CodigoProdutoPrecoVenda));
 
             return produtoPrecoViewList;
         }
-        private static ProdutoPrecoView NewProdutoPrecoView(this PrecoPorTabelaResponse precoPorTabelaResponse, string sku, string produtoTipoId, string codigo)
+        private static ProdutoPrecoView NewProdutoPrecoView(this TabelaPrecoResponse precoPorTabelaResponse, string sku, string produtoTipoId, string codigo)
         {
             ProdutoPrecoView produtoPrecoView = new()
             {
                 Preco = precoPorTabelaResponse.Preco,
-                Descricao = $"Preco Sku: {sku}",
                 Sku = sku,
-                Tipo = produtoTipoId,
-                Codigo = codigo
+                Codigo = precoPorTabelaResponse.IdTabelaPreco.ToString()
             };
             return produtoPrecoView;
         }
-
-
         public static List<ProdutoView> Map(this List<ProdutoResponse> source)
         {
             return source?.Select(Map)

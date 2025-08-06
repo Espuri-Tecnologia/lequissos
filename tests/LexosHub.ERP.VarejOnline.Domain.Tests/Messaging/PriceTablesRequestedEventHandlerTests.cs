@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
 
 namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
 {
@@ -74,7 +75,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                 new TabelaPrecoListResponse { Id = 3 }
             };
 
-            _apiService.SetupSequence(a => a.GetPriceTablesAsync("token", It.IsAny<int>(), It.IsAny<int>(), null, null))
+            _apiService.SetupSequence(a => a.GetPriceTablesAsync("token", It.IsAny<TabelaPrecoRequest>()))
                 .ReturnsAsync(new Response<List<TabelaPrecoListResponse>>(firstPage))
                 .ReturnsAsync(new Response<List<TabelaPrecoListResponse>>(secondPage));
 
