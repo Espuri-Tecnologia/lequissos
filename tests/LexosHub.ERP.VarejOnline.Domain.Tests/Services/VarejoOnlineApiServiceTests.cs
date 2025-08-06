@@ -1,9 +1,14 @@
 using System;
+using System.Net;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Xunit;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
+using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services;
+using Microsoft.Extensions.Options;
+using RestSharp;
+using Xunit;
 
 namespace LexosHub.ERP.VarejOnline.Domain.Tests.Services
 {
@@ -36,6 +41,41 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Services
             var url = await service.GetAuthUrl();
 
             Assert.Equal("https://api/oauth?client_id=id&redirect_uri=redir", url);
+        }
+
+        [Fact]
+        public async Task GetProdutosAsync_WithProdutoBase_ShouldIncludeQueryParameter()
+        {
+            var settings = new VarejOnlineApiSettings { BaseUrl = "https://api/" };
+            var service = CreateService(settings);
+
+            var client = new TestRestClient();
+            typeof(VarejoOnlineApiService)
+                .GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(service, client);
+
+            var request = new ProdutoRequest { ProdutoBase = 10 };
+            await service.GetProdutosAsync("token", request);
+
+            var uri = client.BuildUri(client.LastRequest!);
+            Assert.Contains("produtoBase=10", uri.Query);
+        }
+
+        private class TestRestClient : RestClient
+        {
+            public RestRequest? LastRequest { get; private set; }
+
+            public TestRestClient() : base("https://test") { }
+
+            public override Task<RestResponse> ExecuteAsync(RestRequest request, CancellationToken cancellationToken = default)
+            {
+                LastRequest = request;
+                return Task.FromResult(new RestResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = "[]"
+                });
+            }
         }
     }
 }

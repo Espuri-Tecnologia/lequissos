@@ -139,7 +139,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
                 restRequest.AddQueryParameter("categoria", request.Categoria);
 
             if (request.ProdutoBase.HasValue)
-                request.ProdutoBase.Value.ToString();
+                restRequest.AddQueryParameter("produtoBase", request.ProdutoBase.Value.ToString());
 
             if (!string.IsNullOrWhiteSpace(request.Descricao))
                 restRequest.AddQueryParameter("descricao", request.Descricao);
