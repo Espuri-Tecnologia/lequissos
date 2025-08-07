@@ -195,4 +195,65 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
             Assert.Equal(0, result.Altura);
         }
     }
+
+        [Fact]
+        public void MapConfiguravel_ShouldMapVariacoes()
+        {
+            var produtoBase = new ProdutoResponse
+            {
+                Id = 10,
+                Descricao = "Produto Base",
+                CodigoSku = "BASE",
+                CodigoSistema = "BASE",
+                MercadoriaBase = true,
+            };
+
+            var variacoes = new List<ProdutoResponse>
+            {
+                new ProdutoResponse
+                {
+                    Id = 11,
+                    CodigoSistema = "VAR1",
+                    CodigoBarras = "EAN1",
+                    Ativo = true,
+                    ValorAtributos = new List<ValorAtributoResponse>
+                    {
+                        new ValorAtributoResponse { Nome = "TAMANHO", Valor = "M" },
+                        new ValorAtributoResponse { Nome = "COR", Valor = "Azul" }
+                    }
+                },
+                new ProdutoResponse
+                {
+                    Id = 12,
+                    CodigoSistema = "VAR2",
+                    CodigoBarras = "EAN2",
+                    Ativo = false,
+                    ValorAtributos = new List<ValorAtributoResponse>
+                    {
+                        new ValorAtributoResponse { Nome = "TAMANHO", Valor = "G" },
+                        new ValorAtributoResponse { Nome = "COR", Valor = "Vermelho" }
+                    }
+                }
+            };
+
+            var result = ProdutoConfiguravelViewMapper.Map(produtoBase, variacoes)!;
+
+            Assert.Equal(Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL, result.ProdutoTipoId);
+            Assert.Equal(2, result.Variacoes.Count);
+
+            var v1 = result.Variacoes[0];
+            Assert.Equal("VAR1", v1.Sku);
+            Assert.Equal("EAN1", v1.EAN);
+            Assert.Equal("M", v1.Tamanho);
+            Assert.Equal("Azul", v1.Cor);
+            Assert.True(v1.Deleted == false);
+
+            var v2 = result.Variacoes[1];
+            Assert.Equal("VAR2", v2.Sku);
+            Assert.Equal("EAN2", v2.EAN);
+            Assert.Equal("G", v2.Tamanho);
+            Assert.Equal("Vermelho", v2.Cor);
+            Assert.True(v2.Deleted);
+        }
+    }
 }
