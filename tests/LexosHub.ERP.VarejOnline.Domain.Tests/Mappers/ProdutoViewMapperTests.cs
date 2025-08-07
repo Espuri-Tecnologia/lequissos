@@ -8,10 +8,12 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
 {
     public class ProdutoViewMapperTests
     {
+        private readonly ProdutoViewMapper _mapper = new();
+
         [Fact]
         public void Map_ShouldReturnNull_WhenSourceIsNull()
         {
-            var result = ProdutoSimplesViewMapper.Map((ProdutoResponse?)null);
+            var result = _mapper.MapSimples((ProdutoResponse?)null);
             Assert.Null(result);
         }
 
@@ -33,7 +35,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
                 }
             };
 
-            var result = source.Map();
+            var result = _mapper.MapSimples(source);
 
             Assert.Single(result);
             var item = result[0];
@@ -57,7 +59,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
                 CodigoSku = "SKU"
             };
 
-            var result = ProdutoSimplesViewMapper.Map(source)!;
+            var result = _mapper.MapSimples(source)!;
 
             Assert.NotNull(result.Precos);
             Assert.Empty(result.Precos);
@@ -88,7 +90,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
                 CodigoSku = "  " + sku + "  "
             };
 
-            var result = ProdutoSimplesViewMapper.Map(source)!;
+            var result = _mapper.MapSimples(source)!;
 
             Assert.Equal(50, result.Sku!.Length);
             Assert.False(result.Sku.StartsWith(" "));
@@ -109,7 +111,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
                 Largura = null
             };
 
-            var result = ProdutoSimplesViewMapper.Map(source)!;
+            var result = _mapper.MapSimples(source)!;
 
             Assert.Equal(0, result.Peso);
             Assert.Equal(0, result.Altura);
@@ -129,7 +131,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
                 ValorAtributos = new List<ValorAtributoResponse>()
             };
 
-            var result = ProdutoSimplesViewMapper.Map(source);
+            var result = _mapper.MapSimples(source);
 
             Assert.Null(result);
         }
@@ -150,7 +152,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
                 CodigoBarras = longEan
             };
 
-            var result = ProdutoSimplesViewMapper.Map(source)!;
+            var result = _mapper.MapSimples(source)!;
 
             Assert.True(result.Nome!.Length <= 255);
             Assert.True(result.DescricaoResumida!.Length <= 255);
@@ -168,7 +170,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
                 Categorias = null
             };
 
-            var result = ProdutoSimplesViewMapper.Map(source)!;
+            var result = _mapper.MapSimples(source)!;
 
             Assert.Null(result.Marca);
             Assert.Empty(result.Categorias);
@@ -184,7 +186,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
                 CodigoSku = "  SKU  "
             };
 
-            var result = ProdutoSimplesViewMapper.Map(source)!;
+            var result = _mapper.MapSimples(source)!;
 
             Assert.Equal("Produto", result.Nome);
             Assert.Equal("SKU", result.Sku);
@@ -236,7 +238,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
                 }
             };
 
-            var result = ProdutoConfiguravelViewMapper.Map(produtoBase, variacoes)!;
+            var result = _mapper.MapConfiguravel(produtoBase, variacoes)!;
 
             Assert.Equal(Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL, result.ProdutoTipoId);
             Assert.Equal(2, result.Variacoes.Count);

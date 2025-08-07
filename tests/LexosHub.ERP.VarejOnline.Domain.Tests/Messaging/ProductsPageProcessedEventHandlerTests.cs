@@ -3,6 +3,7 @@ using LexosHub.ERP.VarejOnline.Domain.Interfaces.Repositories.Integration;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -23,7 +24,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         private readonly Mock<IOptions<SyncOutConfig>> _syncOutSqsConfigMock = new();
 
         private CriarProdutosSimplesEventHandler CreateHandler() =>
-            new CriarProdutosSimplesEventHandler(_logger.Object, _sqsRepository.Object, _syncOutSqsConfigMock.Object);
+            new CriarProdutosSimplesEventHandler(_logger.Object, _sqsRepository.Object, _syncOutSqsConfigMock.Object, new ProdutoViewMapper());
 
         [Fact]
         public async Task HandleAsync_ShouldLogInformation()

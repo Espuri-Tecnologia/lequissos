@@ -18,6 +18,7 @@ using LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Persistence;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Services;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +52,7 @@ try
     builder.Services.AddTransient<IVarejOnlineApiService, VarejOnlineApiService>();
     builder.Services.AddTransient<ISqsRepository, SqsRepository>();
     builder.Services.AddTransient<IWebhookService, WebhookService>();
+    builder.Services.AddTransient<ProdutoViewMapper>();
 
     builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
     builder.Services.AddScoped<IWebhookRepository, WebhookRepository>();
