@@ -1,5 +1,6 @@
 using Lexos.Hub.Sync.Models.Produto;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
+using System;
 using System.Linq;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
@@ -29,6 +30,13 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 return null;
             }
 
+            if (source.Classificacao != null &&
+                source.Classificacao.Equals("configuravel", StringComparison.OrdinalIgnoreCase) &&
+                (source.ValorAtributos == null || !source.ValorAtributos.Any()))
+            {
+                return null;
+            }
+
             decimal peso = GetNonNegative(source.Peso);
             decimal comprimento = GetNonNegative(source.Comprimento);
             decimal largura = GetNonNegative(source.Largura);
@@ -36,13 +44,15 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
 
             return new ProdutoView
             {
-                ProdutoTipoId = source.MercadoriaBase.Value ? Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL : Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
+                ProdutoId = source.Id,
+                ProdutoIdGlobal = source.Id,
+                ProdutoTipoId = source.MercadoriaBase == true ? Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL : Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
                 Nome = Trim(source.Descricao, 255),
                 Descricao = Trim(source.Descricao, 255),
                 DescricaoMarketplace = Trim(source.Descricao, 255),
                 DescricaoResumida = Trim(source.DescricaoSimplificada ?? $"{source.Descricao} - {source.CodigoSku}", 255),
                 Ean = Trim(source.CodigoBarras, 50),
-                Sku = Trim(source.CodigoSistema, 50),
+                Sku = Trim(source.CodigoSku, 50),
                 Peso = peso,
                 Comprimento = comprimento,
                 Largura = largura,
@@ -51,7 +61,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 Deleted = !source.Ativo,
                 Classificacao = source.Classificacao,
                 Precos = source.MapToProdutoPrecoView(),
-                ImagensCadastradas = source.MapImagensCadastradas(),                
+                ImagensCadastradas = source.MapImagensCadastradas(),
                 Marca = source.Categorias?.FirstOrDefault(x => x.Nivel == "MARCA")?.Nome,
                 Modelo = source.Categorias?.FirstOrDefault(x => x.Nivel == "COLEÇÃO")?.Nome,
                 Setor = source.Categorias?.FirstOrDefault(x => x.Nivel == "DEPARTAMENTO")?.Nome,
@@ -60,11 +70,11 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 MetaDescription = Trim(source.DescricaoSimplificada ?? source.Descricao, 160),
                 Composicao = source.Componentes?.Select(c => new ProdutoComposicaoView
                 {
-                    Quantidade = double.Parse(c.Quantidade.ToString()),                    
+                    Quantidade = double.Parse(c.Quantidade.ToString()),
                 }).ToList() ?? new List<ProdutoComposicaoView>(),
                 Categorias = source.Categorias?.Select(c => new ProdutoCategoriaView
                 {
-                    PlataformaId = 41,                    
+                    PlataformaId = 41,
                 }).ToList() ?? new List<ProdutoCategoriaView>(),
                 Imagens = source.MapImages(),
                 ProdutoEanComplemento = source.CodigosBarraAdicionais ?? new List<string>(),
