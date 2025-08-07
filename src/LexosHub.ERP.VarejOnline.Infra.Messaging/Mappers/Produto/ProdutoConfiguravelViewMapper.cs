@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Lexos.Hub.Sync.Models.Produto;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 
@@ -34,8 +31,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
 
             return new ProdutoVariacaoView
             {
-                ProdutoIdGlobal = source.Id,
-                ProdutoId = source.Id,
                 Sku = source.CodigoSistema?.Trim(),
                 EAN = source.CodigoBarras,
                 Tamanho = tamanho,
