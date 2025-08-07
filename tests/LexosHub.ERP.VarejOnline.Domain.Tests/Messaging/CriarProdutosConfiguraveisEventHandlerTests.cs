@@ -1,4 +1,5 @@
 using Lexos.Hub.Sync;
+using Lexos.Hub.Sync.Models.Produto;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
@@ -10,6 +11,7 @@ using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Lexos.SQS.Interface;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Moq;
 using System.Collections.Generic;
 using System.Threading;
@@ -30,7 +32,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
             new(_logger.Object, _integrationService.Object, _apiService.Object, _sqsRepository.Object, _options);
 
         [Fact]
-        public async Task HandleAsync_ShouldCallApiAndSendMessage()
+        public async Task HandleAsync_ShouldCallApiPopulateVariacoesAndSendMessage()
         {
             var evt = new CriarProdutosConfiguraveis
             {
@@ -68,12 +70,23 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
             _apiService.Setup(a => a.GetProdutosAsync("token", It.Is<ProdutoRequest>(r => r.ProdutoBase == 1)))
                 .ReturnsAsync(new Response<List<ProdutoResponse>>(variacoes));
 
+            NotificacaoAtualizacaoModel? captured = null;
+            _sqsRepository
+                .Setup(r => r.AdicionarMensagemFilaFifo(It.IsAny<NotificacaoAtualizacaoModel>(), It.IsAny<string>()))
+                .Callback<NotificacaoAtualizacaoModel, string>((m, _) => captured = m);
+
             await CreateHandler().HandleAsync(evt, CancellationToken.None);
 
             _apiService.Verify(a => a.GetProdutosAsync("token", It.Is<ProdutoRequest>(r => r.ProdutoBase == 1)), Times.Once);
             _sqsRepository.Verify(r => r.AdicionarMensagemFilaFifo(
                 It.IsAny<NotificacaoAtualizacaoModel>(),
                 It.Is<string>(s => s == "notificacao-syncout-key")), Times.Once);
+
+            Assert.NotNull(captured);
+            var produtos = JsonConvert.DeserializeObject<List<ProdutoView>>(captured!.Json);
+            Assert.NotNull(produtos);
+            Assert.Single(produtos!);
+            Assert.Single(produtos![0].Variacoes);
         }
     }
 }

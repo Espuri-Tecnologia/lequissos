@@ -66,6 +66,27 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         }
 
         [Fact]
+        public async Task HandleAsync_WithProdutoBase_ShouldCallApiServiceWithProdutoBase()
+        {
+            var evt = new ProductsRequested
+            {
+                HubKey = "key",
+                ProdutoBase = 10
+            };
+
+            var integration = new IntegrationDto { Token = "token" };
+            _integrationService.Setup(s => s.GetIntegrationByKeyAsync("key"))
+                .ReturnsAsync(new Response<IntegrationDto>(integration));
+
+            await CreateHandler().HandleAsync(evt, CancellationToken.None);
+
+            _apiService.Verify(a => a.GetProdutosAsync(
+                    "token",
+                    It.Is<ProdutoRequest>(r => r.ProdutoBase == evt.ProdutoBase)
+                ), Times.Once);
+        }
+
+        [Fact]
         public async Task HandleAsync_ShouldProcessAllPagesAndDispatchEvents()
         {
             var evt = new ProductsRequested
