@@ -7,6 +7,7 @@ using LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 {
@@ -14,11 +15,13 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
     {
         private readonly ILogger<CriarProdutosSimplesEventHandler> _logger;
         private readonly ISqsRepository _syncOutSqsRepository;
+        private readonly ProdutoViewMapper _produtoViewMapper;
 
-        public CriarProdutosSimplesEventHandler(ILogger<CriarProdutosSimplesEventHandler> logger, ISqsRepository syncOutSqsRepository, IOptions<SyncOutConfig> syncOutSqsConfig)
+        public CriarProdutosSimplesEventHandler(ILogger<CriarProdutosSimplesEventHandler> logger, ISqsRepository syncOutSqsRepository, IOptions<SyncOutConfig> syncOutSqsConfig, ProdutoViewMapper produtoViewMapper)
         {
             _logger = logger;
             _syncOutSqsRepository = syncOutSqsRepository;
+            _produtoViewMapper = produtoViewMapper;
             var syncOutConfig = syncOutSqsConfig.Value;
             _syncOutSqsRepository.IniciarFila($"{syncOutConfig.SQSBaseUrl}{syncOutConfig.SQSAccessKeyId}/{syncOutConfig.SQSName}");
         }
@@ -35,9 +38,9 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 
             if (@event is not null && @event.Produtos.Any())
             {
-                var mapped = @event.Produtos.Map();
+                var mapped = _produtoViewMapper.MapSimples(@event.Produtos);
 
-                if (mapped is not null)
+                if (mapped.Any())
                 {
                     var notificacao = new NotificacaoAtualizacaoModel()
                     {
