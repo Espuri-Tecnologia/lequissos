@@ -79,24 +79,5 @@ public class CriarProdutosConfiguraveisEventHandler
             _syncOutSqsRepository.AdicionarMensagemFilaFifo(notificacao, $"notificacao-syncout-{notificacao.Chave}");
         }
     }
-
-    private static ProdutoVariacaoView MapVariacao(ProdutoResponse source)
-    {
-        var tamanho = source.ValorAtributos?.FirstOrDefault(a => a.Nome.Equals("TAMANHO", StringComparison.OrdinalIgnoreCase))?.Valor;
-        var cor = source.ValorAtributos?.FirstOrDefault(a => a.Nome.Equals("COR", StringComparison.OrdinalIgnoreCase))?.Valor;
-
-        return new ProdutoVariacaoView
-        {
-            ProdutoIdGlobal = source.Id,
-            ProdutoId = source.Id,
-            Sku = source.CodigoSistema?.Trim(),
-            EAN = source.CodigoBarras,
-            Tamanho = tamanho,
-            Cor = cor,
-            Deleted = !source.Ativo,
-            OutrasVariacoes = new List<OutraVariacao>(),
-            ReferenciasOutrasPlataformas = new List<ProdutoReferenciaView>()
-        };
-    }
 }
 

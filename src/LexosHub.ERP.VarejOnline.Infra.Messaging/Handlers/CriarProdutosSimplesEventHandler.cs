@@ -18,6 +18,14 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
         private readonly ProdutoViewMapper _produtoViewMapper;
         private readonly CriarProdutosConfiguraveisEventHandler _configuraveisHandler;
 
+        public CriarProdutosSimplesEventHandler(ILogger<CriarProdutosSimplesEventHandler> object1, ISqsRepository object2, IOptions<SyncOutConfig> object3, ProdutoViewMapper produtoViewMapper)
+        {
+            Object1 = object1;
+            Object2 = object2;
+            Object3 = object3;
+            _produtoViewMapper = produtoViewMapper;
+        }
+
         public CriarProdutosSimplesEventHandler(ILogger<CriarProdutosSimplesEventHandler> logger, ISqsRepository syncOutSqsRepository, IOptions<SyncOutConfig> syncOutSqsConfig, ProdutoViewMapper produtoViewMapper, CriarProdutosConfiguraveisEventHandler configuraveisHandler)
         {
             _logger = logger;
@@ -27,6 +35,10 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
             var syncOutConfig = syncOutSqsConfig.Value;
             _syncOutSqsRepository.IniciarFila($"{syncOutConfig.SQSBaseUrl}{syncOutConfig.SQSAccessKeyId}/{syncOutConfig.SQSName}");
         }
+
+        public ILogger<CriarProdutosSimplesEventHandler> Object1 { get; }
+        public ISqsRepository Object2 { get; }
+        public IOptions<SyncOutConfig> Object3 { get; }
 
         public Task HandleAsync(CriarProdutosSimples @event, CancellationToken cancellationToken)
         {

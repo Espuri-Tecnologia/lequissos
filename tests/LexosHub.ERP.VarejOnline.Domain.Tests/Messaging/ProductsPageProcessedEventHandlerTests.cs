@@ -22,9 +22,10 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         private readonly Mock<ISqsRepository> _sqsRepository = new();
         private readonly Mock<IIntegrationRepository> _integrationRepository = new();
         private readonly Mock<IOptions<SyncOutConfig>> _syncOutSqsConfigMock = new();
+        private readonly Mock<ProdutoViewMapper> _produtoViewMapperMock = new();
 
         private CriarProdutosSimplesEventHandler CreateHandler() =>
-            new CriarProdutosSimplesEventHandler(_logger.Object, _sqsRepository.Object, _syncOutSqsConfigMock.Object, new ProdutoViewMapper());
+            new CriarProdutosSimplesEventHandler(_logger.Object, _sqsRepository.Object, _syncOutSqsConfigMock.Object, _produtoViewMapperMock.Object);
 
         [Fact]
         public async Task HandleAsync_ShouldLogInformation()
