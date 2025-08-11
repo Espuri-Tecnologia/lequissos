@@ -1,12 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using LexosHub.ERP.VarejOnline.Domain.DTOs.Pedido;
+using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LexosHub.ERP.VarejOnline.Api.Controllers.Pedido
 {
+    [ApiController]
+    [Route("api/pedidos")]
     public class PedidoController : Controller
     {
-        public IActionResult Index()
+        private readonly IPedidoService _pedidoService;
+
+        public PedidoController(IPedidoService pedidoService)
         {
-            return View();
+            _pedidoService = pedidoService;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAsync([FromBody] PedidoDto pedido)
+        {
+            var result = await _pedidoService.CreateAsync(pedido);
+            return Ok(result);
         }
     }
 }
+

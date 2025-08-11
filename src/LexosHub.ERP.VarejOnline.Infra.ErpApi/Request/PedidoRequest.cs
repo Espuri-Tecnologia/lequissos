@@ -1,3 +1,6 @@
+using System;
+using Newtonsoft.Json;
+
 namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Request
 {
     /// <summary>
@@ -5,9 +8,13 @@ namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Request
     /// </summary>
     public class PedidoRequest
     {
+        [JsonProperty("codigo")]
         public string Codigo { get; set; } = string.Empty;
         public string ClienteCpfCnpj { get; set; } = string.Empty;
         public string ClienteNome { get; set; } = string.Empty;
         public decimal? Total { get; set; }
+
+        [JsonProperty("data")]
+        public DateTime? Data { get; set; }
     }
 }
