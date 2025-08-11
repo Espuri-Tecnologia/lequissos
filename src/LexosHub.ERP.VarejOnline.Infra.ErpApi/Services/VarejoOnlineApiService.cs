@@ -223,6 +223,10 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         }
         #endregion
 
+        #region Pedido
+
+        #endregion
+
         #region WebhookRegister
         public async Task<Response<WebhookOperationResponse>> RegisterWebhookAsync(string token,
     WebhookRequest payload,
