@@ -23,6 +23,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         private string _clientSecret;
         private string _oAuthUrl;
         private string _webHookEnpoint;
+        private string _pedidoEndpoint;
 
         // JsonSerializerOptions global para System.Text.Json
         private static readonly JsonSerializerOptions DefaultJsonOptions = new()
@@ -46,6 +47,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
             _oAuthUrl = _erpApiSettings.OAuthUrl ?? string.Empty;
             _oAuthUrl = _erpApiSettings.OAuthUrl ?? string.Empty;
             _webHookEnpoint = _erpApiSettings.WebhookEndpoint ?? string.Empty;
+            _pedidoEndpoint = _erpApiSettings.PedidoUrl ?? string.Empty;
         }
 
         #region Auth
@@ -224,6 +226,15 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         #endregion
 
         #region Pedido
+
+        public async Task<Response<PedidoResponse>> PostPedidoAsync(string token, PedidoRequest payload)
+        {
+            var request = new RestRequest(_pedidoEndpoint, Method.Post)
+                .AddHeader("Content-Type", "application/json")
+                .AddJsonBody(payload);
+
+            return await ExecuteAsync<PedidoResponse>(request, token);
+        }
 
         #endregion
 

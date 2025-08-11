@@ -7,6 +7,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings
         public string? OAuthGetTokenUrl { get; set; }
         public string? OAuthRedirectUrl { get; set; }
         public string? WebhookEndpoint { get; set; }
+        public string? PedidoUrl { get; set; }
         public string? ClientId { get; set; }
         public string? ClientSecret { get; set; }
     }
