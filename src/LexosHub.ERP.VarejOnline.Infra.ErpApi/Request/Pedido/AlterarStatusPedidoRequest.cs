@@ -1,0 +1,25 @@
+using Newtonsoft.Json;
+
+namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido
+{
+    public class AlterarStatusPedidoRequest
+    {
+        [JsonProperty("idPedido")]
+        public long IdPedido { get; set; }
+
+        [JsonProperty("status")]
+        public string Status { get; set; } = string.Empty;
+
+        [JsonProperty("statusPedidoVenda")]
+        public StatusPedidoVendaRequest? StatusPedidoVenda { get; set; }
+    }
+
+    public class StatusPedidoVendaRequest
+    {
+        [JsonProperty("id")]
+        public long? Id { get; set; }
+
+        [JsonProperty("nome")]
+        public string? Nome { get; set; }
+    }
+}

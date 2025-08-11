@@ -234,6 +234,15 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
             return await ExecuteAsync<PedidoResponse>(restRequest, token);
         }
 
+        public async Task<Response<AlterarStatusPedidoResponse>> AlterarStatusPedidoAsync(string token, AlterarStatusPedidoRequest request)
+        {
+            var restRequest = new RestRequest("apps/api/pedidos/alterar-status", Method.Post)
+                .AddHeader("Content-Type", "application/json")
+                .AddJsonBody(request);
+
+            return await ExecuteAsync<AlterarStatusPedidoResponse>(restRequest, token);
+        }
+
         #endregion
 
         #region WebhookRegister

@@ -20,7 +20,14 @@ namespace LexosHub.ERP.VarejOnline.Api.Controllers.Pedido
         public async Task<IActionResult> EnviarPedido([FromBody] PedidoView pedido, string hubKey)
         {
             var result = await _pedidoService.EnviarPedido(hubKey, pedido);
-            return Ok(result);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpPost("alterar-status")]
+        public async Task<IActionResult> AlterarStatus([FromBody] AlterarStatusPedidoView payload, string hubKey)
+        {
+            var result = await _pedidoService.AlterarStatusPedido(hubKey, payload);
+            return StatusCode((int)result.StatusCode, result);
         }
     }
 }
