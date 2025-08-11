@@ -11,17 +11,19 @@ using System.Linq;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 {
-    public class CriarProdutosSimplesEventHandler : IEventHandler<CriarProdutosSimples>
+    public class CriarProdutosSimplesEventHandler : IEventHandler<CriarProdutosSimples>, IEventHandler<CriarProdutosConfiguraveis>
     {
         private readonly ILogger<CriarProdutosSimplesEventHandler> _logger;
         private readonly ISqsRepository _syncOutSqsRepository;
         private readonly ProdutoViewMapper _produtoViewMapper;
+        private readonly CriarProdutosConfiguraveisEventHandler _configuraveisHandler;
 
-        public CriarProdutosSimplesEventHandler(ILogger<CriarProdutosSimplesEventHandler> logger, ISqsRepository syncOutSqsRepository, IOptions<SyncOutConfig> syncOutSqsConfig, ProdutoViewMapper produtoViewMapper)
+        public CriarProdutosSimplesEventHandler(ILogger<CriarProdutosSimplesEventHandler> logger, ISqsRepository syncOutSqsRepository, IOptions<SyncOutConfig> syncOutSqsConfig, ProdutoViewMapper produtoViewMapper, CriarProdutosConfiguraveisEventHandler configuraveisHandler)
         {
             _logger = logger;
             _syncOutSqsRepository = syncOutSqsRepository;
             _produtoViewMapper = produtoViewMapper;
+            _configuraveisHandler = configuraveisHandler;
             var syncOutConfig = syncOutSqsConfig.Value;
             _syncOutSqsRepository.IniciarFila($"{syncOutConfig.SQSBaseUrl}{syncOutConfig.SQSAccessKeyId}/{syncOutConfig.SQSName}");
         }
@@ -52,8 +54,13 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                     };
                     _syncOutSqsRepository.AdicionarMensagemFilaFifo(notificacao, $"notificacao-syncout-{notificacao.Chave}");
                 }
-            }
-            return Task.CompletedTask;
         }
+        return Task.CompletedTask;
     }
+
+    async Task IEventHandler<CriarProdutosConfiguraveis>.HandleAsync(CriarProdutosConfiguraveis @event, CancellationToken cancellationToken)
+    {
+        await _configuraveisHandler.HandleAsync(@event, cancellationToken);
+    }
+}
 }

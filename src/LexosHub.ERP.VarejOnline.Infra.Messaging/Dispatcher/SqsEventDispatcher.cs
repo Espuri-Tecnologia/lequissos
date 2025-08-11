@@ -3,6 +3,7 @@ using Amazon.SQS.Model;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Text.Json;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
@@ -35,16 +36,25 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
 
         public async Task DispatchAsync(BaseEvent @event, CancellationToken cancellationToken)
         {
-            if (!_queueUrls.TryGetValue(@event.EventType, out var queueUrl))
+            var key = @event.EventType switch
+            {
+                nameof(CriarProdutosSimples) or nameof(CriarProdutosConfiguraveis) => "Produtos",
+                _ => @event.EventType
+            };
+
+            if (!_queueUrls.TryGetValue(key, out var queueUrl))
             {
                 throw new InvalidOperationException($"No queue configured for event '{@event.EventType}'");
             }
 
             var body = JsonSerializer.Serialize(@event, _jsonOptions);
+            var groupId = @event.GetType().GetProperty("HubKey")?.GetValue(@event)?.ToString() ?? @event.EventType;
             var request = new SendMessageRequest
             {
                 QueueUrl = queueUrl,
-                MessageBody = body
+                MessageBody = body,
+                MessageGroupId = groupId,
+                MessageDeduplicationId = Guid.NewGuid().ToString()
             };
 
             await _sqsClient.SendMessageAsync(request, cancellationToken);
