@@ -196,7 +196,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
             Assert.Equal(0, result.Largura);
             Assert.Equal(0, result.Altura);
         }
-    }
+    
 
         [Fact]
         public void MapConfiguravel_ShouldMapVariacoes()

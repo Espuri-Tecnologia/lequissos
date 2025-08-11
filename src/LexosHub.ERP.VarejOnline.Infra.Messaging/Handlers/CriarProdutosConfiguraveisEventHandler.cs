@@ -51,18 +51,15 @@ public class CriarProdutosConfiguraveisEventHandler : IEventHandler<CriarProduto
         {
             foreach (var produto in @event.Produtos)
             {
-                var produtoView = ProdutoSimplesViewMapper.Map(produto);
-                if (produtoView == null)
-                    continue;
+                
+                //if (produtoView == null)
+                //    continue;
 
                 var request = new ProdutoRequest { ProdutoBase = produto.Id };
                 var response = await _apiService.GetProdutosAsync(token, request);
                 var variacoes = response.Result ?? new List<ProdutoResponse>();
 
-                foreach (var variacao in variacoes)
-                {
-                    produtoView.Variacoes.Add(MapVariacao(variacao));
-                }
+                var produtoView = ProdutoConfiguravelViewMapper.Map(produto, variacoes);
 
                 produtosView.Add(produtoView);
             }

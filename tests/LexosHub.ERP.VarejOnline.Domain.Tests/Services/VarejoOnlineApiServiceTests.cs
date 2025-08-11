@@ -50,7 +50,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Services
             var service = CreateService(settings);
 
             var client = new TestRestClient();
-            typeof(VarejoOnlineApiService)
+            typeof(VarejOnlineApiService)
                 .GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(service, client);
 
@@ -67,7 +67,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Services
 
             public TestRestClient() : base("https://test") { }
 
-            public override Task<RestResponse> ExecuteAsync(RestRequest request, CancellationToken cancellationToken = default)
+            public new Task<RestResponse> ExecuteAsync(RestRequest request, CancellationToken cancellationToken = default)
             {
                 LastRequest = request;
                 return Task.FromResult(new RestResponse
