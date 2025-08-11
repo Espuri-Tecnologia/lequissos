@@ -15,7 +15,7 @@ using System.Linq;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
 
-public class CriarProdutosConfiguraveisEventHandler
+public class CriarProdutosConfiguraveisEventHandler : IEventHandler<CriarProdutosConfiguraveis>
 {
     private readonly ILogger<CriarProdutosConfiguraveisEventHandler> _logger;
     private readonly IIntegrationService _integrationService;
