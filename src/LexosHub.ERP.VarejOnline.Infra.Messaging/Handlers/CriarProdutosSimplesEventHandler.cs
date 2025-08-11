@@ -58,9 +58,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
         return Task.CompletedTask;
     }
 
-    async Task IEventHandler<CriarProdutosConfiguraveis>.HandleAsync(CriarProdutosConfiguraveis @event, CancellationToken cancellationToken)
-    {
-        await _configuraveisHandler.HandleAsync(@event, cancellationToken);
-    }
+    public async Task HandleAsync(CriarProdutosConfiguraveis @event, CancellationToken cancellationToken)
+        => await _configuraveisHandler.HandleAsync(@event, cancellationToken);
 }
 }
