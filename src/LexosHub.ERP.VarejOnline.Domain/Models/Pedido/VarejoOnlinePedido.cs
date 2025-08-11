@@ -1,11 +1,10 @@
-namespace LexosHub.ERP.VarejOnline.Domain.DTOs.Pedido
+namespace Lexos.Hub.Sync.Models.Pedido
 {
     /// <summary>
-    /// Representa os dados mínimos de um pedido para integração com o Varejo Online.
+    /// Modelo de pedido utilizado pelo domínio para integração com o Varejo Online.
     /// </summary>
-    public class PedidoDto
+    public class VarejoOnlinePedido
     {
-        public string HubKey { get; set; } = string.Empty;
         public string Codigo { get; set; } = string.Empty;
         public string ClienteCpfCnpj { get; set; } = string.Empty;
         public string ClienteNome { get; set; } = string.Empty;

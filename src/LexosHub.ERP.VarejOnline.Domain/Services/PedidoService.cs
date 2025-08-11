@@ -1,3 +1,4 @@
+using Lexos.Hub.Sync.Models.Pedido;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Pedido;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Domain.Mappers;
@@ -17,16 +18,16 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
             _apiService = apiService;
         }
 
-        public async Task<Response<PedidoResponse>> CreateAsync(PedidoDto dto)
+        public async Task<Response<PedidoResponse>> EnviarPedido(string hubKey, PedidoView pedidoView)
         {
-            if (dto == null) throw new ArgumentNullException(nameof(dto));
+            if (pedidoView == null) throw new ArgumentNullException(nameof(pedidoView));
 
-            var integration = await _integrationService.GetIntegrationByKeyAsync(dto.HubKey);
+            var integration = await _integrationService.GetIntegrationByKeyAsync(hubKey);
             if (integration.Result == null)
                 return new Response<PedidoResponse> { Error = integration.Error ?? new ErrorResult("integrationNotFound") };
 
             var token = integration.Result.Token ?? string.Empty;
-            var request = VarejoOnlinePedidoMapper.Map(dto);
+            var request = VarejoOnlinePedidoMapper.Map(pedidoView);
 
             return await _apiService.PostPedidoAsync(token, request);
         }

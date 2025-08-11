@@ -6,5 +6,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses
     {
         [JsonPropertyName("id")]
         public string? Id { get; set; }
+        public string Codigo { get; set; } = string.Empty;
+        public DateTime? Data { get; set; }
     }
 }
