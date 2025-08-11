@@ -1,6 +1,6 @@
 using Lexos.Hub.Sync.Models.Pedido;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Pedido;
-using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 
 namespace LexosHub.ERP.VarejOnline.Domain.Mappers
@@ -24,10 +24,6 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
 
             return new PedidoRequest
             {
-                Codigo = source.Codigo,
-                ClienteCpfCnpj = source.ClienteCpfcnpj,
-                ClienteNome = source.ClienteNome,
-                Total = source.Total
             };
         }
     }

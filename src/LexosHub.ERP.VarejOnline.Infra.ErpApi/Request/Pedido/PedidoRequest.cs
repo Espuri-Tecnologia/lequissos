@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Request
+namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido
 {
     /// <summary>
     /// Modelo alinhado ao POST /pedidos do Varejo Online.
