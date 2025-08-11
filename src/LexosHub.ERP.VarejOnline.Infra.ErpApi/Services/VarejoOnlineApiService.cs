@@ -225,6 +225,14 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
 
         #region Pedido
 
+        public async Task<Response<PedidoResponse>> PostPedidoAsync(string token, PedidoRequest request)
+        {
+            var restRequest = new RestRequest("apps/api/pedidos", Method.Post)
+                .AddJsonBody(request);
+
+            return await ExecuteAsync<PedidoResponse>(restRequest, token);
+        }
+
         #endregion
 
         #region WebhookRegister
