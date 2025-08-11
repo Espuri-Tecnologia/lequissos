@@ -14,5 +14,6 @@
     <ProjectReference Include="..\..\src\LexosHub.ERP.VarejOnline.Infra.CrossCutting\LexosHub.ERP.VarejOnline.Infra.CrossCutting.csproj" />
     <ProjectReference Include="..\..\src\LexosHub.ERP.VarejOnline.Infra.ErpApi\LexosHub.ERP.VarejOnline.Infra.ErpApi.csproj" />
     <ProjectReference Include="..\..\src\LexosHub.ERP.VarejOnline.Infra.Messaging\LexosHub.ERP.VarejOnline.Infra.Messaging.csproj" />
+    <ProjectReference Include="..\..\src\LexosHub.ERP.VarejOnline.Api\LexosHub.ERP.VarejOnline.Api.csproj" />
   </ItemGroup>
 </Project>

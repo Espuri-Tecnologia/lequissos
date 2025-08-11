@@ -234,6 +234,13 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
             return await ExecuteAsync<PedidoResponse>(restRequest, token);
         }
 
+        public async Task<Response<PedidoResponse>> AlterarStatusPedidoAsync(string token, long pedidoNumero, string novoStatus)
+        {
+            var resource = $"apps/api/pedidos/{pedidoNumero}/status/{novoStatus}";
+            var restRequest = new RestRequest(resource, Method.Put);
+            return await ExecuteAsync<PedidoResponse>(restRequest, token);
+        }
+
         #endregion
 
         #region WebhookRegister

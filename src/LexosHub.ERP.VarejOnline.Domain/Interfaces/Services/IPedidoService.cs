@@ -8,5 +8,6 @@ namespace LexosHub.ERP.VarejOnline.Domain.Interfaces.Services
     public interface IPedidoService
     {
         Task<Response<PedidoResponse>> EnviarPedido(string hubKey, PedidoView pedidoView);
+        Task<Response<PedidoResponse>> AlterarStatusPedido(string hubKey, long pedidoNumero, string novoStatus);
     }
 }

@@ -4,6 +4,7 @@ using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Domain.Mappers;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
+using System.Net;
 
 namespace LexosHub.ERP.VarejOnline.Domain.Services
 {
@@ -30,6 +31,20 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
             var request = VarejoOnlinePedidoMapper.Map(pedidoView);
 
             return await _apiService.PostPedidoAsync(token, request);
+        }
+
+        public async Task<Response<PedidoResponse>> AlterarStatusPedido(string hubKey, long pedidoNumero, string novoStatus)
+        {
+            var integration = await _integrationService.GetIntegrationByKeyAsync(hubKey);
+            if (integration.Result == null)
+                return new Response<PedidoResponse>
+                {
+                    Error = integration.Error ?? new ErrorResult("integrationNotFound"),
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+
+            var token = integration.Result.Token ?? string.Empty;
+            return await _apiService.AlterarStatusPedidoAsync(token, pedidoNumero, novoStatus);
         }
     }
 }
