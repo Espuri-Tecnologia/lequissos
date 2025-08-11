@@ -21,6 +21,7 @@ using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Services;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services;
+using LexosHub.ERP.VarejOnline.Domain.Mappers;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Diagnostics;
@@ -52,6 +53,8 @@ try
     builder.Services.AddTransient<IVarejOnlineApiService, VarejOnlineApiService>();
     builder.Services.AddTransient<ISqsRepository, SqsRepository>();
     builder.Services.AddTransient<IWebhookService, WebhookService>();
+    builder.Services.AddTransient<IPedidoService, PedidoService>();
+    builder.Services.AddAutoMapper(typeof(PedidoProfile));
     builder.Services.AddTransient<ProdutoViewMapper>();
 
     builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
