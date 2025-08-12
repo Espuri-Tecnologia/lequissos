@@ -24,5 +24,18 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
         {
             return ProdutoConfiguravelViewMapper.Map(produtoBase, variacoes);
         }
+
+        public ProdutoView? MapKit(ProdutoResponse produtoBase)
+        {
+            return ProdutoKitViewMapper.Map(produtoBase);
+        }
+
+        public List<ProdutoView> MapKit(IEnumerable<ProdutoResponse>? source)
+        {
+            return source?.Select(MapKit)
+                .Where(v => v != null)
+                .Cast<ProdutoView>()
+                .ToList() ?? new List<ProdutoView>();
+        }
     }
 }
