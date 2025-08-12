@@ -39,6 +39,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
             var key = @event.EventType switch
             {
                 nameof(CriarProdutosSimples) or nameof(CriarProdutosConfiguraveis) => "Produtos",
+                nameof(CriarProdutosKits) => "ProdutosKits",
                 _ => @event.EventType
             };
 
