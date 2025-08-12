@@ -18,5 +18,5 @@ public interface IVarejOnlineApiService
     Task<Response<WebhookOperationResponse>> RegisterWebhookAsync(string token, WebhookRequest payload, CancellationToken cancellationToken = default);
     Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, TabelaPrecoRequest request);
     Task<Response<PedidoResponse>> PostPedidoAsync(string token, PedidoRequest request);
-    Task<Response<AlterarStatusPedidoResponse>> AlterarStatusPedidoAsync(string token, AlterarStatusPedidoRequest request);
+    Task<Response<PedidoResponse>> AlterarStatusPedidoAsync(string token, long pedidoNumero, string novoStatus);
 }

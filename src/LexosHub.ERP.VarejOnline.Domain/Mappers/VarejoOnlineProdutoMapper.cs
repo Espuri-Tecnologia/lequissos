@@ -22,7 +22,6 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
 
                 var mapped = new VarejOnlineProduto
                 {
-                    ProdutoIdGlobal = item.id,
                     Nome = item.descricao,
                     DescricaoResumida = item.descricaoSimplificada,
                     Ean = item.codigoBarras,

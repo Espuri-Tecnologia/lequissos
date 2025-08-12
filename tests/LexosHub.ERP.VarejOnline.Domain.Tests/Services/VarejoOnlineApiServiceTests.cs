@@ -61,19 +61,53 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Services
             Assert.Contains("produtoBase=10", uri.Query);
         }
 
+        [Fact]
+        public async Task AlterarStatusPedidoAsync_ShouldBuildUrlAndHandleResponses()
+        {
+            var settings = new VarejOnlineApiSettings { BaseUrl = "https://api/" };
+            var service = CreateService(settings);
+
+            var client = new TestRestClient();
+            typeof(VarejOnlineApiService)
+                .GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(service, client);
+
+            var response = await service.AlterarStatusPedidoAsync("token", 123, "novo");
+
+            var uri = client.BuildUri(client.LastRequest!);
+            Assert.Equal("/apps/api/pedidos/123/status/novo", uri.AbsolutePath);
+            Assert.Contains("token=token", uri.Query);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            client = new TestRestClient(HttpStatusCode.Conflict, "{}");
+            typeof(VarejOnlineApiService)
+                .GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(service, client);
+
+            response = await service.AlterarStatusPedidoAsync("token", 1, "novo");
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            Assert.False(response.IsSuccess);
+        }
+
         private class TestRestClient : RestClient
         {
             public RestRequest? LastRequest { get; private set; }
+            private readonly HttpStatusCode _statusCode;
+            private readonly string _content;
 
-            public TestRestClient() : base("https://test") { }
+            public TestRestClient(HttpStatusCode statusCode = HttpStatusCode.OK, string content = "[]") : base("https://test")
+            {
+                _statusCode = statusCode;
+                _content = content;
+            }
 
             public new Task<RestResponse> ExecuteAsync(RestRequest request, CancellationToken cancellationToken = default)
             {
                 LastRequest = request;
                 return Task.FromResult(new RestResponse
                 {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = "[]"
+                    StatusCode = _statusCode,
+                    Content = _content
                 });
             }
         }

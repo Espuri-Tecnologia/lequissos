@@ -1,3 +1,4 @@
+using Amazon.Auth.AccessControlPolicy;
 using Lexos.Hub.Sync;
 using Lexos.Hub.Sync.Enums;
 using Lexos.Hub.Sync.Models.Produto;
@@ -67,11 +68,20 @@ public class CriarProdutosConfiguraveisEventHandler : IEventHandler<CriarProduto
 
         if (produtosView.Any())
         {
+            var json = JsonConvert.SerializeObject(
+                produtosView,
+                Formatting.Indented,
+                new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DefaultValueHandling = DefaultValueHandling.Ignore
+                });
+
             var notificacao = new NotificacaoAtualizacaoModel
             {
                 Chave = @event.HubKey,
                 DataHora = DateTime.Now,
-                Json = JsonConvert.SerializeObject(produtosView),
+                Json = json,
                 TipoProcesso = TipoProcessoAtualizacao.Produto,
                 PlataformaId = 41
             };
