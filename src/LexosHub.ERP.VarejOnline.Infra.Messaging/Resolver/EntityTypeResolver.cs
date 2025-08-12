@@ -11,6 +11,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
             { "IntegrationCreated", typeof(IntegrationCreated) },
             { "ProductsRequested", typeof(ProductsRequested) },
             { "CriarProdutosSimples", typeof(CriarProdutosSimples) },
+            { "CriarProdutosKits", typeof(CriarProdutosKits) },
             { "CriarProdutosConfiguraveis", typeof(CriarProdutosConfiguraveis) },
             { "PriceTablesRequested", typeof(PriceTablesRequested) },
             { "PriceTablePageProcessed", typeof(PriceTablePageProcessed) },

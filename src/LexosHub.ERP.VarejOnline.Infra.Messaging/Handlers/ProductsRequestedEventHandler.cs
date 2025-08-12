@@ -83,19 +83,39 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                     break;
                 }
 
-                var simples = produtos.Where(p => p.MercadoriaBase == false).ToList();
-                var configuraveis = produtos.Where(p => p.MercadoriaBase == true).ToList();
-
-                var pageEvent = new CriarProdutosSimples
+                var kits = produtos.Where(p => p.Componentes?.Any() == true).ToList();
+                if (kits.Any())
                 {
-                    HubKey = @event.HubKey,
-                    Start = start,
-                    PageSize = pageSize,
-                    Produtos = response.Result,
-                    ProcessedCount = count
-                };
+                    var kitsEvent = new CriarProdutosKits
+                    {
+                        HubKey = @event.HubKey,
+                        Start = start,
+                        PageSize = pageSize,
+                        Produtos = kits,
+                        ProcessedCount = kits.Count
+                    };
 
-                await _dispatcher.DispatchAsync(pageEvent, cancellationToken);
+                    await _dispatcher.DispatchAsync(kitsEvent, cancellationToken);
+                }
+
+                var semKits = produtos.Where(p => p.Componentes?.Any() != true).ToList();
+
+                var simples = semKits.Where(p => p.MercadoriaBase == false).ToList();
+                var configuraveis = semKits.Where(p => p.MercadoriaBase == true).ToList();
+
+                if (simples.Any())
+                {
+                    var pageEvent = new CriarProdutosSimples
+                    {
+                        HubKey = @event.HubKey,
+                        Start = start,
+                        PageSize = pageSize,
+                        Produtos = simples,
+                        ProcessedCount = simples.Count
+                    };
+
+                    await _dispatcher.DispatchAsync(pageEvent, cancellationToken);
+                }
 
                 produtosConfiguraveis.AddRange(configuraveis);
 
