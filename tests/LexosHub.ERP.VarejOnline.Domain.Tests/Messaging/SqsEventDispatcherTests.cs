@@ -39,5 +39,30 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                     JsonSerializer.Deserialize<BaseEvent>(r.MessageBody, new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }) is IntegrationCreated),
                 It.IsAny<CancellationToken>()), Times.Once);
         }
+
+        [Fact]
+        public async Task DispatchAsync_ShouldSendCriarProdutosKitsToConfiguredQueue()
+        {
+            var sqsMock = new Mock<IAmazonSQS>();
+            var inMemory = new Dictionary<string, string>
+            {
+                {"AWS:ServiceURL", "http://localhost"},
+                {"AWS:SQSQueues:ProdutosKits", "queue/produtokit"}
+            };
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemory)
+                .Build();
+
+            var dispatcher = new SqsEventDispatcher(sqsMock.Object, configuration);
+            var evt = new CriarProdutosKits { HubKey = "key" };
+
+            await dispatcher.DispatchAsync(evt, CancellationToken.None);
+
+            sqsMock.Verify(s => s.SendMessageAsync(
+                It.Is<SendMessageRequest>(r =>
+                    r.QueueUrl == "http://localhost/queue/produtokit" &&
+                    JsonSerializer.Deserialize<BaseEvent>(r.MessageBody, new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }) is CriarProdutosKits),
+                It.IsAny<CancellationToken>()), Times.Once);
+        }
     }
 }
