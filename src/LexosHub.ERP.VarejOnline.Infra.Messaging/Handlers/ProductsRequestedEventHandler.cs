@@ -43,6 +43,9 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                 : _defaultPageSize;
 
             var produtosConfiguraveis = new List<ProdutoResponse>();
+            int totalKits = 0;
+            int totalSimples = 0;
+            int totalConfiguraveis = 0;
 
             int count;
 
@@ -83,21 +86,53 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                     break;
                 }
 
-                var simples = produtos.Where(p => p.MercadoriaBase == false).ToList();
-                var configuraveis = produtos.Where(p => p.MercadoriaBase == true).ToList();
+                var kits = produtos.Where(p => p.Componentes != null && p.Componentes.Any()).ToList();
+                var simples = produtos
+                    .Where(p => (p.Componentes == null || !p.Componentes.Any()) && p.MercadoriaBase != true)
+                    .ToList();
+                var configuraveis = produtos
+                    .Where(p => (p.Componentes == null || !p.Componentes.Any()) && p.MercadoriaBase == true)
+                    .ToList();
 
-                var pageEvent = new CriarProdutosSimples
+                _logger.LogInformation(
+                    "Página {Start} classificada: {SimplesCount} simples, {ConfiguraveisCount} configuráveis, {KitsCount} kits",
+                    start,
+                    simples.Count,
+                    configuraveis.Count,
+                    kits.Count);
+
+                if (simples.Any())
                 {
-                    HubKey = @event.HubKey,
-                    Start = start,
-                    PageSize = pageSize,
-                    Produtos = response.Result,
-                    ProcessedCount = count
-                };
+                    var pageEvent = new CriarProdutosSimples
+                    {
+                        HubKey = @event.HubKey,
+                        Start = start,
+                        PageSize = pageSize,
+                        Produtos = simples,
+                        ProcessedCount = simples.Count
+                    };
 
-                await _dispatcher.DispatchAsync(pageEvent, cancellationToken);
+                    await _dispatcher.DispatchAsync(pageEvent, cancellationToken);
+                    totalSimples += simples.Count;
+                }
+
+                if (kits.Any())
+                {
+                    var kitsEvent = new CriarProdutosKits
+                    {
+                        HubKey = @event.HubKey,
+                        Start = start,
+                        PageSize = pageSize,
+                        Produtos = kits,
+                        ProcessedCount = kits.Count
+                    };
+
+                    await _dispatcher.DispatchAsync(kitsEvent, cancellationToken);
+                    totalKits += kits.Count;
+                }
 
                 produtosConfiguraveis.AddRange(configuraveis);
+                totalConfiguraveis += configuraveis.Count;
 
                 start += pageSize;
 
@@ -113,6 +148,12 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                 };
                 await _dispatcher.DispatchAsync(configuraveisEvent, cancellationToken);
             }
+
+            _logger.LogInformation(
+                "Processamento finalizado. Simples: {Simples}, Configuráveis: {Configuraveis}, Kits: {Kits}",
+                totalSimples,
+                totalConfiguraveis,
+                totalKits);
         }
 
     }
