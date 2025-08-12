@@ -35,7 +35,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
                     {"AWS:ServiceURL", "http://localhost"},
-                    {"AWS:SQSQueues:ProductsPageProcessed", "queue/page"}
+                    {"AWS:SQSQueues:Produtos", "queue/produtos"}
                 })
                 .Build();
             var dispatcher = new SqsEventDispatcher(_sqs.Object, config);
@@ -129,6 +129,45 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                     It.IsAny<CancellationToken>()), Times.Once);
         }
 
+        [Fact]
+        public async Task HandleAsync_WhenKitsExist_ShouldDispatchKitsEventWithCorrectCount()
+        {
+            var evt = new ProductsRequested
+            {
+                HubKey = "key",
+                Quantidade = 5
+            };
+
+            var integration = new IntegrationDto { Token = "token" };
+            _integrationService.Setup(s => s.GetIntegrationByKeyAsync("key"))
+                .ReturnsAsync(new Response<IntegrationDto>(integration));
+
+            var kit = new ProdutoResponse
+            {
+                Id = 1,
+                Componentes = new List<ComponenteResponse> { new ComponenteResponse { Quantidade = 1 } }
+            };
+
+            var simples = new ProdutoResponse { Id = 2 };
+
+            var page = new List<ProdutoResponse> { kit, simples };
+
+            _apiService.Setup(a => a.GetProdutosAsync("token", It.IsAny<ProdutoRequest>()))
+                .ReturnsAsync(new Response<List<ProdutoResponse>>(page));
+
+            await CreateHandler().HandleAsync(evt, CancellationToken.None);
+
+            _sqs.Verify(s => s.SendMessageAsync(
+                    It.Is<SendMessageRequest>(r =>
+                        IsProductsPageProcessed(r, 0, 5, 1, "key", new List<ProdutoResponse> { simples })),
+                    It.IsAny<CancellationToken>()), Times.Once);
+
+            _sqs.Verify(s => s.SendMessageAsync(
+                    It.Is<SendMessageRequest>(r =>
+                        IsKitsProcessed(r, 0, 5, 1, "key", new List<ProdutoResponse> { kit })),
+                    It.IsAny<CancellationToken>()), Times.Once);
+        }
+
         private bool IsProductsPageProcessed(
             SendMessageRequest request,
             int expectedStart,
@@ -142,6 +181,30 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                 new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }
             );
             if (baseEvent is CriarProdutosSimples p)
+            {
+                return p.Start == expectedStart
+                    && p.PageSize == expectedPageSize
+                    && p.ProcessedCount == expectedProcessedCount
+                    && p.HubKey == expectedHubKey
+                    && p.Produtos is IEnumerable<ProdutoResponse> produtos
+                    && ProdutosAreEqual(produtos, expectedProdutos);
+            }
+            return false;
+        }
+
+        private bool IsKitsProcessed(
+            SendMessageRequest request,
+            int expectedStart,
+            int expectedPageSize,
+            int expectedProcessedCount,
+            string expectedHubKey,
+            List<ProdutoResponse> expectedProdutos)
+        {
+            var baseEvent = JsonSerializer.Deserialize<BaseEvent>(
+                request.MessageBody,
+                new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }
+            );
+            if (baseEvent is CriarProdutosKits p)
             {
                 return p.Start == expectedStart
                     && p.PageSize == expectedPageSize

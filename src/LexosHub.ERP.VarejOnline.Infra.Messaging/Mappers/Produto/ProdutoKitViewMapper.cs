@@ -23,9 +23,9 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
             produtoView.ProdutoTipoId = Lexos.Hub.Sync.Constantes.Produto.COMPOSTO;
             produtoView.Composicao = produtoBase.Componentes?.Select(c => new ProdutoComposicaoView
             {
-                ProdutoIdGlobal = c.Produto.Id,
                 Sku = c.Produto.CodigoSistema,
                 Quantidade = double.Parse(c.Quantidade.ToString())
+                
             }).ToList() ?? new List<ProdutoComposicaoView>();
 
             return produtoView;

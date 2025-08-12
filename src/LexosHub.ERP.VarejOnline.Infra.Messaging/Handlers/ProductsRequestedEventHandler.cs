@@ -43,6 +43,9 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                 : _defaultPageSize;
 
             var produtosConfiguraveis = new List<ProdutoResponse>();
+            int totalKits = 0;
+            int totalSimples = 0;
+            int totalConfiguraveis = 0;
 
             int count;
 
@@ -118,6 +121,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                 }
 
                 produtosConfiguraveis.AddRange(configuraveis);
+                totalConfiguraveis += configuraveis.Count;
 
                 start += pageSize;
 
@@ -133,6 +137,12 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                 };
                 await _dispatcher.DispatchAsync(configuraveisEvent, cancellationToken);
             }
+
+            _logger.LogInformation(
+                "Processamento finalizado. Simples: {Simples}, Configur�veis: {Configuraveis}, Kits: {Kits}",
+                totalSimples,
+                totalConfiguraveis,
+                totalKits);
         }
 
     }
