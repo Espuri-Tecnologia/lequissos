@@ -32,12 +32,9 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
             return new ProdutoVariacaoView
             {
                 Sku = source.CodigoSistema?.Trim(),
-                EAN = source.CodigoBarras,
+                EAN = source.CodigoBarras ?? null,
                 Tamanho = tamanho,
-                Cor = cor,
-                Deleted = !source.Ativo,
-                OutrasVariacoes = new List<OutraVariacao>(),
-                ReferenciasOutrasPlataformas = new List<ProdutoReferenciaView>()
+                Cor = cor
             };
         }
     }
