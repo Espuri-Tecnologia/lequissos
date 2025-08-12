@@ -2,6 +2,7 @@ using Lexos.Hub.Sync.Models.Pedido;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Pedido;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace LexosHub.ERP.VarejOnline.Api.Controllers.Pedido
 {
@@ -20,14 +21,20 @@ namespace LexosHub.ERP.VarejOnline.Api.Controllers.Pedido
         public async Task<IActionResult> EnviarPedido([FromBody] PedidoView pedido, string hubKey)
         {
             var result = await _pedidoService.EnviarPedido(hubKey, pedido);
-            return StatusCode((int)result.StatusCode, result);
+            return Ok(result);
         }
 
-        [HttpPost("alterar-status")]
-        public async Task<IActionResult> AlterarStatus([FromBody] AlterarStatusPedidoView payload, string hubKey)
+        [HttpPut("{pedidoNumero}/status/{novoStatus}")]
+        public async Task<IActionResult> AlterarStatusPedido(string hubKey, long pedidoNumero, string novoStatus)
         {
-            var result = await _pedidoService.AlterarStatusPedido(hubKey, payload);
-            return StatusCode((int)result.StatusCode, result);
+            var result = await _pedidoService.AlterarStatusPedido(hubKey, pedidoNumero, novoStatus);
+            if (result.IsSuccess)
+                return Ok(result);
+
+            if (result.StatusCode == HttpStatusCode.Conflict)
+                return Conflict(result);
+
+            return BadRequest(result);
         }
     }
 }
