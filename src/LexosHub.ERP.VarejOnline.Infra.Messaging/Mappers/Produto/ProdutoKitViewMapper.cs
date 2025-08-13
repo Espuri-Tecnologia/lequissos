@@ -1,3 +1,5 @@
+using Lexos.Hub.Sync.Models.Produto;
+using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using System.Collections.Generic;
 using System.Linq;
 using Lexos.Hub.Sync.Models.Produto;
@@ -10,10 +12,10 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
         public static List<ProdutoComposicaoView> Map(List<ComponenteResponse>? componentes)
         {
             return componentes?.Select(MapComponente).ToList() ?? new List<ProdutoComposicaoView>();
-        }
+            }
 
         private static ProdutoComposicaoView MapComponente(ComponenteResponse c)
-        {
+            {
             return new ProdutoComposicaoView
             {
                 ProdutoId = c.Produto?.Id ?? 0,

@@ -1,3 +1,4 @@
+using Amazon.Auth.AccessControlPolicy;
 using Lexos.Hub.Sync.Models.Produto;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using System;
@@ -7,7 +8,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
 {
     public static class ProdutoSimplesViewMapper
     {
-        private const string CodigoProdutoPrecoVenda = "preco_venda";
+        private const string CodigoProdutoPrecoTabela = "preco_regiao_";
 
         private static string? Trim(string? value, int maxLength)
         {
@@ -44,8 +45,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
 
             return new ProdutoView
             {
-                ProdutoId = source.Id,
-                ProdutoIdGlobal = source.Id,
                 ProdutoTipoId = source.MercadoriaBase == true ? Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL : Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
                 Nome = Trim(source.Descricao, 255),
                 Descricao = Trim(source.Descricao, 255),
@@ -57,6 +56,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 Comprimento = comprimento,
                 Largura = largura,
                 Altura = altura,
+                IsNew = true,
                 Unidade = Trim(source.Unidade, 10),
                 Deleted = !source.Ativo,
                 Classificacao = source.Classificacao,
@@ -106,7 +106,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
             {
                 Imagens = imagens,
                 Sku = produto.CodigoSku,
-                TipoProdutoId = Lexos.Hub.Sync.Constantes.Produto.SIMPLES
+                TipoProdutoId = produto.MercadoriaBase == true ? Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL : Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
             };
         }
 
@@ -132,13 +132,13 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 return new List<ProdutoPrecoView> { 
                     new ProdutoPrecoView { 
                         Preco = produto.Preco.Value, 
-                        Codigo = "1",
+                        Codigo = $"{CodigoProdutoPrecoTabela}{produto.Id}",
                         Sku = produto.CodigoSistema,
                     } 
                 };
 
             foreach (TabelaPrecoResponse priceResponse in produto.PrecosPorTabelas)
-                produtoPrecoViewList.Add(priceResponse.NewProdutoPrecoView(produto.CodigoSistema, produtoTipoId: produtoTipoId, codigo: CodigoProdutoPrecoVenda));
+                produtoPrecoViewList.Add(priceResponse.NewProdutoPrecoView(produto.CodigoSistema, produtoTipoId: produtoTipoId, codigo: CodigoProdutoPrecoTabela));
 
             return produtoPrecoViewList;
         }
@@ -148,7 +148,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
             {
                 Preco = precoPorTabelaResponse.Preco,
                 Sku = sku,
-                Codigo = precoPorTabelaResponse.IdTabelaPreco.ToString()
+                Codigo = $"{codigo}{precoPorTabelaResponse.IdTabelaPreco.ToString()}"
             };
             return produtoPrecoView;
         }
