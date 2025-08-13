@@ -20,11 +20,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 .ToList() ?? new List<ProdutoView>();
         }
 
-        public List<ProdutoView> MapKits(IEnumerable<ProdutoResponse>? source)
-        {
-            return MapSimples(source);
-        }
-
         public ProdutoView? MapConfiguravel(ProdutoResponse produtoBase, List<ProdutoResponse> variacoes)
         {
             return ProdutoConfiguravelViewMapper.Map(produtoBase, variacoes);
@@ -32,10 +27,20 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
 
         public ProdutoView? MapKit(ProdutoResponse produtoBase)
         {
-            return ProdutoKitViewMapper.Map(produtoBase);
+            var produto = ProdutoSimplesViewMapper.Map(produtoBase);
+
+            if (produto == null)
+            {
+                return null;
+            }
+
+            produto.ProdutoTipoId = Lexos.Hub.Sync.Constantes.Produto.COMPOSTO;
+            produto.Composicao = ProdutoKitViewMapper.Map(produtoBase.Componentes);
+
+            return produto;
         }
 
-        public List<ProdutoView> MapKit(IEnumerable<ProdutoResponse>? source)
+        public List<ProdutoView> MapKits(IEnumerable<ProdutoResponse>? source)
         {
             return source?.Select(MapKit)
                 .Where(v => v != null)

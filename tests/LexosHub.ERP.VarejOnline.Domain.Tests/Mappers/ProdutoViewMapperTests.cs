@@ -257,5 +257,54 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
             Assert.Equal("Vermelho", v2.Cor);
             Assert.True(v2.Deleted);
         }
+
+        [Fact]
+        public void MapKit_ShouldMapComposicaoAndSetTipo()
+        {
+            var produtoBase = new ProdutoResponse
+            {
+                Id = 20,
+                Descricao = "Kit Produto",
+                CodigoSku = "KIT",
+                Componentes = new List<ComponenteResponse>
+                {
+                    new ComponenteResponse
+                    {
+                        Quantidade = 2,
+                        Unidade = "UN",
+                        Produto = new ComponenteProdutoResponse
+                        {
+                            Id = 30,
+                            CodigoSistema = "SKU1"
+                        }
+                    },
+                    new ComponenteResponse
+                    {
+                        Quantidade = 1,
+                        Unidade = "UN",
+                        Produto = new ComponenteProdutoResponse
+                        {
+                            Id = 31,
+                            CodigoSistema = "SKU2"
+                        }
+                    }
+                }
+            };
+
+            var result = _mapper.MapKit(produtoBase)!;
+
+            Assert.Equal(Lexos.Hub.Sync.Constantes.Produto.COMPOSTO, result.ProdutoTipoId);
+            Assert.Equal(2, result.Composicao.Count);
+
+            var c1 = result.Composicao[0];
+            Assert.Equal(30, c1.ProdutoId);
+            Assert.Equal("SKU1", c1.Sku);
+            Assert.Equal(2, c1.Quantidade);
+
+            var c2 = result.Composicao[1];
+            Assert.Equal(31, c2.ProdutoId);
+            Assert.Equal("SKU2", c2.Sku);
+            Assert.Equal(1, c2.Quantidade);
+        }
     }
 }
