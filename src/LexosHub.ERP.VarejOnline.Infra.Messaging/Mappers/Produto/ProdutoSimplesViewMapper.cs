@@ -68,10 +68,13 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 CategoriaERP = source.Categorias?.FirstOrDefault(x => x.Nivel == "TRIBUTAÇÃO")?.Nome,
                 MetaTitle = Trim(source.Descricao, 60),
                 MetaDescription = Trim(source.DescricaoSimplificada ?? source.Descricao, 160),
-                //Composicao = source.Componentes?.Select(c => new ProdutoComposicaoView
-                //{
-                //    Quantidade = double.Parse(c.Quantidade.ToString()),
-                //}).ToList() ?? new List<ProdutoComposicaoView>(),
+                Composicao = ProdutoKitViewMapper.Map(source.Componentes),
+                Categorias = source.Categorias?.Select(c => new ProdutoCategoriaView
+                {
+                    PlataformaId = 41,
+                }).ToList() ?? new List<ProdutoCategoriaView>(),
+                Imagens = source.MapImages(),
+                ProdutoEanComplemento = source.CodigosBarraAdicionais ?? new List<string>(),
                 ProdutoImposto = new ProdutoImpostoView
                 {
                     NCM = source.CodigoNcm,
