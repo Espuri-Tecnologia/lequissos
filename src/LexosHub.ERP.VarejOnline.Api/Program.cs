@@ -87,6 +87,7 @@ try
     builder.Services.AddTransient<IEventHandler<PriceTablesRequested>, PriceTablesRequestedEventHandler>();
     builder.Services.AddTransient<IEventHandler<PriceTablePageProcessed>, PriceTablesPageProcessedEventHandler>();
     builder.Services.AddTransient<IEventHandler<CompaniesRequested>, CompaniesRequestedEventHandler>();
+    builder.Services.AddTransient<IEventHandler<StoresRequested>, StoresRequestedEventHandler>();
     builder.Services.AddHostedService<SqsListenerService>();
 
     var app = builder.Build().SetupMiddlewares();

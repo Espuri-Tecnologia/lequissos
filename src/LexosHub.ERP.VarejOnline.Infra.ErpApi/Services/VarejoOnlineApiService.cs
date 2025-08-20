@@ -6,6 +6,7 @@ using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Empresa;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Options;
@@ -73,6 +74,16 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         public Task<string> GetAuthUrl()
         {
             return Task.FromResult($"{_erpApiSettings.BaseUrl}{_oAuthUrl}client_id={_clientId}&redirect_uri={_oAuthRedirectUrl}");
+        }
+        #endregion
+
+        #region Entidades
+        public async Task<Response<List<EntidadeResponse>>> GetEntidadesAsync(string token, bool somenteAtivas)
+        {
+            var restRequest = new RestRequest("entidades", Method.Get);
+            restRequest.AddQueryParameter("somenteAtivas", somenteAtivas.ToString().ToLower());
+
+            return await ExecuteAsync<List<EntidadeResponse>>(restRequest, token);
         }
         #endregion
 
