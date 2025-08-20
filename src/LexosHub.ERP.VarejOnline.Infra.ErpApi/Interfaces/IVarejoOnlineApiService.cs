@@ -6,7 +6,6 @@ using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
-using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses.Entidade;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 
 public interface IVarejOnlineApiService
