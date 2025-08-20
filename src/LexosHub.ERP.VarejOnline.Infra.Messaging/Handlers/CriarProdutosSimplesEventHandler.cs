@@ -43,11 +43,21 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 
                 if (mapped.Any())
                 {
+                    var json = JsonConvert.SerializeObject(
+                        mapped,
+                        Formatting.Indented,
+                        new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            DefaultValueHandling = DefaultValueHandling.Ignore,
+                            ContractResolver = new IgnoreEmptyEnumerablesResolver()
+                        });
+
                     var notificacao = new NotificacaoAtualizacaoModel()
                     {
                         Chave = @event.HubKey,
                         DataHora = DateTime.Now,
-                        Json = JsonConvert.SerializeObject(mapped),
+                        Json = json,
                         TipoProcesso = TipoProcessoAtualizacao.Produto,
                         PlataformaId = 41
                     };

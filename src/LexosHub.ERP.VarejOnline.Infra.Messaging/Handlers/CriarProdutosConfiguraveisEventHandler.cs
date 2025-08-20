@@ -74,7 +74,8 @@ public class CriarProdutosConfiguraveisEventHandler : IEventHandler<CriarProduto
                 new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore,
-                    DefaultValueHandling = DefaultValueHandling.Ignore
+                    DefaultValueHandling = DefaultValueHandling.Ignore,
+                    ContractResolver = new IgnoreEmptyEnumerablesResolver()
                 });
 
             var notificacao = new NotificacaoAtualizacaoModel

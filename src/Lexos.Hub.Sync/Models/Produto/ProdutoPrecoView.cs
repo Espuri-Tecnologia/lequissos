@@ -17,7 +17,7 @@ namespace Lexos.Hub.Sync.Models.Produto
         public string Sku { get; set; }
         public long Quantidade { get; set; }
 
-        public int TipoPrecoId { get; set; } = PRECO_VENDA_PADRAO;
+        public int TipoPrecoId { get; set; }
 
         /// <summary>
         /// Data atual da ultima versao da entidade, utilizada para controlar o fluxo de atualizacoes, portanto, um item so pode ser alterado caso a nova versao seja superior a atual.

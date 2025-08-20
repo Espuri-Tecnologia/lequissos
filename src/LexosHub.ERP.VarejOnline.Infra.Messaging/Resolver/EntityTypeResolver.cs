@@ -13,7 +13,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
             { "CriarProdutosSimples", typeof(CriarProdutosSimples) },
             { "CriarProdutosKits", typeof(CriarProdutosKits) },
             { "CriarProdutosConfiguraveis", typeof(CriarProdutosConfiguraveis) },
-            { "CriarProdutosKits", typeof(CriarProdutosKits) },
             { "PriceTablesRequested", typeof(PriceTablesRequested) },
             { "PriceTablePageProcessed", typeof(PriceTablePageProcessed) },
             { "CompaniesRequested", typeof(CompaniesRequested) },

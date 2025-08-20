@@ -36,6 +36,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
 
             produto.ProdutoTipoId = Lexos.Hub.Sync.Constantes.Produto.COMPOSTO;
             produto.Composicao = ProdutoKitViewMapper.Map(produtoBase.Componentes);
+            produto.Sku = produtoBase.CodigoSistema;
 
             return produto;
         }

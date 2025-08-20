@@ -51,7 +51,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 DescricaoMarketplace = Trim(source.Descricao, 255),
                 DescricaoResumida = Trim(source.DescricaoSimplificada ?? $"{source.Descricao} - {source.CodigoSku}", 255),
                 Ean = Trim(source.CodigoBarras, 50),
-                Sku = Trim(source.CodigoSku, 50),
+                Sku = Trim(source.CodigoSistema, 50),
                 Peso = peso,
                 Comprimento = comprimento,
                 Largura = largura,
@@ -69,11 +69,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 MetaTitle = Trim(source.Descricao, 60),
                 MetaDescription = Trim(source.DescricaoSimplificada ?? source.Descricao, 160),
                 Composicao = ProdutoKitViewMapper.Map(source.Componentes),
-                Categorias = source.Categorias?.Select(c => new ProdutoCategoriaView
-                {
-                    PlataformaId = 41,
-                }).ToList() ?? new List<ProdutoCategoriaView>(),
-                Imagens = source.MapImages(),
                 ProdutoEanComplemento = source.CodigosBarraAdicionais ?? new List<string>(),
                 ProdutoImposto = new ProdutoImpostoView
                 {
