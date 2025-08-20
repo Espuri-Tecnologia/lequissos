@@ -53,6 +53,7 @@ try
     builder.Services.AddTransient<ISqsRepository, SqsRepository>();
     builder.Services.AddTransient<IWebhookService, WebhookService>();
     builder.Services.AddTransient<ProdutoViewMapper>();
+    builder.Services.AddHttpClient();
 
     builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
     builder.Services.AddScoped<IWebhookRepository, WebhookRepository>();
@@ -87,6 +88,7 @@ try
     builder.Services.AddTransient<IEventHandler<PriceTablesRequested>, PriceTablesRequestedEventHandler>();
     builder.Services.AddTransient<IEventHandler<PriceTablePageProcessed>, PriceTablesPageProcessedEventHandler>();
     builder.Services.AddTransient<IEventHandler<CompaniesRequested>, CompaniesRequestedEventHandler>();
+    builder.Services.AddTransient<IEventHandler<StoresRequested>, StoresRequestedEventHandler>();
     builder.Services.AddHostedService<SqsListenerService>();
 
     var app = builder.Build().SetupMiddlewares();
