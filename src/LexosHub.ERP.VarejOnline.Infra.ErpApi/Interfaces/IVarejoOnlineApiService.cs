@@ -5,6 +5,7 @@ using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Empresa;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 
@@ -13,6 +14,7 @@ public interface IVarejOnlineApiService
     Task<Response<TokenResponse?>> ExchangeCodeForTokenAsync(string code);
     Task<string> GetAuthUrl();
     Task<Response<List<EmpresaResponse>>> GetEmpresasAsync(string token, EmpresaRequest request);
+    Task<Response<List<EntidadeResponse>>> GetEntidadesAsync(string token, bool entidadeEcommerce = true);
     Task<Response<List<ProdutoResponse>>> GetProdutosAsync(string token, ProdutoRequest request);
     Task<Response<List<EstoqueResponse>>> GetEstoquesAsync(string token, EstoqueRequest request);
     Task<Response<WebhookOperationResponse>> RegisterWebhookAsync(string token, WebhookRequest payload, CancellationToken cancellationToken = default);

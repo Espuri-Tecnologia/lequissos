@@ -6,6 +6,7 @@ using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Empresa;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Options;
@@ -103,6 +104,16 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
                 restRequest.AddQueryParameter("cnpj", request.Cnpj);
 
             return await ExecuteAsync<List<EmpresaResponse>>(restRequest, token);
+        }
+        #endregion
+
+        #region Entidades
+        public async Task<Response<List<EntidadeResponse>>> GetEntidadesAsync(string token, bool entidadeEcommerce = true)
+        {
+            var restRequest = new RestRequest("entidades", Method.Get);
+            restRequest.AddQueryParameter("entidadeEcommerce", entidadeEcommerce.ToString().ToLower());
+
+            return await ExecuteAsync<List<EntidadeResponse>>(restRequest, token);
         }
         #endregion
 
