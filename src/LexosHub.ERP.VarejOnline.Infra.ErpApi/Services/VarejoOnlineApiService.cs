@@ -77,16 +77,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         }
         #endregion
 
-        #region Entidades
-        public async Task<Response<List<EntidadeResponse>>> GetEntidadesAsync(string token, bool somenteAtivas)
-        {
-            var restRequest = new RestRequest("entidades", Method.Get);
-            restRequest.AddQueryParameter("somenteAtivas", somenteAtivas.ToString().ToLower());
-
-            return await ExecuteAsync<List<EntidadeResponse>>(restRequest, token);
-        }
-        #endregion
-
         #region Empresas
         public async Task<Response<List<EmpresaResponse>>> GetEmpresasAsync(string token, EmpresaRequest request)
         {

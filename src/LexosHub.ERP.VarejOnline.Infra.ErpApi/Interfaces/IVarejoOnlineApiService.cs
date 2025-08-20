@@ -13,7 +13,6 @@ public interface IVarejOnlineApiService
 {
     Task<Response<TokenResponse?>> ExchangeCodeForTokenAsync(string code);
     Task<string> GetAuthUrl();
-    Task<Response<List<EntidadeResponse>>> GetEntidadesAsync(string token, bool somenteAtivas);
     Task<Response<List<EmpresaResponse>>> GetEmpresasAsync(string token, EmpresaRequest request);
     Task<Response<List<EntidadeResponse>>> GetEntidadesAsync(string token, bool entidadeEcommerce = true);
     Task<Response<List<ProdutoResponse>>> GetProdutosAsync(string token, ProdutoRequest request);

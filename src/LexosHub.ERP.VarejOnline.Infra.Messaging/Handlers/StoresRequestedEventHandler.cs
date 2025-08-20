@@ -1,6 +1,7 @@
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
+using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
@@ -36,7 +37,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
             var token = integrationResponse.Result?.Token ?? string.Empty;
 
             var entidadesResponse = await _apiService.GetEntidadesAsync(token, true);
-            var entidades = entidadesResponse.Result ?? new List<LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Empresa.EntidadeResponse>();
+            var entidades = entidadesResponse.Result ?? new List<EntidadeResponse>();
 
             var payload = entidades.Select(e => new { LojaGlobalId = e.Id, NomeFantasia = e.Nome }).ToList();
 
