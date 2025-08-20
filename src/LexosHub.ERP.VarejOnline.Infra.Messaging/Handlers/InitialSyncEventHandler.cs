@@ -21,6 +21,9 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 
             var companiesEvent = new CompaniesRequested { HubKey = @event.HubKey };
             await _dispatcher.DispatchAsync(companiesEvent, cancellationToken);
+
+            var storesEvent = new StoresRequested { HubKey = @event.HubKey };
+            await _dispatcher.DispatchAsync(storesEvent, cancellationToken);
         }
     }
 }

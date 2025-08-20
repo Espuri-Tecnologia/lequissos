@@ -1,5 +1,6 @@
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Logging;
@@ -17,6 +18,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
         private readonly IVarejOnlineApiService _apiService;
         private readonly SyncOutConfig _syncOutConfig;
 
+
         public StoresRequestedEventHandler(
             ILogger<StoresRequestedEventHandler> logger,
             IIntegrationService integrationService,
@@ -24,8 +26,8 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
             IOptions<SyncOutConfig> syncOutConfig)
         {
             _logger = logger;
-            _integrationService = integrationService;
             _apiService = apiService;
+            _integrationService = integrationService;
             _syncOutConfig = syncOutConfig.Value;
         }
 

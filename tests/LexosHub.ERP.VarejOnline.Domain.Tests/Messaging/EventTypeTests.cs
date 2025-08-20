@@ -13,6 +13,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         {
             new object[] { new IntegrationCreated() },
             new object[] { new CompaniesRequested() },
+            new object[] { new StoresRequested() },
             new object[] { new ProductsRequested() },
             new object[] { new CriarProdutosSimples() },
             new object[] { new CriarProdutosKits() },
