@@ -44,6 +44,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Do
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexos.Hub.Sync", "src\Lexos.Hub.Sync\Lexos.Hub.Sync.csproj", "{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Infra.SyncOut", "LexosHub.ERP.VarejOnline.Infra.SyncOut\LexosHub.ERP.VarejOnline.Infra.SyncOut.csproj", "{292D0530-80EF-41B3-9D06-AA954103576C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,10 @@ Global
 		{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{292D0530-80EF-41B3-9D06-AA954103576C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{292D0530-80EF-41B3-9D06-AA954103576C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{292D0530-80EF-41B3-9D06-AA954103576C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{292D0530-80EF-41B3-9D06-AA954103576C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +111,7 @@ Global
 		{9A12B248-8FE6-A395-2D23-41519DD58DC4} = {FE4F49AB-CFAF-439E-85DB-F4B8933FC08D}
 		{39EB45A5-3A8B-4D3A-961F-846B6D9A702E} = {8A5BDD3C-3598-4F48-ABDB-936BB40748CA}
 		{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F} = {BB053B5A-CCD3-4D16-9B6D-98CDC20C78AF}
+		{292D0530-80EF-41B3-9D06-AA954103576C} = {704F844E-1B5C-4DC8-A5F9-62B0D208B178}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9CC72422-F7FA-4102-99D1-E3DFF134F6FF}

@@ -1,3 +1,4 @@
+using Lexos.Hub.Sync.Models.Produto;
 using System.Collections.Generic;
 
 namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses
@@ -59,5 +60,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses
         public List<DescontoProgressivoResponse>? DescontoProgressivo { get; set; }
         public List<AtributoProdutoResponse>? AtributosProduto { get; set; }
         public List<TabelaPrecoResponse>? PrecosPorTabelas { get; set; }
+
     }
 }

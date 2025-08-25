@@ -14,11 +14,11 @@ public interface IVarejOnlineApiService
     Task<Response<TokenResponse?>> ExchangeCodeForTokenAsync(string code);
     Task<string> GetAuthUrl();
     Task<Response<List<EmpresaResponse>>> GetEmpresasAsync(string token, EmpresaRequest request);
-    Task<Response<List<EntidadeResponse>>> GetEntidadesAsync(string token, bool entidadeEcommerce = true);
     Task<Response<List<ProdutoResponse>>> GetProdutosAsync(string token, ProdutoRequest request);
     Task<Response<List<EstoqueResponse>>> GetEstoquesAsync(string token, EstoqueRequest request);
     Task<Response<WebhookOperationResponse>> RegisterWebhookAsync(string token, WebhookRequest payload, CancellationToken cancellationToken = default);
     Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, TabelaPrecoRequest request);
     Task<Response<PedidoResponse>> PostPedidoAsync(string token, PedidoRequest request);
     Task<Response<PedidoResponse>> AlterarStatusPedidoAsync(string token, long pedidoNumero, string novoStatus);
+    Task<Response<List<EntidadeResponse>>> GetEntidadesAsync(string token);
 }

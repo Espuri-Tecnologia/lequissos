@@ -3,6 +3,8 @@ using Lexos.Hub.Sync.Models.Produto;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
 {
@@ -61,6 +63,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 Deleted = !source.Ativo,
                 Classificacao = source.Classificacao,
                 Precos = source.MapToProdutoPrecoView(),
+                Estoques = source.DadosPorEntidade?.MapEstoques(source.CodigoSistema!),
                 ImagensCadastradas = source.MapImagensCadastradas(),
                 Marca = source.Categorias?.FirstOrDefault(x => x.Nivel == "MARCA")?.Nome,
                 Modelo = source.Categorias?.FirstOrDefault(x => x.Nivel == "COLEÇÃO")?.Nome,
@@ -76,6 +79,21 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                     Origem = source.Origem.HasValue ? (short)source.Origem.Value : short.MinValue,
                     Cest = source.CodigoCest
                 }
+            };
+        }
+
+        public static List<ProdutoEstoqueView> MapEstoques(this List<DadosPorEntidadeResponse> estoquesEntidades, string sku)
+        {
+            return estoquesEntidades.Select(estoque => estoque.MapEstoque(sku)).ToList();
+        }
+
+        public static ProdutoEstoqueView MapEstoque(this DadosPorEntidadeResponse estoqueEntidade, string sku)
+        {
+            return new ProdutoEstoqueView()
+            {
+                LojaIdGlobal = (int)estoqueEntidade.Entidade,
+                Sku = sku,
+                Quantidade = estoqueEntidade.EstoqueMaximo               
             };
         }
 

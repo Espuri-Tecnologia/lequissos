@@ -1,6 +1,4 @@
 ﻿using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
-using System;
-using System.Collections.Generic;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
 {

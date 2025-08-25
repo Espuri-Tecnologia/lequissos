@@ -1,13 +1,12 @@
+using Amazon.Runtime.Internal;
+using Lexos.Hub.Sync.Models.Loja;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
-using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
+using LexosHub.ERP.VarejOnline.Infra.SyncOut.Interfaces;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 {
@@ -16,19 +15,19 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
         private readonly ILogger<StoresRequestedEventHandler> _logger;
         private readonly IIntegrationService _integrationService;
         private readonly IVarejOnlineApiService _apiService;
-        private readonly SyncOutConfig _syncOutConfig;
+        private readonly ISyncOutApiService _syncOutApiApiService;
 
 
         public StoresRequestedEventHandler(
             ILogger<StoresRequestedEventHandler> logger,
             IIntegrationService integrationService,
             IVarejOnlineApiService apiService,
-            IOptions<SyncOutConfig> syncOutConfig)
+            ISyncOutApiService syncOutApiApiService)
         {
             _logger = logger;
             _apiService = apiService;
             _integrationService = integrationService;
-            _syncOutConfig = syncOutConfig.Value;
+            _syncOutApiApiService = syncOutApiApiService;
         }
 
         public async Task HandleAsync(StoresRequested @event, CancellationToken cancellationToken)
@@ -38,19 +37,18 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
             var integrationResponse = await _integrationService.GetIntegrationByKeyAsync(@event.HubKey);
             var token = integrationResponse.Result?.Token ?? string.Empty;
 
-            var entidadesResponse = await _apiService.GetEntidadesAsync(token, true);
+            var entidadesResponse = await _apiService.GetEntidadesAsync(token);
             var entidades = entidadesResponse.Result ?? new List<EntidadeResponse>();
 
-            var payload = entidades.Select(e => new { LojaGlobalId = e.Id, NomeFantasia = e.Nome }).ToList();
+            var lojas = entidades.Where(x => x.EntidadeEcommerce).Select(e => new LojaDto { LojaGlobalId = e.Id, NomeFantasia = e.Nome }).ToList();
 
-            var requestUrl = $"{_syncOutConfig.ApiUrl}Settings/AtualizarInformacoesHubVindasErpExterno";
-            using var httpClient = new HttpClient();
-            if (!string.IsNullOrEmpty(token))
+            var request = new IntegracaoErpHubDto
             {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            }
-            var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-            await httpClient.PostAsync(requestUrl, content, cancellationToken);
+                Chave = @event.HubKey,
+                Lojas = lojas
+            };
+            var response = await _syncOutApiApiService.IntegrarLojas(request);
+
         }
     }
 }
