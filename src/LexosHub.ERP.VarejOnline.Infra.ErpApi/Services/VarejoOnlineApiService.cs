@@ -116,6 +116,23 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         }
         #endregion
 
+        #region Terceiros
+        public async Task<Response<List<TerceiroResponse>>> GetTerceiroByDocumentoAsync(string token, string documento)
+        {
+            var restRequest = new RestRequest("apps/api/terceiros", Method.Get);
+            if (!string.IsNullOrWhiteSpace(documento))
+                restRequest.AddQueryParameter("documento", documento);
+            return await ExecuteAsync<List<TerceiroResponse>>(restRequest, token);
+        }
+
+        public async Task<Response<TerceiroResponse?>> CreateTerceiroAsync(string token, TerceiroRequest request)
+        {
+            var restRequest = new RestRequest("apps/api/terceiros", Method.Post)
+                .AddJsonBody(request);
+            return await ExecuteAsync<TerceiroResponse?>(restRequest, token);
+        }
+        #endregion
+
         #region Prices
         public async Task<Response<List<TabelaPrecoListResponse>>> GetPriceTablesAsync(string token, TabelaPrecoRequest request)
         {
