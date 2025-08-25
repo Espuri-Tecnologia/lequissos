@@ -21,4 +21,6 @@ public interface IVarejOnlineApiService
     Task<Response<PedidoResponse>> PostPedidoAsync(string token, PedidoRequest request);
     Task<Response<PedidoResponse>> AlterarStatusPedidoAsync(string token, long pedidoNumero, string novoStatus);
     Task<Response<List<EntidadeResponse>>> GetEntidadesAsync(string token);
+    Task<Response<List<TerceiroResponse>>> GetTerceiroByDocumentoAsync(string token, string documento);
+    Task<Response<TerceiroResponse?>> CreateTerceiroAsync(string token, TerceiroRequest request);
 }
