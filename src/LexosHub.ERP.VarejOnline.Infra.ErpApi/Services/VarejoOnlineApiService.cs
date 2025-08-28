@@ -3,10 +3,12 @@ using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Clientes;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Empresa;
+using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses.Clientes;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Options;
@@ -117,19 +119,20 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         #endregion
 
         #region Terceiros
-        public async Task<Response<List<TerceiroResponse>>> GetTerceiroByDocumentoAsync(string token, string documento)
+        public async Task<Response<List<TerceiroResponse>>> GetTerceirosAsync(string token, TerceiroQueryRequest request)
         {
             var restRequest = new RestRequest("apps/api/terceiros", Method.Get);
-            if (!string.IsNullOrWhiteSpace(documento))
-                restRequest.AddQueryParameter("documento", documento);
+            restRequest.AddQueryParameter("documento", request.Documento);
             return await ExecuteAsync<List<TerceiroResponse>>(restRequest, token);
         }
 
-        public async Task<Response<TerceiroResponse?>> CreateTerceiroAsync(string token, TerceiroRequest request)
+        public async Task<Response<TerceiroResponse>> CreateTerceiroAsync(string token, TerceiroRequest request)
         {
             var restRequest = new RestRequest("apps/api/terceiros", Method.Post)
+                .AddHeader("Content-Type", "application/json")
                 .AddJsonBody(request);
-            return await ExecuteAsync<TerceiroResponse?>(restRequest, token);
+
+            return await ExecuteAsync<TerceiroResponse>(restRequest, token);
         }
         #endregion
 
