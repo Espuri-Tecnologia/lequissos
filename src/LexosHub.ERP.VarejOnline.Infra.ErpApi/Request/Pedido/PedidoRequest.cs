@@ -15,6 +15,9 @@ namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido
         [JsonProperty("idOrcamento")]
         public long? IdOrcamento { get; set; }
 
+        [JsonProperty("cnpj")]
+        public string? Cnpj { get; set; }
+
         /// <summary>dd-MM-yyyy</summary>
         [JsonProperty("data")]
         public string? Data { get; set; }
@@ -59,6 +62,9 @@ namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido
 
         [JsonProperty("itens")]
         public List<ItemPedido>? Itens { get; set; }
+
+        [JsonProperty("servicos")]
+        public List<ServicoPedido>? Servicos { get; set; }
 
         [JsonProperty("emitirNotaFiscal")]
         public bool? EmitirNotaFiscal { get; set; }

@@ -1,12 +1,10 @@
 using Lexos.Hub.Sync.Models.Pedido;
-using LexosHub.ERP.VarejOnline.Domain.DTOs.Pedido;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Domain.Mappers;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
-using System.Linq;
 using System.Net;
 
 namespace LexosHub.ERP.VarejOnline.Domain.Services
@@ -36,7 +34,11 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
 
             if (!string.IsNullOrWhiteSpace(pedidoView.ClienteCpfcnpj))
             {
-                var terceiroResponse = await _apiService.GetTerceiroByDocumentoAsync(token, pedidoView.ClienteCpfcnpj);
+                var terceiroRequested = new Infra.ErpApi.Request.Clientes.TerceiroQueryRequest
+                {
+                    Documento = pedidoView.ClienteCpfcnpj
+                };
+                var terceiroResponse = await _apiService.GetTerceirosAsync(token, terceiroRequested);
                 if (!terceiroResponse.IsSuccess)
                     return new Response<PedidoResponse> { Error = terceiroResponse.Error, StatusCode = terceiroResponse.StatusCode };
 

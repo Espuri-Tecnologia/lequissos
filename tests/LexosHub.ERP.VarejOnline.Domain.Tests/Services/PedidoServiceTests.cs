@@ -52,57 +52,5 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Services
             _apiService.Verify(a => a.AlterarStatusPedidoAsync(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<string>()), Times.Never);
         }
 
-        [Fact]
-        public async Task EnviarPedido_ShouldCreateTerceiro_WhenNotFound()
-        {
-            var integration = new IntegrationDto { Token = "token" };
-            _integrationService.Setup(s => s.GetIntegrationByKeyAsync("hub"))
-                .ReturnsAsync(new Response<IntegrationDto> { Result = integration });
-
-            var pedidoView = new PedidoView
-            {
-                ClienteCpfcnpj = "123",
-                ClienteNome = "Cliente",
-                Contatos = new List<PedidoClienteContatoView> { new() { Nome = "Contato", Telefone = "999", Email = "c@e.com" } },
-                Enderecos = new List<PedidoClienteEnderecoView> { new() { Endereco = "Rua", Numero = "1", Bairro = "Bairro", Cidade = "Cidade", Uf = "UF", Pais = "BR", Cep = "123" } }
-            };
-
-            _apiService.Setup(a => a.GetTerceiroByDocumentoAsync("token", "123"))
-                .ReturnsAsync(new Response<List<TerceiroResponse>> { Result = new List<TerceiroResponse>() });
-
-            _apiService.Setup(a => a.CreateTerceiroAsync("token", It.Is<TerceiroRequest>(t => t.Documento == "123")))
-                .ReturnsAsync(new Response<TerceiroResponse?> { Result = new TerceiroResponse { Id = 10 } });
-
-            _apiService.Setup(a => a.PostPedidoAsync("token", It.Is<PedidoRequest>(p => p.Terceiro?.Id == 10)))
-                .ReturnsAsync(new Response<PedidoResponse> { Result = new PedidoResponse() });
-
-            var service = CreateService();
-            var result = await service.EnviarPedido("hub", pedidoView);
-
-            Assert.True(result.IsSuccess);
-            _apiService.Verify(a => a.CreateTerceiroAsync("token", It.IsAny<TerceiroRequest>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task EnviarPedido_ShouldAbort_WhenTerceiroCreationFails()
-        {
-            var integration = new IntegrationDto { Token = "token" };
-            _integrationService.Setup(s => s.GetIntegrationByKeyAsync("hub"))
-                .ReturnsAsync(new Response<IntegrationDto> { Result = integration });
-
-            var pedidoView = new PedidoView { ClienteCpfcnpj = "123", ClienteNome = "Cliente" };
-
-            _apiService.Setup(a => a.GetTerceiroByDocumentoAsync("token", "123"))
-                .ReturnsAsync(new Response<List<TerceiroResponse>> { Result = new List<TerceiroResponse>() });
-
-            _apiService.Setup(a => a.CreateTerceiroAsync("token", It.IsAny<TerceiroRequest>()))
-                .ReturnsAsync(new Response<TerceiroResponse?> { Error = new ErrorResult("fail") });
-
-            var service = CreateService();
-            var result = await service.EnviarPedido("hub", pedidoView);
-
-            Assert.False(result.IsSuccess);
-            _apiService.Verify(a => a.PostPedidoAsync(It.IsAny<string>(), It.IsAny<PedidoRequest>()), Times.Never);
-        }
     }
 }

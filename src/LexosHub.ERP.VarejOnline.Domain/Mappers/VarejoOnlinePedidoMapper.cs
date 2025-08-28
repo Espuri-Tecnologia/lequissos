@@ -186,13 +186,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
                 return null;
             }
 
-            return new Transporte
-            {
-                Modalidade = source.TipoFrete,
-                Transportador = string.IsNullOrWhiteSpace(source.TransportadoraNome)
-                    ? null
-                    : new TerceiroRef { Documento = source.TransportadoraNome }
-            };
+            return new Transporte();
         }
     }
 }
