@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Lexos.Hub.Sync.Models.Pedido;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido;
@@ -13,8 +15,8 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
         /// <summary>
         /// Converte os dados do <see cref="PedidoView"/> para um <see cref="PedidoRequest"/>.
         /// </summary>
-        /// <param name="source">Inst‚ncia de origem.</param>
-        /// <returns>Objeto <see cref="PedidoRequest"/> com as informaÁıes necess·rias.</returns>
+        /// <param name="source">Inst√¢ncia de origem.</param>
+        /// <returns>Objeto <see cref="PedidoRequest"/> com as informa√ß√µes necess√°rias.</returns>
         public static PedidoRequest? Map(PedidoView? source)
         {
             if (source == null)
@@ -22,8 +24,21 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
                 return null;
             }
 
+            var servicos = source.Itens?
+                .Where(i => string.Equals(i.ProdutoTipo, "SERVICO", StringComparison.OrdinalIgnoreCase))
+                .Select(i => new ServicoPedido
+                {
+                    Servico = new ProdutoRef { Id = i.ProdutoId, CodigoInterno = i.Sku },
+                    Quantidade = i.Qtde,
+                    ValorUnitario = i.Valor,
+                    ValorDesconto = i.Desconto
+                })
+                .ToList();
+
             return new PedidoRequest
             {
+                Cnpj = string.IsNullOrWhiteSpace(source.ClienteCpfcnpj) ? null : source.ClienteCpfcnpj,
+                Servicos = servicos?.Any() == true ? servicos : null
             };
         }
     }
