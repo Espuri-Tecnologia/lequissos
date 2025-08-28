@@ -1,9 +1,13 @@
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Lexos.Hub.Sync.Models.Pedido;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejOnline.Domain.Services;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido;
+using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Moq;
 using Xunit;
@@ -47,5 +51,6 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Services
             Assert.False(result.IsSuccess);
             _apiService.Verify(a => a.AlterarStatusPedidoAsync(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<string>()), Times.Never);
         }
+
     }
 }
