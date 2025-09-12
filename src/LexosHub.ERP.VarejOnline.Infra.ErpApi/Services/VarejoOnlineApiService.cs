@@ -1,16 +1,15 @@
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Clientes;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
-using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Clientes;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook;
-using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Empresa;
-using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses.Clientes;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
+using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses.Clientes;
 using Microsoft.Extensions.Options;
 using RestSharp;
 using System.Text.Json;
@@ -274,9 +273,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         #endregion
 
         #region WebhookRegister
-        public async Task<Response<WebhookOperationResponse>> RegisterWebhookAsync(string token,
-    WebhookRequest payload,
-    CancellationToken cancellationToken = default)
+        public async Task<Response<WebhookOperationResponse>> RegisterWebhookAsync(string token, WebhookRequest payload, CancellationToken cancellationToken = default)
         {
             var request = new RestRequest(_webHookEnpoint, Method.Post)
                 .AddHeader("Content-Type", "application/json")
