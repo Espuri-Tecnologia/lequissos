@@ -48,7 +48,7 @@ public class WebhookController : ControllerBase
         long? productId = ExtractObjectId(notification.Object);
 
         if (productId == null)
-            return BadRequest(new { error = "ID do produto inv·lido na notificaÁ„o" });
+            return BadRequest(new { error = "ID do produto inv√°lido na notifica√ß√£o" });
 
         var evt = new ProductsRequested
         {
@@ -60,7 +60,7 @@ public class WebhookController : ControllerBase
 
         _logger.LogInformation("Evento ProductsRequested disparado para productId={ProductId}", productId);
 
-        return Ok(new { message = "NotificaÁ„o de produto processada com sucesso." });
+        return Ok(new { message = "Notifica√ß√£o de produto processada com sucesso." });
     }
 
     [HttpPost("{hubkey}/tabela-preco")]
@@ -78,7 +78,7 @@ public class WebhookController : ControllerBase
         int? tabelaPrecoId = (int?)ExtractObjectId(notification.Object);
 
         if (tabelaPrecoId == null)
-            return BadRequest(new { error = "ID da tabela de preÁo inv·lido na notificaÁ„o" });
+            return BadRequest(new { error = "ID da tabela de pre√ßo inv√°lido na notifica√ß√£o" });
 
         var evt = new PriceTablesRequested
         {
@@ -90,7 +90,37 @@ public class WebhookController : ControllerBase
 
         _logger.LogInformation("Evento PriceTablesRequested disparado para tabelaPrecoId={TabelaPrecoId}", tabelaPrecoId);
 
-        return Ok(new { message = "NotificaÁ„o de tabela de preÁo processada com sucesso." });
+        return Ok(new { message = "Notifica√ß√£o de tabela de pre√ßo processada com sucesso." });
+    }
+
+    [HttpPost("{hubkey}/nota-fiscal")]
+    public async Task<IActionResult> PostNotaFiscalWebhookAsync(
+        [FromBody] WebhookNotificationDto notification,
+        [FromRoute] string hubkey,
+        CancellationToken cancellationToken)
+    {
+        if (notification == null)
+            return BadRequest(new { error = "Payload vazio" });
+
+        using var scope = _logger.BeginScope("Webhook NotaFiscal | Hub: {hubkey}", hubkey);
+        _logger.LogInformation("Recebido payload: {@Payload}", notification);
+
+        long? numeroNota = ExtractObjectId(notification.Object);
+
+        if (numeroNota == null)
+            return BadRequest(new { error = "N√∫mero da nota fiscal inv√°lido na notifica√ß√£o" });
+
+        var evt = new InvoicesRequested
+        {
+            HubKey = hubkey,
+            Number = numeroNota.Value
+        };
+
+        await _dispatcher.DispatchAsync(evt, cancellationToken);
+
+        _logger.LogInformation("Evento InvoicesRequested disparado para numeroNota={NumeroNota}", numeroNota);
+
+        return Ok(new { message = "Notifica√ß√£o de nota fiscal processada com sucesso." });
     }
     private long? ExtractObjectId(string obj)
     {
