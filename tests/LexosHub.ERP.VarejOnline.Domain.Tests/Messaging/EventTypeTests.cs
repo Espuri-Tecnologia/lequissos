@@ -19,6 +19,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
             new object[] { new CriarProdutosKits() },
             new object[] { new PriceTablesRequested() },
             new object[] { new PriceTablePageProcessed() },
+            new object[] { new InvoicesRequested() },
             new object[] { new InitialSync() }
         };
 

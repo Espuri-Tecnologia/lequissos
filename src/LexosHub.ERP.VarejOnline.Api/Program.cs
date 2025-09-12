@@ -84,6 +84,7 @@ try
     builder.Services.AddTransient<IEventHandler<CompaniesRequested>, CompaniesRequestedEventHandler>();
     builder.Services.AddTransient<IEventHandler<StoresRequested>, StoresRequestedEventHandler>();
     builder.Services.AddTransient<IEventHandler<RegisterDefaultWebhooks>, RegisterDefaultWebhooksEventHandler>();
+    builder.Services.AddTransient<IEventHandler<InvoicesRequested>, InvoicesRequestedEventHandler>();
     builder.Services.AddHostedService<SqsListenerService>();
 
     var app = builder.Build().SetupMiddlewares();
