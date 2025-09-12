@@ -13,6 +13,7 @@ using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses.Clientes;
 using Moq;
 using Xunit;
+using System;
 
 namespace LexosHub.ERP.VarejOnline.Domain.Tests.Services
 {

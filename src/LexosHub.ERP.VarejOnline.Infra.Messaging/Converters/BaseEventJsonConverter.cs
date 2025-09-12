@@ -10,24 +10,40 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Converters
     {
         public override BaseEvent? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            using var document = JsonDocument.ParseValue(ref reader);
+            using var doc = JsonDocument.ParseValue(ref reader);
+            var root = doc.RootElement;
 
-            if (!document.RootElement.TryGetProperty("EventType", out var eventTypeProperty))
+            // tenta EventType e eventType
+            if (!TryGetProp(root, "EventType", out var p) && !TryGetProp(root, "eventType", out p))
             {
-                throw new JsonException("EventType property not found");
+                // fallback seguro: tenta desserializar como BaseEvent (mantém EventType via ctor)
+                return root.Deserialize<BaseEvent>(options);
             }
 
-            var eventTypeName = eventTypeProperty.GetString();
-            if (string.IsNullOrEmpty(eventTypeName))
-            {
-                throw new JsonException("EventType property is null or empty");
-            }
+            var eventTypeName = p.GetString();
+            if (string.IsNullOrWhiteSpace(eventTypeName))
+                return root.Deserialize<BaseEvent>(options);
 
-            var actualType = EventTypeResolver.Resolve(eventTypeName);
-            var json = document.RootElement.GetRawText();
-            return (BaseEvent?)JsonSerializer.Deserialize(json, actualType, options);
+            if (!EventTypeResolver.TryResolve(eventTypeName!, out var actualType))
+                return root.Deserialize<BaseEvent>(options);
+
+            // evite alocação de string extra usando Deserialize direto do JsonElement
+            return (BaseEvent?)root.Deserialize(actualType, options);
         }
 
+        private static bool TryGetProp(JsonElement root, string name, out JsonElement value)
+        {
+            foreach (var prop in root.EnumerateObject())
+            {
+                if (string.Equals(prop.Name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    value = prop.Value;
+                    return true;
+                }
+            }
+            value = default;
+            return false;
+        }
         public override void Write(Utf8JsonWriter writer, BaseEvent value, JsonSerializerOptions options)
         {
             JsonSerializer.Serialize(writer, (object)value, value.GetType(), options);

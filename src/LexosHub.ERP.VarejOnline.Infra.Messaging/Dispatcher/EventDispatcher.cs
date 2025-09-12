@@ -1,7 +1,6 @@
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
 {

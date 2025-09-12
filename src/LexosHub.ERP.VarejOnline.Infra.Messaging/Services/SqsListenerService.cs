@@ -1,33 +1,52 @@
-using Amazon.SQS;
-using Amazon.SQS.Model;
+using Lexos.SQS.Interface;
+using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
-using System.Linq;
 
-namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Services
+namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
 {
     public class SqsListenerService : BackgroundService
     {
-        private readonly IAmazonSQS _sqsClient;
         private readonly ILogger<SqsListenerService> _logger;
-        private readonly EventDispatcher _dispatcher;
-        private readonly IReadOnlyList<string> _queueUrls;
+        private readonly IEventDispatcher _dispatcher;
+        private readonly Dictionary<string, string> _queueUrls; // key lógica -> URL completa
         private readonly JsonSerializerOptions _jsonOptions;
+        private readonly ISqsRepository _sqsRepository;
 
-        public SqsListenerService(IAmazonSQS sqsClient, IConfiguration configuration, ILogger<SqsListenerService> logger, EventDispatcher dispatcher)
+        public SqsListenerService(
+            ILogger<SqsListenerService> logger,
+            IEventDispatcher dispatcher,
+            IOptions<VarejOnlineSqsConfig> sqsVarejOnlineConfig,
+            ISqsRepository sqsRepository)
         {
-            _sqsClient = sqsClient;
             _logger = logger;
-            var baseUrl = configuration["AWS:ServiceURL"]?.TrimEnd('/');
-            var queuePaths = configuration.GetSection("AWS:SQSQueues").Get<string[]>() ?? Array.Empty<string>();
-            _queueUrls = queuePaths.Select(q => $"{baseUrl}/{q.TrimStart('/')}").ToList();
             _dispatcher = dispatcher;
-            _jsonOptions = new JsonSerializerOptions();
+            _sqsRepository = sqsRepository;
+
+            var cfg = sqsVarejOnlineConfig?.Value ?? throw new ArgumentNullException(nameof(sqsVarejOnlineConfig));
+            if (string.IsNullOrWhiteSpace(cfg.SQSBaseUrl))
+                throw new ArgumentException("SQSBaseUrl não configurado em AWSConfig.");
+            if (string.IsNullOrWhiteSpace(cfg.SQSAccessKeyId))
+                throw new ArgumentException("SQSAccessKeyId (AccountId) não configurado em AWSConfig.");
+            if (cfg.SQSQueues is null || cfg.SQSQueues.Count == 0)
+                throw new ArgumentException("SQSQueues vazio/não configurado em AWSConfig.");
+
+            _queueUrls = cfg.SQSQueues.ToDictionary(
+                kvp => kvp.Key,
+                kvp => $"{cfg.SQSBaseUrl}{cfg.SQSAccessKeyId}/{kvp.Value}",
+                StringComparer.OrdinalIgnoreCase
+            );
+
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
             _jsonOptions.Converters.Add(new BaseEventJsonConverter());
         }
 
@@ -37,35 +56,33 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Services
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                foreach (var queueUrl in _queueUrls)
+                try
                 {
-                    var request = new ReceiveMessageRequest
+                    // Varre cada fila, uma por vez (repo é stateful)
+                    foreach (var (logicalKey, queueUrl) in _queueUrls)
                     {
-                        QueueUrl = queueUrl,
-                        MaxNumberOfMessages = 10,
-                        WaitTimeSeconds = 10
-                    };
+                        if (stoppingToken.IsCancellationRequested) break;
 
-                    var response = await _sqsClient.ReceiveMessageAsync(request, stoppingToken);
+                        _sqsRepository.IniciarFila(queueUrl, Lexos.SQS.Models.TipoConta.Production);
 
-                    foreach (var message in response.Messages)
-                    {
-                        try
+                        var msgs = _sqsRepository.ObterMensagens<JsonElement>(10);
+                        foreach (var m in msgs ?? [])
                         {
-                            _logger.LogInformation($"Mensagem recebida: {message.Body}");
+                            var evt = JsonSerializer.Deserialize<BaseEvent>(m.Mensagem, _jsonOptions); // _jsonOptions tem BaseEventJsonConverter
+                            if (evt is null) 
+                                continue;
 
-                            var typedEvent = JsonSerializer.Deserialize<BaseEvent>(message.Body, _jsonOptions)!;
-
-                            await _dispatcher.DispatchAsync(typedEvent, stoppingToken);
-
-                            await _sqsClient.DeleteMessageAsync(queueUrl, message.ReceiptHandle, stoppingToken);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Erro ao processar mensagem SQS");
+                            await _dispatcher.DispatchAsync(evt, stoppingToken);
+                            _sqsRepository.RemoverMensagem(m.ReceiptHandle);
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Erro no loop principal do SQS Listener");
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
         }
     }

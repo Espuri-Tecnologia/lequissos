@@ -1,8 +1,10 @@
 using Amazon.SQS;
 using Amazon.SQS.Model;
+using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
+using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
@@ -11,6 +13,7 @@ using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +29,8 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         private readonly Mock<ILogger<ProductsRequestedEventHandler>> _logger = new();
         private readonly Mock<IIntegrationService> _integrationService = new();
         private readonly Mock<IVarejOnlineApiService> _apiService = new();
-        private readonly Mock<IAmazonSQS> _sqs = new();
+        private readonly Mock<IOptions<VarejOnlineSqsConfig>> _sqsConfig = new();
+        private readonly Mock<ISqsRepository> _sqs = new();
         private readonly Mock<IConfiguration> _configuration = new();
 
         private ProductsRequestedEventHandler CreateHandler()
@@ -38,7 +42,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                     {"AWS:SQSQueues:Produtos", "queue/produtos"}
                 })
                 .Build();
-            var dispatcher = new SqsEventDispatcher(_sqs.Object, config);
+            var dispatcher = new SqslEventPublisher(_sqs.Object, _sqsConfig.Object);
             return new ProductsRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object, dispatcher, _configuration.Object);
         }
 
@@ -118,15 +122,13 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                     It.Is<ProdutoRequest>(r => r.Inicio == 2 && r.Quantidade == 2)
                 ), Times.Once);
 
-            _sqs.Verify(s => s.SendMessageAsync(
+            _sqs.Verify(s => s.AdicionarMensagemFilaNormal(
                     It.Is<SendMessageRequest>(r =>
-                        IsProductsPageProcessed(r, 0, 2, 2, "key", firstPage)),
-                    It.IsAny<CancellationToken>()), Times.Once);
+                        IsProductsPageProcessed(r, 0, 2, 2, "key", firstPage))), Times.Once);
 
-            _sqs.Verify(s => s.SendMessageAsync(
+            _sqs.Verify(s => s.AdicionarMensagemFilaNormal(
                     It.Is<SendMessageRequest>(r =>
-                        IsProductsPageProcessed(r, 2, 2, 1, "key", secondPage)),
-                    It.IsAny<CancellationToken>()), Times.Once);
+                        IsProductsPageProcessed(r, 2, 2, 1, "key", secondPage))), Times.Once);
         }
 
         [Fact]
@@ -157,15 +159,13 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
 
             await CreateHandler().HandleAsync(evt, CancellationToken.None);
 
-            _sqs.Verify(s => s.SendMessageAsync(
+            _sqs.Verify(s => s.AdicionarMensagemFilaNormal(
                     It.Is<SendMessageRequest>(r =>
-                        IsProductsPageProcessed(r, 0, 5, 1, "key", new List<ProdutoResponse> { simples })),
-                    It.IsAny<CancellationToken>()), Times.Once);
+                        IsProductsPageProcessed(r, 0, 5, 1, "key", new List<ProdutoResponse> { simples }))), Times.Once);
 
-            _sqs.Verify(s => s.SendMessageAsync(
+            _sqs.Verify(s => s.AdicionarMensagemFilaNormal(
                     It.Is<SendMessageRequest>(r =>
-                        IsKitsProcessed(r, 0, 5, 1, "key", new List<ProdutoResponse> { kit })),
-                    It.IsAny<CancellationToken>()), Times.Once);
+                        IsKitsProcessed(r, 0, 5, 1, "key", new List<ProdutoResponse> { kit }))), Times.Once);
         }
 
         private bool IsProductsPageProcessed(

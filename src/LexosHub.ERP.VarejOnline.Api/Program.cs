@@ -19,10 +19,10 @@ using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto;
-using LexosHub.ERP.VarejOnline.Infra.Messaging.Services;
 using LexosHub.ERP.VarejOnline.Infra.SyncOut.Interfaces;
 using LexosHub.ERP.VarejOnline.Infra.SyncOut.Services;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Diagnostics;
@@ -48,6 +48,7 @@ try
 
     builder.Services.AddOptions<SyncOutConfig>().Bind(builder.Configuration.GetSection(nameof(SyncOutConfig)));
     builder.Services.AddOptions<SyncInConfig>().Bind(builder.Configuration.GetSection(nameof(SyncInConfig)));
+    builder.Services.AddOptions<VarejOnlineSqsConfig>().Bind(builder.Configuration.GetSection(nameof(VarejOnlineSqsConfig)));
 
     builder.Services.AddTransient<IIntegrationService, IntegrationService>();
     builder.Services.AddTransient<IAuthService, AuthService>();
@@ -68,19 +69,9 @@ try
 
     builder.Services.AddOptions<VarejOnlineApiSettings>().Bind(builder.Configuration.GetSection(nameof(VarejOnlineApiSettings)));
 
-    builder.Services.AddSingleton<IAmazonSQS>(sp =>
-    {
-        var config = sp.GetRequiredService<IConfiguration>();
-
-        var sqsConfig = new AmazonSQSConfig
-        {
-            ServiceURL = config["AWS:ServiceURL"]
-        };
-
-        return new AmazonSQSClient("test", "test", sqsConfig);
-    });
     builder.Services.AddSingleton<EventDispatcher>();
-    builder.Services.AddSingleton<IEventDispatcher, SqsEventDispatcher>();
+    builder.Services.AddSingleton<IEventDispatcher, EventDispatcher>();
+    builder.Services.AddSingleton<ISqslEventPublisher, SqslEventPublisher>();
     builder.Services.AddTransient<IEventHandler<IntegrationCreated>, IntegrationCreatedEventHandler>();
     builder.Services.AddTransient<IEventHandler<InitialSync>, InitialSyncEventHandler>();
     builder.Services.AddTransient<IEventHandler<ProductsRequested>, ProductsRequestedEventHandler>();

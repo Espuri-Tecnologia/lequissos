@@ -1,4 +1,3 @@
-using Amazon.Auth.AccessControlPolicy;
 using Lexos.Hub.Sync;
 using Lexos.Hub.Sync.Enums;
 using Lexos.Hub.Sync.Models.Produto;
@@ -12,7 +11,6 @@ using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Linq;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
 
@@ -52,10 +50,8 @@ public class CriarProdutosConfiguraveisEventHandler : IEventHandler<CriarProduto
         {
             foreach (var produto in @event.Produtos)
             {
-                
                 //if (produtoView == null)
                 //    continue;
-
                 var request = new ProdutoRequest { ProdutoBase = produto.Id };
                 var response = await _apiService.GetProdutosAsync(token, request);
                 var variacoes = response.Result ?? new List<ProdutoResponse>();

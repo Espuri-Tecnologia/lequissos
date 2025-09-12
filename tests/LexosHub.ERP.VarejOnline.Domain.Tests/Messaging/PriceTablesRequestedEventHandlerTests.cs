@@ -1,13 +1,15 @@
-using Amazon.SQS;
 using Amazon.SQS.Model;
+using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
+using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
-using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,9 +19,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using Lexos.SQS.Interface;
-using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
-using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
 
 namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
 {
@@ -29,7 +28,8 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         private readonly Mock<ISqsRepository> _sqsRepository = new();
         private readonly Mock<IVarejOnlineApiService> _apiService = new();
         private readonly Mock<IIntegrationService> _integrationService = new();
-        private readonly Mock<IAmazonSQS> _sqs = new();
+        private readonly Mock<IOptions<VarejOnlineSqsConfig>> _sqsConfig = new();
+        private readonly Mock<ISqsRepository> _sqs = new();
 
         private readonly IConfiguration _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>
@@ -43,7 +43,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
 
         private PriceTablesRequestedEventHandler CreateHandler()
         {
-            var dispatcher = new SqsEventDispatcher(_sqs.Object, _configuration);
+            var dispatcher = new SqslEventPublisher(_sqs.Object, _sqsConfig.Object);
             var options = Options.Create(new SyncOutConfig());
             return new PriceTablesRequestedEventHandler(
                 _logger.Object,
@@ -81,9 +81,8 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
 
             await CreateHandler().HandleAsync(evt, CancellationToken.None);
 
-            _sqs.Verify(s => s.SendMessageAsync(
-                    It.Is<SendMessageRequest>(r => IsProductsRequestedWithIds(r, "key", "1,2,3")),
-                    It.IsAny<CancellationToken>()),
+            _sqs.Verify(s => s.AdicionarMensagemFilaNormal(
+                    It.Is<SendMessageRequest>(r => IsProductsRequestedWithIds(r, "key", "1,2,3"))),
                 Times.Once);
         }
 
