@@ -91,7 +91,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
                     b.Property<int>("IntegrationId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Method")
+                    b.Property<string>("Types")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

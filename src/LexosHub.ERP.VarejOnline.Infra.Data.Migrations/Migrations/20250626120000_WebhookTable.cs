@@ -17,7 +17,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
                     IntegrationId = table.Column<int>(type: "int", nullable: false),
                     Uuid = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Event = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Method = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Types = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)

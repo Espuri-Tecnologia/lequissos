@@ -8,6 +8,9 @@ namespace LexosHub.ERP.VarejOnline.Domain.Interfaces.Services
     public interface IWebhookService
     {
         Task<Response<WebhookRecordDto>> AddAsync(WebhookRecordDto webhook);
+        /// <summary>
+        /// Register a webhook for the given hub key and event using the provided types.
+        /// </summary>
         Task<Response<WebhookRecordDto>> RegisterAsync(WebhookDto webhookDto, CancellationToken cancellationToken = default);
     }
 }
