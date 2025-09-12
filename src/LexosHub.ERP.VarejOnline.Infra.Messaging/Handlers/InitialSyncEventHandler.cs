@@ -24,6 +24,9 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 
             var storesEvent = new StoresRequested { HubKey = @event.HubKey };
             await _dispatcher.DispatchAsync(storesEvent, cancellationToken);
+
+            var webhooksEvent = new RegisterDefaultWebhooks { HubKey = @event.HubKey };
+            await _dispatcher.DispatchAsync(webhooksEvent, cancellationToken);
         }
     }
 }
