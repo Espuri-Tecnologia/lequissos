@@ -6,7 +6,6 @@ using LexosHub.ERP.VarejOnline.Domain.Interfaces.Repositories.Webhook;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
 using System.Threading;
-using System.Collections.Generic;
 using System;
 
 namespace LexosHub.ERP.VarejOnline.Domain.Services
@@ -49,7 +48,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
             {
                 Event = webhookDto.Event,
                 url = webhookDto.Url,
-                types = new List<string> { webhookDto.Method }
+                types = webhookDto.Types
             };
 
             var result = await _apiService.RegisterWebhookAsync(token, request, cancellationToken);
@@ -61,7 +60,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
             {
                 IntegrationId = integrationResponse.Result.Id,
                 Event = webhookDto.Event,
-                Method = webhookDto.Method,
+                Types = webhookDto.Types,
                 Url = webhookDto.Url,
                 Uuid = result.Result.IdRecurso
             };

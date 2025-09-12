@@ -8,7 +8,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Models.Webhook
         public int IntegrationId { get; set; }
         public string? Uuid { get; set; }
         public string Event { get; set; } = string.Empty;
-        public string Method { get; set; } = string.Empty;
+        public string Types { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
     }
 }

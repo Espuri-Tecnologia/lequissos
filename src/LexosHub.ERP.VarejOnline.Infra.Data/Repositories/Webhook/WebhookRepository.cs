@@ -2,6 +2,7 @@ using LexosHub.ERP.VarejOnline.Domain.DTOs.Webhook;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Persistence;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Repositories.Webhook;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Webhook
 {
@@ -21,15 +22,15 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Webhook
             try
             {
                 var id = await _writeDbConnection.ExecuteScalarAsync<int>(
-                    sql: @"INSERT INTO [Webhook] ([IntegrationId], [Uuid], [Event], [Method], [Url], [CreatedDate], [UpdatedDate])
+                    sql: @"INSERT INTO [Webhook] ([IntegrationId], [Uuid], [Event], [Types], [Url], [CreatedDate], [UpdatedDate])
                            OUTPUT INSERTED.Id
-                           VALUES (@IntegrationId, @Uuid, @Event, @Method, @Url, GETDATE(), GETDATE());",
+                           VALUES (@IntegrationId, @Uuid, @Event, @Types, @Url, GETDATE(), GETDATE());",
                     param: new
                     {
                         webhook.IntegrationId,
                         webhook.Uuid,
                         webhook.Event,
-                        webhook.Method,
+                        Types = string.Join(',', webhook.Types ?? new List<string>()),
                         webhook.Url
                     });
                 webhook.Id = id;
