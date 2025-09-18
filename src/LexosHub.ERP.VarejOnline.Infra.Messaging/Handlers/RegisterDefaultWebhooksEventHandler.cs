@@ -23,7 +23,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
             _logger.LogInformation("Registering default webhooks for hub {HubKey}", @event.HubKey);
 
             var events = new[] { "PRODUTOS", "TABELAPRECOPRODUTO", "NOTAFISCAL" };
-            var methods = new[] { "POST", "PUT" };
+            var methods = new List<string> { "POST", "PUT" };
 
             foreach (var evt in events)
             {
@@ -33,7 +33,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                     {
                         HubKey = @event.HubKey,
                         Event = evt,
-                        Method = method,
+                        Types = methods,
                         Url = $"https://api-varejoonline.lexoshub.com/{@event.HubKey}/{evt}"
                     };
 

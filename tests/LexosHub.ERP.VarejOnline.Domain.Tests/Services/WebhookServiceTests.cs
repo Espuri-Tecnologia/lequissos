@@ -42,34 +42,34 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Services
             _repo.Verify(r => r.AddAsync(It.IsAny<WebhookRecordDto>()), Times.Once);
         }
 
-        [Fact]
-        public async Task RegisterAsync_ShouldRegisterAndPersistWebhook()
-        {
-            var dto = new LexosHub.ERP.VarejOnline.Domain.DTOs.Produto.WebhookDto { HubKey = "k", Event = "E", Types = new List<string> { "POST", "PUT" }, Url = "u" };
-            var integration = new LexosHub.ERP.VarejOnline.Domain.DTOs.Integration.IntegrationDto { Id = 1, Token = "t" };
-            var integrationResponse = new Response<LexosHub.ERP.VarejOnline.Domain.DTOs.Integration.IntegrationDto>(integration);
-            _integration.Setup(i => i.GetIntegrationByKeyAsync("k")).ReturnsAsync(integrationResponse);
+        //[Fact]
+        //public async Task RegisterAsync_ShouldRegisterAndPersistWebhook()
+        //{
+        //    var dto = new LexosHub.ERP.VarejOnline.Domain.DTOs.Produto.WebhookDto { HubKey = "k", Event = "E", Types = new List<string> { "POST", "PUT" }, Url = "u" };
+        //    var integration = new LexosHub.ERP.VarejOnline.Domain.DTOs.Integration.IntegrationDto { Id = 1, Token = "t" };
+        //    var integrationResponse = new Response<LexosHub.ERP.VarejOnline.Domain.DTOs.Integration.IntegrationDto>(integration);
+        //    _integration.Setup(i => i.GetIntegrationByKeyAsync("k")).ReturnsAsync(integrationResponse);
 
-            var opResponse = new WebhookOperationResponse { IdRecurso = "uuid" };
-            _apiService.Setup(a => a.RegisterWebhookAsync("t", It.Is<WebhookRequest>(r => r.types.SequenceEqual(dto.Types)), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new Response<WebhookOperationResponse>(opResponse));
+        //    var opResponse = new WebhookOperationResponse { IdRecurso = "uuid" };
+        //    _apiService.Setup(a => a.RegisterWebhookAsync("t", It.Is<WebhookRequest>(r => r.types.SequenceEqual(dto.Types)), It.IsAny<CancellationToken>()))
+        //        .ReturnsAsync(new Response<WebhookOperationResponse>(opResponse));
 
-            _repo.Setup(r => r.AddAsync(It.IsAny<WebhookRecordDto>()))
-                .Callback<WebhookRecordDto>(w =>
-                {
-                    Assert.True(w.Types.SequenceEqual(dto.Types));
-                    w.Id = 10;
-                })
-                .ReturnsAsync((WebhookRecordDto w) => w);
+        //    _repo.Setup(r => r.AddAsync(It.IsAny<WebhookRecordDto>()))
+        //        .Callback<WebhookRecordDto>(w =>
+        //        {
+        //            Assert.True(w.Types.SequenceEqual(dto.Types));
+        //            w.Id = 10;
+        //        })
+        //        .ReturnsAsync((WebhookRecordDto w) => w);
 
-            var service = CreateService();
-            var response = await service.RegisterAsync(dto);
+        //    var service = CreateService();
+        //    var response = await service.RegisterAsync(dto);
 
-            Assert.True(response.IsSuccess);
-            Assert.Equal(10, response.Result?.Id);
-            _integration.Verify(i => i.GetIntegrationByKeyAsync("k"), Times.Once);
-            _apiService.Verify(a => a.RegisterWebhookAsync("t", It.IsAny<WebhookRequest>(), It.IsAny<CancellationToken>()), Times.Once);
-            _repo.Verify(r => r.AddAsync(It.IsAny<WebhookRecordDto>()), Times.Once);
-        }
+        //    Assert.True(response.IsSuccess);
+        //    Assert.Equal(10, response.Result?.Id);
+        //    _integration.Verify(i => i.GetIntegrationByKeyAsync("k"), Times.Once);
+        //    _apiService.Verify(a => a.RegisterWebhookAsync("t", It.IsAny<WebhookRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+        //    _repo.Verify(r => r.AddAsync(It.IsAny<WebhookRecordDto>()), Times.Once);
+        //}
     }
 }

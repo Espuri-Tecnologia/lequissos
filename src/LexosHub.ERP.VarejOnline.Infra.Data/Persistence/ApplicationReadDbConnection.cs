@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Persistence;
+using LexosHub.ERP.VarejOnline.Infra.CrossCutting;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
@@ -15,7 +16,7 @@ public class ApplicationReadDbConnection : IApplicationReadDbConnection
 
     public IDbConnection CreateConnection()
     {
-        var conn = new SqlConnection(_configuration.GetConnectionString("ErpDBConn"));
+        var conn = new SqlConnection(DatabaseHandler.MontarConexao(_configuration));
         conn.Open();
         return conn;
     }

@@ -1,17 +1,18 @@
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses.Clientes
 {
     public class TerceiroResponse
     {
+        [JsonProperty("id")]
         public long Id { get; set; }
+        [JsonProperty("nome")]
         public string Nome { get; set; } = string.Empty;
+        [JsonProperty("documento")]
         public string Documento { get; set; } = string.Empty;
+        [JsonProperty("tipo")]
         public string Tipo { get; set; } = string.Empty;
-        public string? Email { get; set; }
-        public string? Telefone { get; set; }
-        public List<TerceiroContatoResponse>? Contatos { get; set; }
-        public List<TerceiroEnderecoResponse>? Enderecos { get; set; }
     }
 
     public class TerceiroContatoResponse

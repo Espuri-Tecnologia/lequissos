@@ -14,7 +14,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
     {
         private readonly ILogger<SqsListenerService> _logger;
         private readonly IEventDispatcher _dispatcher;
-        private readonly Dictionary<string, string> _queueUrls; // key lógica -> URL completa
+        private readonly Dictionary<string, string> _queueUrls;
         private readonly JsonSerializerOptions _jsonOptions;
         private readonly ISqsRepository _sqsRepository;
 
@@ -58,7 +58,6 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
             {
                 try
                 {
-                    // Varre cada fila, uma por vez (repo é stateful)
                     foreach (var (logicalKey, queueUrl) in _queueUrls)
                     {
                         if (stoppingToken.IsCancellationRequested) break;
@@ -68,7 +67,7 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
                         var msgs = _sqsRepository.ObterMensagens<JsonElement>(10);
                         foreach (var m in msgs ?? [])
                         {
-                            var evt = JsonSerializer.Deserialize<BaseEvent>(m.Mensagem, _jsonOptions); // _jsonOptions tem BaseEventJsonConverter
+                            var evt = JsonSerializer.Deserialize<BaseEvent>(m.Mensagem, _jsonOptions);
                             if (evt is null) 
                                 continue;
 
@@ -81,7 +80,6 @@ namespace LexosHub.ERP.VarejoOnline.Infra.Messaging.Services
                 {
                     _logger.LogError(ex, "Erro no loop principal do SQS Listener");
                 }
-
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
         }

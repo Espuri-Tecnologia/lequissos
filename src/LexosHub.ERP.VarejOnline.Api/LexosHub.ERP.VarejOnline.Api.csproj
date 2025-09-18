@@ -47,5 +47,10 @@
     <ProjectReference Include="..\LexosHub.ERP.VarejOnline.Infra.Data.Migrations\LexosHub.ERP.VarejOnline.Infra.Data.Migrations.csproj" />
     <ProjectReference Include="..\LexosHub.ERP.VarejOnline.Infra.Data\LexosHub.ERP.VarejOnline.Infra.Data.csproj" />
     <ProjectReference Include="..\LexosHub.ERP.VarejOnline.Infra.Messaging\LexosHub.ERP.VarejOnline.Infra.Messaging.csproj" />
+    <ProjectReference Include="..\LexosHub.ERP.VarejOnline.Infra.SyncOut\LexosHub.ERP.VarejOnline.Infra.SyncOut.csproj" />
   </ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Lexos.DevEnv" Version="1.0.5" />
+	</ItemGroup>
 </Project>

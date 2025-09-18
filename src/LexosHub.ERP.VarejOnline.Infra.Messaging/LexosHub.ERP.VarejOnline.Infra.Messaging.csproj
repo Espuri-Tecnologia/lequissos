@@ -8,15 +8,16 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.SQS" Version="3.7.100.1" />
+    <PackageReference Include="Lexos.Hub.Sync" Version="1.0.44" />
 	<PackageReference Include="Lexos.SQS" Version="1.0.12" />
 	<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\LexosHub.ERP.VarejOnline.Infra.SyncOut\LexosHub.ERP.VarejOnline.Infra.SyncOut.csproj" />
     <ProjectReference Include="..\LexosHub.ERP.VarejOnline.Domain\LexosHub.ERP.VarejOnline.Domain.csproj" />
     <ProjectReference Include="..\LexosHub.ERP.VarejOnline.Infra.ErpApi\LexosHub.ERP.VarejOnline.Infra.ErpApi.csproj" />
+    <ProjectReference Include="..\LexosHub.ERP.VarejOnline.Infra.SyncOut\LexosHub.ERP.VarejOnline.Infra.SyncOut.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,19 +7,28 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Reflection;
+using LexosHub.ERP.VarejOnline.Infra.CrossCutting;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Context
 {
     public class AppDbContext : DbContext, IAppDbContext
     {
-        public AppDbContext() { }
+        public AppDbContext(IConfiguration configuration) {
+            _configuration = configuration;
+        }
 
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options, 
+                            IConfiguration configuration) : base(options) 
+        {
+            _configuration = configuration;
+        }
 
         public DbSet<Integration> Integration => Set<Integration>();
         public DbSet<Webhook> Webhook => Set<Webhook>();
         public DbSet<SyncProcess> SyncProcess => Set<SyncProcess>();
         public IDbConnection Connection => Database.GetDbConnection();
+
+        public IConfiguration _configuration;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -30,7 +39,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Context
                 builder.AddJsonFile("migrationsettings.json");
                 IConfiguration configuration = builder.Build();
 
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("ErpDBConn"));
+                optionsBuilder.UseSqlServer(DatabaseHandler.MontarConexao(_configuration));
             }
         }
 

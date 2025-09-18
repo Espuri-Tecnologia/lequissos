@@ -27,5 +27,10 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
 	</ItemGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\LexosHub.ERP.VarejOnline.Infra.CrossCutting\LexosHub.ERP.VarejOnline.Infra.CrossCutting.csproj" />
+	</ItemGroup>
 	
 </Project>

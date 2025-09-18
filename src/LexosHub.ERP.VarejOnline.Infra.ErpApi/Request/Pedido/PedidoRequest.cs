@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido

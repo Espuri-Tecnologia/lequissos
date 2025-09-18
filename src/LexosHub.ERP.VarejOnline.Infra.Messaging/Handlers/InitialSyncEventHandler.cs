@@ -19,9 +19,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
         {
             _logger.LogInformation("Initial sync started for hub {HubKey}", @event.HubKey);
 
-            var companiesEvent = new CompaniesRequested { HubKey = @event.HubKey };
-            await _dispatcher.DispatchAsync(companiesEvent, cancellationToken);
-
             var storesEvent = new StoresRequested { HubKey = @event.HubKey };
             await _dispatcher.DispatchAsync(storesEvent, cancellationToken);
 

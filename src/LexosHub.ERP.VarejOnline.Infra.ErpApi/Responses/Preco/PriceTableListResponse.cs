@@ -1,4 +1,4 @@
-using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Preço;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Preco;
 
 namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices
 {

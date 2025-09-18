@@ -8,6 +8,7 @@
         public int TenantId { get; set; }
         public bool Habilitado { get; set; }
         public bool Excluido { get; set; }
+        public SettingsDto? Settings { get; set; }
 
     }
 }

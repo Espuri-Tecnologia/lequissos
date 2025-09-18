@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Persistence;
+using LexosHub.ERP.VarejOnline.Infra.CrossCutting;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
@@ -17,31 +18,31 @@ public class ApplicationWriteDbConnection : IApplicationWriteDbConnection
 
     public async Task<int> ExecuteAsync(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     {
-        await using var conn = new SqlConnection(_configuration.GetConnectionString("ErpDBConn"));
+        await using var conn = new SqlConnection(DatabaseHandler.MontarConexao(_configuration));
         return await conn.ExecuteAsync(sql, param, transaction);
     }
 
     public async Task<T> ExecuteScalarAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     {
-        await using var conn = new SqlConnection(_configuration.GetConnectionString("ErpDBConn"));
+        await using var conn = new SqlConnection(DatabaseHandler.MontarConexao(_configuration));
         return await conn.ExecuteScalarAsync<T>(sql, param, transaction);
     }
 
     public async Task<T> QueryFirstOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     {
-        await using var conn = new SqlConnection(_configuration.GetConnectionString("ErpDBConn"));
+        await using var conn = new SqlConnection(DatabaseHandler.MontarConexao(_configuration));
         return await conn.QueryFirstOrDefaultAsync<T>(sql, param, transaction);
     }
 
     public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     {
-        await using var conn = new SqlConnection(_configuration.GetConnectionString("ErpDBConn"));
+        await using var conn = new SqlConnection(DatabaseHandler.MontarConexao(_configuration));
         return await conn.QueryAsync<T>(sql, param, transaction);
     }
 
     public IDbConnection CreateConnection()
     {
-        var conn = new SqlConnection(_configuration.GetConnectionString("ErpDBConn"));
+        var conn = new SqlConnection(DatabaseHandler.MontarConexao(_configuration));
         conn.Open();
         return conn;
     }

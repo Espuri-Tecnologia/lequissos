@@ -29,15 +29,16 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
                 NumeroPedidoCliente = source.Codigo,
                 Data = source.Data.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture),
                 Horario = source.Data.ToString("HH:mm:ss", CultureInfo.InvariantCulture),
+                Entidade = montaEntidade(source),
                 Terceiro = long.TryParse(source.ClienteCpfcnpj, out var clienteId) ? new TerceiroRef { Id = clienteId } : null,
+                Representante = new RepresentanteRef { Id = 5 },
                 ValorDesconto = source.Desconto,
                 ValorFrete = source.Frete,
                 ValorOutros = source.Acrescimo,
                 Observacao = source.Observacao,
                 Itens = MapItens(source.Itens),
                 Pagamento = MapPagamento(source.ComposicaoPagamento),
-                EnderecoEntrega = MapEndereco(source.Enderecos?.FirstOrDefault(e => string.Equals(e.TipoEndereco, "entrega", StringComparison.OrdinalIgnoreCase))),
-                Transporte = MapTransporte(source)
+                EnderecoEntrega = MapEndereco(source.Enderecos?.FirstOrDefault(e => string.Equals(e.TipoEndereco, "entrega", StringComparison.OrdinalIgnoreCase)))
             };
 
             return request;
@@ -177,6 +178,11 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
                 Cidade = endereco.Cidade,
                 Uf = endereco.Uf
             };
+        }
+
+        private static EntidadeRef montaEntidade(PedidoView pedido)
+        {
+            return new EntidadeRef { Id = pedido.LojaFaturamentoId };
         }
 
         private static Transporte? MapTransporte(PedidoView source)

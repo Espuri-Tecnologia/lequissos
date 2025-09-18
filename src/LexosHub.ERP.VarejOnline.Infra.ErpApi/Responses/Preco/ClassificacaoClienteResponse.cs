@@ -1,4 +1,4 @@
-﻿namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Preço
+﻿namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Preco
 {
     public class ClassificacaoClienteResponse
     {

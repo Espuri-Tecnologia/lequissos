@@ -3,6 +3,7 @@ using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 [ApiController]
 [Route("api/webhook")]
@@ -10,15 +11,15 @@ using Microsoft.AspNetCore.Mvc;
 public class WebhookController : ControllerBase
 {
     private readonly IWebhookService _webhookService;
-    private readonly IEventDispatcher _dispatcher;
+    private readonly ISqslEventPublisher _publisher;
     private readonly ILogger<WebhookController> _logger;
 
     public WebhookController(
-        IEventDispatcher dispatcher,
+        ISqslEventPublisher publisher,
         ILogger<WebhookController> logger,
         IWebhookService webhookService)
     {
-        _dispatcher = dispatcher;
+        _publisher = publisher;
         _logger = logger;
         _webhookService = webhookService;
     }
@@ -31,6 +32,20 @@ public class WebhookController : ControllerBase
 
         await _webhookService.RegisterAsync(webhookDto);
         return Ok(new { message = "Webhook recebido com sucesso." });
+    }
+
+    [HttpPost("{hubkey}")]
+    public async Task<IActionResult> PublishProductsRequested([FromRoute] string hubkey, CancellationToken cancellationToken)
+    {
+
+        var evt = new ProductsRequested
+        {
+            HubKey = hubkey
+        };
+
+        await _publisher.DispatchAsync(evt, cancellationToken);
+
+        return Ok(new { message = "Notificação de produto processada com sucesso." });
     }
 
     [HttpPost("{hubkey}/produto")]
@@ -56,7 +71,7 @@ public class WebhookController : ControllerBase
             Id = productId
         };
 
-        await _dispatcher.DispatchAsync(evt, cancellationToken);
+        await _publisher.DispatchAsync(evt, cancellationToken);
 
         _logger.LogInformation("Evento ProductsRequested disparado para productId={ProductId}", productId);
 
@@ -86,7 +101,7 @@ public class WebhookController : ControllerBase
             Id = tabelaPrecoId.Value
         };
 
-        await _dispatcher.DispatchAsync(evt, cancellationToken);
+        await _publisher.DispatchAsync(evt, cancellationToken);
 
         _logger.LogInformation("Evento PriceTablesRequested disparado para tabelaPrecoId={TabelaPrecoId}", tabelaPrecoId);
 
@@ -116,7 +131,7 @@ public class WebhookController : ControllerBase
             Number = numeroNota.Value
         };
 
-        await _dispatcher.DispatchAsync(evt, cancellationToken);
+        await _publisher.DispatchAsync(evt, cancellationToken);
 
         _logger.LogInformation("Evento InvoicesRequested disparado para numeroNota={NumeroNota}", numeroNota);
 

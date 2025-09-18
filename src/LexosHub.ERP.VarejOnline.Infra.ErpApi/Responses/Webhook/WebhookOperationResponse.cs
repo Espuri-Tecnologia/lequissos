@@ -1,6 +1,6 @@
 namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook
 {
-    public sealed class WebhookOperationResponse
+    public sealed class OperationResponse
     {
         public string? IdRecurso { get; set; }
         public int CodigoMensagem { get; set; }

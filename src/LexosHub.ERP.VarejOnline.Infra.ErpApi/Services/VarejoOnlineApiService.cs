@@ -27,7 +27,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         private string _oAuthUrl;
         private string _webHookEnpoint;
 
-        // JsonSerializerOptions global para System.Text.Json
         private static readonly JsonSerializerOptions DefaultJsonOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -125,13 +124,13 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
             return await ExecuteAsync<List<TerceiroResponse>>(restRequest, token);
         }
 
-        public async Task<Response<TerceiroResponse>> CreateTerceiroAsync(string token, TerceiroRequest request)
+        public async Task<Response<OperationResponse>> CreateTerceiroAsync(string token, ErpApi.Request.Clientes.TerceiroRequest request)
         {
             var restRequest = new RestRequest("apps/api/terceiros", Method.Post)
                 .AddHeader("Content-Type", "application/json")
                 .AddJsonBody(request);
 
-            return await ExecuteAsync<TerceiroResponse>(restRequest, token);
+            return await ExecuteAsync<OperationResponse>(restRequest, token);
         }
         #endregion
 
@@ -273,13 +272,13 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         #endregion
 
         #region WebhookRegister
-        public async Task<Response<WebhookOperationResponse>> RegisterWebhookAsync(string token, WebhookRequest payload, CancellationToken cancellationToken = default)
+        public async Task<Response<OperationResponse>> RegisterWebhookAsync(string token, WebhookRequest payload, CancellationToken cancellationToken = default)
         {
             var request = new RestRequest(_webHookEnpoint, Method.Post)
                 .AddHeader("Content-Type", "application/json")
                 .AddJsonBody(payload);
 
-            return await ExecuteAsync<WebhookOperationResponse>(request, token);
+            return await ExecuteAsync<OperationResponse>(request, token);
         }
         #endregion
 

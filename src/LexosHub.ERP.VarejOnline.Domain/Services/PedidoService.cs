@@ -2,8 +2,8 @@ using Lexos.Hub.Sync.Models.Pedido;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Domain.Mappers;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Clientes;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido;
-using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using System.Net;
 
@@ -30,7 +30,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
 
             var token = integration.Result.Token ?? string.Empty;
 
-            long? terceiroId = null;
+            long terceiroId = 0;
 
             if (!string.IsNullOrWhiteSpace(pedidoView.ClienteCpfcnpj))
             {
@@ -42,9 +42,9 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
                 if (!terceiroResponse.IsSuccess)
                     return new Response<PedidoResponse> { Error = terceiroResponse.Error, StatusCode = terceiroResponse.StatusCode };
 
-                terceiroId = terceiroResponse.Result?.FirstOrDefault()?.Id;
+                terceiroId = terceiroResponse.Result!.Any() ? terceiroResponse.Result!.FirstOrDefault()!.Id : 0;
 
-                if (!terceiroId.HasValue)
+                if (terceiroId <= 0)
                 {
                     var terceiroRequest = BuildTerceiroRequest(pedidoView);
                     var createResponse = await _apiService.CreateTerceiroAsync(token, terceiroRequest);
@@ -52,13 +52,13 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
                     if (createResponse.Result == null)
                         return new Response<PedidoResponse> { Error = createResponse.Error ?? new ErrorResult("terceiroCreationFailed"), StatusCode = createResponse.StatusCode };
 
-                    terceiroId = createResponse.Result.Id;
+                    long.TryParse(createResponse!.Result.IdRecurso, out terceiroId);
                 }
             }
 
             var request = VarejoOnlinePedidoMapper.Map(pedidoView);
 
-            if (request != null && terceiroId.HasValue)
+            if (request != null && terceiroId > 0)
                 request.Terceiro = new TerceiroRef { Id = terceiroId };
 
             return await _apiService.PostPedidoAsync(token, request);
@@ -67,23 +67,26 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
         private static TerceiroRequest BuildTerceiroRequest(PedidoView pedidoView)
         {
             var contato = pedidoView.Contatos?.FirstOrDefault();
-            var endereco = pedidoView.Enderecos?.FirstOrDefault();
+            var endereco = pedidoView.Enderecos?.Where(x => x.TipoEndereco.Contains("cobranca")).FirstOrDefault();
 
             return new TerceiroRequest
             {
                 Nome = pedidoView.ClienteNome ?? string.Empty,
                 Documento = pedidoView.ClienteCpfcnpj ?? string.Empty,
-                Contato = contato?.Nome,
-                Telefone = contato?.Telefone,
-                Email = contato?.Email,
-                Endereco = endereco?.Endereco,
-                Numero = endereco?.Numero,
-                Complemento = endereco?.Complemento,
-                Bairro = endereco?.Bairro,
-                Cidade = endereco?.Cidade,
-                Uf = endereco?.Uf,
-                Pais = endereco?.Pais,
-                Cep = endereco?.Cep
+                Enderecos = new List<EnderecoTerceiroRequest>()
+                {
+                    new EnderecoTerceiroRequest
+                    {
+                        Tipo = "OUTROS",
+                        TipoEndereco = "ENDERECO_COBRANCA",
+                        Logradouro = endereco.Endereco,
+                        Cep = endereco.Cep,
+                        Bairro = endereco.Bairro,
+                        Uf = endereco.Uf,
+                        Complemento = endereco.Complemento,
+                        Numero = endereco.Numero                        
+                    }
+                }
             };
         }
 

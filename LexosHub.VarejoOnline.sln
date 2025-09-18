@@ -44,7 +44,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Do
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexos.Hub.Sync", "src\Lexos.Hub.Sync\Lexos.Hub.Sync.csproj", "{C73C5521-9830-0BEF-ACFA-D5C9DDA1F48F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Infra.SyncOut", "LexosHub.ERP.VarejOnline.Infra.SyncOut\LexosHub.ERP.VarejOnline.Infra.SyncOut.csproj", "{292D0530-80EF-41B3-9D06-AA954103576C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexosHub.ERP.VarejOnline.Infra.SyncOut", "src\LexosHub.ERP.VarejOnline.Infra.SyncOut\LexosHub.ERP.VarejOnline.Infra.SyncOut.csproj", "{292D0530-80EF-41B3-9D06-AA954103576C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

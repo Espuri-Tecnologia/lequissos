@@ -1,4 +1,3 @@
-using Amazon.SQS;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Lexos.SQS;
@@ -22,10 +21,13 @@ using LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto;
 using LexosHub.ERP.VarejOnline.Infra.SyncOut.Interfaces;
 using LexosHub.ERP.VarejOnline.Infra.SyncOut.Services;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 using System.Diagnostics;
+using Lexos.DevEnv;
+using LexosHub.ERP.VarejOnline.Infra.CrossCutting;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Services;
 
 try
 {
@@ -34,13 +36,25 @@ try
     var builder = WebApplication.CreateBuilder(args);
     //builder.Host.UseSerilog((context, configuration) => LexosHub.ERP.VarejOnline.Api.Datadog.Setup(context, configuration));
 
+    builder.Host.ConfigureAppConfiguration((context, config) =>
+    {
+        var localDev = context.HostingEnvironment.EnvironmentName == "LocalBdDev";
+        context.Configuration.UseLexosEnv(localDev ? "LocalBdDev" : "LocalBdProd", "lexoshub-varejoonline");
+
+        config.SetBasePath(Directory.GetCurrentDirectory());
+        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        config.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+
+        config.AddEnvironmentVariables("LX_");
+    });
+
     Log.Information($"Environment: {builder.Environment.EnvironmentName}");
-    Log.Information($"ConnectionString ErpDBConn: {builder.Configuration.GetConnectionString("ErpDBConn")}");
+    Log.Information($"ConnectionString ErpDBConn: {DatabaseHandler.MontarConexao(builder.Configuration)}");
 
     builder.RegisterServices();
 
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("ErpDBConn"))
+        options.UseSqlServer(DatabaseHandler.MontarConexao(builder.Configuration))
     );
 
     builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
@@ -73,6 +87,7 @@ try
     builder.Services.AddSingleton<IEventDispatcher, EventDispatcher>();
     builder.Services.AddSingleton<ISqslEventPublisher, SqslEventPublisher>();
     builder.Services.AddTransient<IEventHandler<IntegrationCreated>, IntegrationCreatedEventHandler>();
+    builder.Services.AddTransient<IPedidoService, PedidoService>();
     builder.Services.AddTransient<IEventHandler<InitialSync>, InitialSyncEventHandler>();
     builder.Services.AddTransient<IEventHandler<ProductsRequested>, ProductsRequestedEventHandler>();
     builder.Services.AddTransient<IEventHandler<CriarProdutosSimples>, CriarProdutosSimplesEventHandler>();
@@ -86,6 +101,8 @@ try
     builder.Services.AddTransient<IEventHandler<RegisterDefaultWebhooks>, RegisterDefaultWebhooksEventHandler>();
     builder.Services.AddTransient<IEventHandler<InvoicesRequested>, InvoicesRequestedEventHandler>();
     builder.Services.AddHostedService<SqsListenerService>();
+   
+    builder.Services.AddTransient<ISqsRepository, SqsRepository>();
 
     var app = builder.Build().SetupMiddlewares();
 

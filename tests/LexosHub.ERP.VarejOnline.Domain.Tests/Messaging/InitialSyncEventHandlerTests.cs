@@ -1,4 +1,3 @@
-using Amazon.SQS;
 using Amazon.SQS.Model;
 using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
@@ -7,6 +6,7 @@ using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -23,17 +23,11 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         private readonly Mock<ILogger<InitialSyncEventHandler>> _logger = new();
         private readonly Mock<IOptions<VarejOnlineSqsConfig>> _sqsConfig = new();
         private readonly Mock<ISqsRepository> _sqs = new();
-        private readonly IConfiguration _configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string>
-            {
-                {"AWS:ServiceURL", "http://localhost"},
-                {"AWS:SQSQueues:CompaniesRequested", "queue/companies"}
-            })
-            .Build();
+        private readonly Mock<IServiceScopeFactory> _scope= new();
 
         private InitialSyncEventHandler CreateHandler()
         {
-            var dispatcher = new SqslEventPublisher(_sqs.Object, _sqsConfig.Object);
+            var dispatcher = new EventDispatcher(_scope.Object);
             return new InitialSyncEventHandler(_logger.Object, dispatcher);
         }
 

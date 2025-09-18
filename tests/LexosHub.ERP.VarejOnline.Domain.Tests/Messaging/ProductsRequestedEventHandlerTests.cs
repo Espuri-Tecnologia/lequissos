@@ -12,6 +12,7 @@ using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -32,6 +33,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         private readonly Mock<IOptions<VarejOnlineSqsConfig>> _sqsConfig = new();
         private readonly Mock<ISqsRepository> _sqs = new();
         private readonly Mock<IConfiguration> _configuration = new();
+        private readonly Mock<IServiceScopeFactory> _scope = new();
 
         private ProductsRequestedEventHandler CreateHandler()
         {
@@ -42,7 +44,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                     {"AWS:SQSQueues:Produtos", "queue/produtos"}
                 })
                 .Build();
-            var dispatcher = new SqslEventPublisher(_sqs.Object, _sqsConfig.Object);
+            var dispatcher = new EventDispatcher(_scope.Object);
             return new ProductsRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object, dispatcher, _configuration.Object);
         }
 
