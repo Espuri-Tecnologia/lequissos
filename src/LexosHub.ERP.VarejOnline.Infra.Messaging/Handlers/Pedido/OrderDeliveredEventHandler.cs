@@ -45,14 +45,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers.Pedido
                     }
                 };
 
-                var result = _apiService.AlterarStatusPedidoAsync(token!, request);
-
-                if(!result.IsCompleted)
-                {
-                    //tratar erro do processo
-                }
-
-                
+                await _apiService.AlterarStatusPedidoAsync(token!, request);
             }
         }
     }
