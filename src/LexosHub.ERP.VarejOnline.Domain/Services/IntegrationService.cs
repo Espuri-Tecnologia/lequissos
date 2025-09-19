@@ -5,6 +5,7 @@ using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace LexosHub.ERP.VarejOnline.Domain.Services
 {
@@ -38,6 +39,8 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
             {
                 HubIntegrationId = item.IntegracaoId,
                 HubKey = item.Chave,
+                Token = item.Token,
+                RefreshToken = item.RefreshToken,
                 TenantId = item.TenantId,
                 Cnpj = item.Cnpj,
                 IsActive = item.Habilitado,
@@ -61,6 +64,14 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
         public async Task<Response<IntegrationDto>> UpdateIntegrationAsync(IntegrationDto integrationDto, HubIntegracaoDto item)
         {
             integrationDto.Url = string.Empty;
+            integrationDto.IsActive = item.Habilitado;
+            integrationDto.Settings = item.Settings;
+            integrationDto.HubIntegrationId = item.IntegracaoId;
+            integrationDto.HubKey = item.Chave;
+            integrationDto.Token = item.Token;
+            integrationDto.RefreshToken = item.RefreshToken;
+            integrationDto.TenantId = item.TenantId;
+            integrationDto.Cnpj = item.Cnpj;
             integrationDto.IsActive = item.Habilitado;
 
             await _integrationRepo.UpdateAsync(integrationDto);

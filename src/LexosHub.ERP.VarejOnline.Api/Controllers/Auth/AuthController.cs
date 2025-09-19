@@ -35,6 +35,7 @@ public class AuthController : Controller
             return BadRequest(new Response<HubIntegracaoDto> { Error = new ErrorResult(e.Message) });
         }
     }
+
     [HttpGet("callback")]
     public async Task<IActionResult> Callback([FromQuery] string code)
     {
@@ -43,6 +44,6 @@ public class AuthController : Controller
 
         var tokenResponse = await _authService.EnableTokenIntegrationAsync(code);
 
-        return Ok("Token salvo com sucesso!");
+        return Ok(tokenResponse);
     }
 }

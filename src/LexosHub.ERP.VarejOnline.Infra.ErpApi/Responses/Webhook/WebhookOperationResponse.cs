@@ -1,4 +1,4 @@
-namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook
+namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses
 {
     public sealed class OperationResponse
     {

@@ -1,4 +1,5 @@
 ﻿using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Events.Pedido;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
 {
@@ -16,7 +17,11 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
             { nameof(PriceTablePageProcessed), typeof(PriceTablePageProcessed) },
             { nameof(CompaniesRequested), typeof(CompaniesRequested) },
             { nameof(StoresRequested), typeof(StoresRequested) },
+            { nameof(StocksRequested), typeof(StocksRequested) },
             { nameof(InvoicesRequested), typeof(InvoicesRequested) },
+            { nameof(OrderCreated), typeof(OrderCreated) },
+            { nameof(OrderDelivered), typeof(OrderDelivered) },
+            { nameof(OrderShipped), typeof(OrderShipped) },
             { nameof(InitialSync), typeof(InitialSync) }
             };
 

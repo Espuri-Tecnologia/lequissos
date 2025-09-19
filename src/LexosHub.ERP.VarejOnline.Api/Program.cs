@@ -1,7 +1,10 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hangfire;
+using Lexos.DevEnv;
 using Lexos.SQS;
 using Lexos.SQS.Interface;
+using LexosHub.ERP.VarejOnline.Api.Jobs;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Persistence;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Repositories.Integration;
@@ -9,6 +12,7 @@ using LexosHub.ERP.VarejOnline.Domain.Interfaces.Repositories.Webhook;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Domain.Services;
 using LexosHub.ERP.VarejOnline.Domain.Validators;
+using LexosHub.ERP.VarejOnline.Infra.CrossCutting;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Context;
 using LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration;
@@ -16,18 +20,18 @@ using LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Persistence;
 using LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Webhook;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Events.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto;
 using LexosHub.ERP.VarejOnline.Infra.SyncOut.Interfaces;
 using LexosHub.ERP.VarejOnline.Infra.SyncOut.Services;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services;
+using LexosHub.ERP.VarejoOnline.Infra.Messaging.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
 using System.Diagnostics;
-using Lexos.DevEnv;
-using LexosHub.ERP.VarejOnline.Infra.CrossCutting;
-using LexosHub.ERP.VarejoOnline.Infra.Messaging.Services;
 
 try
 {
@@ -35,6 +39,8 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
     //builder.Host.UseSerilog((context, configuration) => LexosHub.ERP.VarejOnline.Api.Datadog.Setup(context, configuration));
+
+    builder.RegisterHangfire();
 
     builder.Host.ConfigureAppConfiguration((context, config) =>
     {
@@ -68,6 +74,7 @@ try
     builder.Services.AddTransient<IAuthService, AuthService>();
     builder.Services.AddTransient<IVarejOnlineApiService, VarejOnlineApiService>();
     builder.Services.AddTransient<ISqsRepository, SqsRepository>();
+    builder.Services.AddScoped<StockSyncJobService>();
     builder.Services.AddTransient<IWebhookService, WebhookService>();
     builder.Services.AddTransient<ISyncOutApiService, SyncOutApiService>();
     builder.Services.AddTransient<ProdutoViewMapper>();
@@ -87,10 +94,13 @@ try
     builder.Services.AddSingleton<IEventDispatcher, EventDispatcher>();
     builder.Services.AddSingleton<ISqslEventPublisher, SqslEventPublisher>();
     builder.Services.AddTransient<IEventHandler<IntegrationCreated>, IntegrationCreatedEventHandler>();
-    builder.Services.AddTransient<IPedidoService, PedidoService>();
     builder.Services.AddTransient<IEventHandler<InitialSync>, InitialSyncEventHandler>();
     builder.Services.AddTransient<IEventHandler<ProductsRequested>, ProductsRequestedEventHandler>();
+    builder.Services.AddTransient<IEventHandler<StocksRequested>, StocksRequestedEventHandler>();
     builder.Services.AddTransient<IEventHandler<CriarProdutosSimples>, CriarProdutosSimplesEventHandler>();
+    builder.Services.AddTransient<IEventHandler<OrderCreated>, OrderCreatedEventHandler>();
+    builder.Services.AddTransient<IEventHandler<OrderShipped>, OrderShippedEventHandler>();
+    builder.Services.AddTransient<IEventHandler<OrderDelivered>, OrderDeliveredEventHandler>();
     builder.Services.AddTransient<IEventHandler<CriarProdutosConfiguraveis>, CriarProdutosConfiguraveisEventHandler>();
     builder.Services.AddTransient<IEventHandler<CriarProdutosKits>, CriarProdutosKitsEventHandler>();
     builder.Services.AddTransient<CriarProdutosConfiguraveisEventHandler>();
@@ -114,11 +124,18 @@ try
 
     if (Debugger.IsAttached)
     {
+        using var scope = app.Services.CreateScope();
+        var recurring = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
 
+        recurring.AddOrUpdate<StockSyncJobService>(
+            StockSyncJobService.RecurringJobId,
+            svc => svc.RunAsync(CancellationToken.None),
+            "* * * * *"
+        );
     }
     else
     {
-        //RecurringJob.AddOrUpdate<SyncProcessJobService>(SyncProcessJobService.AddSyncProcessToNewIntegrationJobId, x => x.AddSyncProcessToNewIntegrationJob(null), "*/3 * * * *");
+        //RecurringJob.AddOrUpdate<SyncProcessJobService>(SyncProcessJobService.SyncStockContinuousJobId, x => x.AddSyncProcessToNewIntegrationJob(null), "*/3 * * * *");
         //RecurringJob.AddOrUpdate<SyncProcessJobService>(SyncProcessJobService.RunScheduleSyncProcessRecurringJobId, x => x.RunScheduleSyncProcessRecurringJob(null), "*/3 * * * *");
         //RecurringJob.AddOrUpdate<SyncProcessJobService>(SyncProcessJobService.AddSyncProcessToNewIntegrationJobId, x => x.AddSyncProcessToNewIntegrationJob(null), "*/3 * * * *");
         //RecurringJob.AddOrUpdate<SyncProcessJobService>(SyncProcessJobService.RunCheckStoppedIntegrationsJobId, x => x.RunCheckStoppedIntegrationsJob(null), "*/10 * * * *");

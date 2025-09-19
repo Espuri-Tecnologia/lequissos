@@ -1,8 +1,10 @@
 using Lexos.Hub.Sync.Models.Pedido;
-using LexosHub.ERP.VarejOnline.Domain.DTOs.Pedido;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Events.Pedido;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+
 
 namespace LexosHub.ERP.VarejOnline.Api.Controllers.Pedido
 {
@@ -10,31 +12,53 @@ namespace LexosHub.ERP.VarejOnline.Api.Controllers.Pedido
     [Route("api/pedidos")]
     public class PedidoController : Controller
     {
-        private readonly IPedidoService _pedidoService;
+        private readonly IEventDispatcher _dispatcher;
 
-        public PedidoController(IPedidoService pedidoService)
+        public PedidoController(IEventDispatcher dispatcher)
         {
-            _pedidoService = pedidoService;
+            _dispatcher = dispatcher;
         }
 
         [HttpPost]
         public async Task<IActionResult> EnviarPedido([FromBody] PedidoView pedido, string hubKey)
         {
-            var result = await _pedidoService.EnviarPedido(hubKey, pedido);
-            return Ok(result);
+            if (pedido == null) throw new ArgumentNullException(nameof(pedido));
+
+            var orderCreatedEvent = new OrderCreated
+            {
+                HubKey = hubKey,
+                Pedido = pedido
+            };
+            await _dispatcher.DispatchAsync(orderCreatedEvent, new CancellationToken());
+            return Ok();
         }
 
-        [HttpPut("{pedidoNumero}/status/{novoStatus}")]
-        public async Task<IActionResult> AlterarStatusPedido(string hubKey, long pedidoNumero, string novoStatus)
+        [HttpPut("/alterar-status-entregue")]
+        public async Task<IActionResult> AlterarStatusPedidoEntregue(string hubKey, long erpPedidoId)
         {
-            var result = await _pedidoService.AlterarStatusPedido(hubKey, pedidoNumero, novoStatus);
-            if (result.IsSuccess)
-                return Ok(result);
+            if (string.IsNullOrWhiteSpace(hubKey)) throw new ArgumentNullException(nameof(hubKey));
 
-            if (result.StatusCode == HttpStatusCode.Conflict)
-                return Conflict(result);
+            var orderCreatedEvent = new OrderDelivered
+            {
+                HubKey = hubKey,
+                PedidoERPId = erpPedidoId
+            };
+            await _dispatcher.DispatchAsync(orderCreatedEvent, new CancellationToken());
+            return Ok();
+        }
 
-            return BadRequest(result);
+        [HttpPut("/alterar-status-enviado")]
+        public async Task<IActionResult> AlterarStatusPedidoEnviado(string hubKey, long erpPedidoId)
+        {
+            if (string.IsNullOrWhiteSpace(hubKey)) throw new ArgumentNullException(nameof(hubKey));
+
+            var orderCreatedEvent = new OrderShipped
+            {
+                HubKey = hubKey,
+                PedidoERPId = erpPedidoId
+            };
+            await _dispatcher.DispatchAsync(orderCreatedEvent, new CancellationToken());
+            return Ok();
         }
     }
 }

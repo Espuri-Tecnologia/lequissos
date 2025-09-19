@@ -2,6 +2,7 @@
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Persistence;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Repositories.Integration;
+using LexosHub.ERP.VarejOnline.Infra.Data.DapperMappers;
 using Microsoft.Extensions.Logging;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
@@ -25,6 +26,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
         {
             try
             {
+
                 var id = await _writeDbConnection.ExecuteScalarAsync<int>(
                     sql: @"INSERT INTO [Integration]
                            (
@@ -36,6 +38,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                                ,[Token]
                                ,[RefreshToken]
                                ,[IsActive]
+                               ,[Settings]
                                ,[CreatedDate]
                                ,[UpdatedDate]
                                ,[HasValidVersion]
@@ -51,6 +54,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                                ,@Token
                                ,@RefreshToken
                                ,@IsActive
+                               ,@Settings
                                ,GETDATE()
                                ,GETDATE()
                                ,@HasValidVersion
@@ -65,6 +69,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                         integration.Token,
                         integration.RefreshToken,
                         integration.IsActive,
+                        integration.Settings,
                         integration.HasValidVersion
                     }
                 );
@@ -91,6 +96,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                                ,[Token] = @Token
                                ,[RefreshToken] = @RefreshToken
                                ,[IsActive] = @IsActive
+                               ,[Settings] = @Settings
                                ,[LastSyncDate] = @LastSyncDate
                                ,[HasValidVersion] = @HasValidVersion
                            WHERE
@@ -147,6 +153,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                                ,[Token]
                                ,[RefreshToken]
                                ,[IsActive]
+                               ,[Settings]
                                ,[CreatedDate]
                                ,[UpdatedDate]
                                ,[LastSyncDate]
@@ -167,12 +174,14 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
         }
 
 
-    public async Task<IntegrationDto> GetByDocument(string cnpj)
-    {
-      try
-      {
-        return await _readDbConnection.QueryFirstOrDefaultAsync<IntegrationDto>(
-            sql: @"SELECT
+        public async Task<IntegrationDto> GetByDocument(string cnpj)
+        {
+            try
+            {
+                SqlMapper.AddTypeHandler(new CustomerJsonObjectTypeHandler());
+
+                return await _readDbConnection.QueryFirstOrDefaultAsync<IntegrationDto>(
+                    sql: @"SELECT
                                [Id]
                                ,[HubIntegrationId]
                                ,[TenantId]
@@ -181,6 +190,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                                ,[Token]
                                ,[RefreshToken]
                                ,[IsActive]
+                               ,[Settings]
                                ,[CreatedDate]
                                ,[UpdatedDate]
                                ,[LastSyncDate]
@@ -191,19 +201,20 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                                [Cnpj] = @Cnpj
                            ORDER BY
                                [CreatedDate] DESC",
-            param: new { Cnpj = cnpj });
-      }
-      catch (Exception e)
-      {
-        _logger.LogError("----- IntegrationRepository -> Error on GetByDocument {integrationId} - {error} ----", cnpj, e.Message + "INNER EX: " + e.InnerException);
-        throw;
-      }
-    }
+                    param: new { Cnpj = cnpj });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("----- IntegrationRepository -> Error on GetByDocument {integrationId} - {error} ----", cnpj, e.Message + "INNER EX: " + e.InnerException);
+                throw;
+            }
+        }
 
-    public async Task<IntegrationDto> GetByIdWithLastOrderDateAsync(int id)
+        public async Task<IntegrationDto> GetByIdWithLastOrderDateAsync(int id)
         {
             try
             {
+                SqlMapper.AddTypeHandler(new CustomerJsonObjectTypeHandler());
                 return await _readDbConnection.QueryFirstOrDefaultAsync<IntegrationDto>(
                     sql: @"SELECT TOP 1
                            SP.ReferenceDate AS LastOrderSyncDate
@@ -215,6 +226,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                           ,I.[Token]
                           ,I.[RefreshToken]
                           ,I.[IsActive]
+                          ,I.[Settings]
                           ,I.[CreatedDate]
                           ,I.[UpdatedDate]
                           ,I.[LastSyncDate]
@@ -249,6 +261,8 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
         {
             try
             {
+                SqlMapper.AddTypeHandler(new CustomerJsonObjectTypeHandler());
+
                 return await _readDbConnection.QueryFirstOrDefaultAsync<IntegrationDto>(
                     sql: @"SELECT TOP 1
                            [Id]
@@ -262,6 +276,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                            ,[IsActive]
                            ,[CreatedDate]
                            ,[UpdatedDate]
+                           ,[Settings]
                            ,[LastSyncDate]
                            ,[HasValidVersion]
                         FROM
@@ -283,6 +298,8 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
         {
             try
             {
+                SqlMapper.AddTypeHandler(new CustomerJsonObjectTypeHandler());
+
                 return await _readDbConnection.QueryAsync<IntegrationDto>(
                     sql: @"SELECT 
                            [Id]
@@ -293,6 +310,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                            ,[Token]
                            ,[RefreshToken]
                            ,[IsActive]
+                           ,[Settings]
                            ,[CreatedDate]
                            ,[UpdatedDate]
                            ,[LastSyncDate]
@@ -323,6 +341,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration
                            ,[Token]
                            ,[RefreshToken]
                            ,[IsActive]
+                           ,[Settings]
                            ,[CreatedDate]
                            ,[UpdatedDate]
                            ,[LastSyncDate]

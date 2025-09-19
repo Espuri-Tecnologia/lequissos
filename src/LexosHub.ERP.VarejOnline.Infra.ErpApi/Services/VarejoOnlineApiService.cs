@@ -4,6 +4,7 @@ using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Clientes;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Webhook;
@@ -124,7 +125,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
             return await ExecuteAsync<List<TerceiroResponse>>(restRequest, token);
         }
 
-        public async Task<Response<OperationResponse>> CreateTerceiroAsync(string token, ErpApi.Request.Clientes.TerceiroRequest request)
+        public async Task<Response<OperationResponse>> CreateTerceiroAsync(string token, TerceiroRequest request)
         {
             var restRequest = new RestRequest("apps/api/terceiros", Method.Post)
                 .AddHeader("Content-Type", "application/json")
@@ -222,7 +223,8 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         #region Estoques
         public async Task<Response<List<EstoqueResponse>>> GetEstoquesAsync(string token, EstoqueRequest request)
         {
-            var restRequest = new RestRequest("saldos-mercadorias", Method.Get);
+            var resource = "apps/api/saldos-mercadorias";
+            var restRequest = new RestRequest(resource, Method.Get);
 
             if (!string.IsNullOrWhiteSpace(request.Produtos))
                 restRequest.AddQueryParameter("produtos", request.Produtos);
@@ -253,20 +255,24 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         #endregion
 
         #region Pedido
-        public async Task<Response<PedidoResponse>> PostPedidoAsync(string token, PedidoRequest request)
+        public async Task<Response<OperationResponse>> PostPedidoAsync(string token, PedidoRequest request)
         {
             var restRequest = new RestRequest("apps/api/pedidos", Method.Post)
                 .AddHeader("Content-Type", "application/json")
                 .AddJsonBody(request);
 
-            return await ExecuteAsync<PedidoResponse>(restRequest, token);
+            return await ExecuteAsync<OperationResponse>(restRequest, token);
         }
 
-        public async Task<Response<PedidoResponse>> AlterarStatusPedidoAsync(string token, long pedidoNumero, string novoStatus)
+        public async Task<Response<OperationResponse>> AlterarStatusPedidoAsync(string token, AlterarStatusPedidoRequest request)
         {
-            var resource = $"apps/api/pedidos/{pedidoNumero}/status/{novoStatus}";
-            var restRequest = new RestRequest(resource, Method.Put);
-            return await ExecuteAsync<PedidoResponse>(restRequest, token);
+            var resource = $"apps/api/pedidos/alterar-status";
+            var restRequest = new RestRequest(resource, Method.Post)
+                                .AddHeader("Content-Type", "application/json")
+                                .AddJsonBody(request);            
+            var operationRespnse = await ExecuteAsync<OperationResponse>(restRequest, token);
+
+            return operationRespnse;
         }
 
         #endregion

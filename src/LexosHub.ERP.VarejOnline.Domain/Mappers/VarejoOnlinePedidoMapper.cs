@@ -37,6 +37,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
                 ValorOutros = source.Acrescimo,
                 Observacao = source.Observacao,
                 Itens = MapItens(source.Itens),
+                EmitirNotaFiscal = source.IsFulfillment ? false : true,
                 Pagamento = MapPagamento(source.ComposicaoPagamento),
                 EnderecoEntrega = MapEndereco(source.Enderecos?.FirstOrDefault(e => string.Equals(e.TipoEndereco, "entrega", StringComparison.OrdinalIgnoreCase)))
             };

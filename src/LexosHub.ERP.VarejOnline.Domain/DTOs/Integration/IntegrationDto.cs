@@ -10,6 +10,7 @@
         public string? Cnpj { get; set; }
         public string? Token { get; set; }
         public string? RefreshToken { get; set; }
+        public Settings? Settings { get; set; }
         public bool IsActive { get; set; }
         public DateTime? LastSyncDate { get; set; }
         public DateTime CreatedDate { get; set; }

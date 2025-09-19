@@ -1,6 +1,6 @@
-﻿using LexosHub.ERP.VarejOnline.Domain.DTOs.Integration;
-using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
+﻿using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
+using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Auth;
 using Microsoft.Extensions.Logging;
 
 namespace LexosHub.ERP.VarejOnline.Domain.Services
@@ -25,9 +25,8 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
             return await _varejoOnlineApiService.GetAuthUrl();
         }
 
-        public async Task<Response<IntegrationDto>> EnableTokenIntegrationAsync(string code)
+        public async Task<Response<TokenResponse>> EnableTokenIntegrationAsync(string code)
         {
-
             if (string.IsNullOrEmpty(code))
                 throw new ArgumentNullException("Código não informado.");
 
@@ -35,11 +34,11 @@ namespace LexosHub.ERP.VarejOnline.Domain.Services
 
             if (tokenResponse.IsSuccess)
             {
-                var integrationDto = await _integrationService.GetIntegrationByDocument(tokenResponse.Result?.CnpjEmpresa);
-                if (!integrationDto.IsSuccess)
-                    throw new ArgumentNullException("Empresa não cadastrada na integração");
+                var integrationDto = await _integrationService.GetIntegrationByDocument(tokenResponse.Result?.CnpjEmpresa!);
+                if (integrationDto.IsSuccess)
+                    await _integrationService.UpdateTokenAsync(integrationDto.Result!, tokenResponse.Result!);
 
-                return await _integrationService.UpdateTokenAsync(integrationDto.Result, tokenResponse.Result);
+                return tokenResponse!;
             }
             throw new Exception("Problema ao retornar o Token");
         }

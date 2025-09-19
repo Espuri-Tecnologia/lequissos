@@ -7,9 +7,6 @@ namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido
         [JsonProperty("idPedido")]
         public long IdPedido { get; set; }
 
-        [JsonProperty("status")]
-        public string Status { get; set; } = string.Empty;
-
         [JsonProperty("statusPedidoVenda")]
         public StatusPedidoVendaRequest? StatusPedidoVenda { get; set; }
     }
@@ -18,8 +15,5 @@ namespace LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido
     {
         [JsonProperty("id")]
         public long? Id { get; set; }
-
-        [JsonProperty("nome")]
-        public string? Nome { get; set; }
     }
 }
