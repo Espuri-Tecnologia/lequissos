@@ -1,4 +1,3 @@
-using Amazon.SQS.Model;
 using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
@@ -6,17 +5,14 @@ using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Requests.Produto;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses.Prices;
-using LexosHub.ERP.VarejOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -29,9 +25,14 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         private readonly Mock<ISqsRepository> _sqsRepository = new();
         private readonly Mock<IVarejOnlineApiService> _apiService = new();
         private readonly Mock<IIntegrationService> _integrationService = new();
-        private readonly Mock<IOptions<VarejOnlineSqsConfig>> _sqsConfig = new();
-        private readonly Mock<ISqsRepository> _sqs = new();
-        private readonly Mock<IServiceScopeFactory> _scope = new();
+        private readonly Mock<IEventDispatcher> _dispatcher = new();
+
+        private readonly SyncOutConfig _syncOutConfig = new()
+        {
+            SQSBaseUrl = "https://sqs.local/",
+            SQSAccessKeyId = "access",
+            SQSName = "queue"
+        };
 
         private readonly IConfiguration _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>
@@ -45,8 +46,8 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
 
         private PriceTablesRequestedEventHandler CreateHandler()
         {
-            var dispatcher = new EventDispatcher(_scope.Object);
-            var options = Options.Create(new SyncOutConfig());
+            var dispatcher = _dispatcher.Object;
+            var options = Options.Create(_syncOutConfig);
             return new PriceTablesRequestedEventHandler(
                 _logger.Object,
                 _sqsRepository.Object,
@@ -58,7 +59,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         }
 
         [Fact]
-        public async Task HandleAsync_ShouldDispatchProductsRequestedWithIds()
+        public async Task HandleAsync_ShouldDispatchPriceTablePageProcessedForEachPage()
         {
             var evt = new PriceTablesRequested { HubKey = "key" };
             var integration = new IntegrationDto { Token = "token" };
@@ -81,22 +82,35 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                 .ReturnsAsync(new Response<List<TabelaPrecoListResponse>>(firstPage))
                 .ReturnsAsync(new Response<List<TabelaPrecoListResponse>>(secondPage));
 
+            var dispatchedEvents = new List<PriceTablePageProcessed>();
+
+            _dispatcher
+                .Setup(d => d.DispatchAsync(It.IsAny<PriceTablePageProcessed>(), It.IsAny<CancellationToken>()))
+                .Callback((PriceTablePageProcessed e, CancellationToken _) => dispatchedEvents.Add(e))
+                .Returns(Task.CompletedTask);
+
             await CreateHandler().HandleAsync(evt, CancellationToken.None);
 
-            _sqs.Verify(s => s.AdicionarMensagemFilaNormal(
-                    It.Is<SendMessageRequest>(r => IsProductsRequestedWithIds(r, "key", "1,2,3"))),
-                Times.Once);
-        }
+            Assert.Collection(
+                dispatchedEvents,
+                e =>
+                {
+                    Assert.Equal("key", e.HubKey);
+                    Assert.Equal(0, e.Start);
+                    Assert.Equal(2, e.PageSize);
+                    Assert.Equal(firstPage, e.PriceTables);
+                    Assert.Equal(firstPage.Count, e.ProcessedCount);
+                },
+                e =>
+                {
+                    Assert.Equal("key", e.HubKey);
+                    Assert.Equal(2, e.Start);
+                    Assert.Equal(2, e.PageSize);
+                    Assert.Equal(secondPage, e.PriceTables);
+                    Assert.Equal(secondPage.Count, e.ProcessedCount);
+                });
 
-        private bool IsProductsRequestedWithIds(SendMessageRequest request, string hubKey, string ids)
-        {
-            var baseEvent = JsonSerializer.Deserialize<BaseEvent>(
-                request.MessageBody,
-                new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }
-            );
-            if (baseEvent is ProductsRequested p)
-                return p.HubKey == hubKey && p.IdsTabelasPrecos == ids;
-            return false;
+            _sqsRepository.Verify(s => s.IniciarFila("https://sqs.local/access/queue"), Times.Once);
         }
     }
 }
