@@ -1,24 +1,16 @@
-using Amazon.SQS;
-using Amazon.SQS.Model;
-using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
-using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
-using LexosHub.ERP.VarejOnline.Infra.Messaging.Converters;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -30,22 +22,29 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         private readonly Mock<ILogger<ProductsRequestedEventHandler>> _logger = new();
         private readonly Mock<IIntegrationService> _integrationService = new();
         private readonly Mock<IVarejOnlineApiService> _apiService = new();
-        private readonly Mock<IOptions<VarejOnlineSqsConfig>> _sqsConfig = new();
-        private readonly Mock<ISqsRepository> _sqs = new();
-        private readonly Mock<IConfiguration> _configuration = new();
-        private readonly Mock<IServiceScopeFactory> _scope = new();
+        private readonly Mock<IEventDispatcher> _dispatcher = new();
+
+        public ProductsRequestedEventHandlerTests()
+        {
+            _dispatcher
+                .Setup(d => d.DispatchAsync(It.IsAny<BaseEvent>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+        }
 
         private ProductsRequestedEventHandler CreateHandler()
         {
-            var config = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    {"AWS:ServiceURL", "http://localhost"},
-                    {"AWS:SQSQueues:Produtos", "queue/produtos"}
+                    {"VarejOnlineApiSettings:DefaultPageSize", "10"}
                 })
                 .Build();
-            var dispatcher = new EventDispatcher(_scope.Object);
-            return new ProductsRequestedEventHandler(_logger.Object, _integrationService.Object, _apiService.Object, dispatcher, _configuration.Object);
+            return new ProductsRequestedEventHandler(
+                _logger.Object,
+                _integrationService.Object,
+                _apiService.Object,
+                _dispatcher.Object,
+                configuration);
         }
 
         [Fact]
@@ -124,13 +123,27 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
                     It.Is<ProdutoRequest>(r => r.Inicio == 2 && r.Quantidade == 2)
                 ), Times.Once);
 
-            _sqs.Verify(s => s.AdicionarMensagemFilaNormal(
-                    It.Is<SendMessageRequest>(r =>
-                        IsProductsPageProcessed(r, 0, 2, 2, "key", firstPage))), Times.Once);
+            _dispatcher.Verify(d => d.DispatchAsync(
+                    It.Is<BaseEvent>(e => IsCriarProdutosSimples(
+                        e,
+                        "key",
+                        0,
+                        2,
+                        2,
+                        firstPage)),
+                    It.Is<CancellationToken>(c => c == CancellationToken.None)),
+                Times.Once);
 
-            _sqs.Verify(s => s.AdicionarMensagemFilaNormal(
-                    It.Is<SendMessageRequest>(r =>
-                        IsProductsPageProcessed(r, 2, 2, 1, "key", secondPage))), Times.Once);
+            _dispatcher.Verify(d => d.DispatchAsync(
+                    It.Is<BaseEvent>(e => IsCriarProdutosSimples(
+                        e,
+                        "key",
+                        2,
+                        2,
+                        1,
+                        secondPage)),
+                    It.Is<CancellationToken>(c => c == CancellationToken.None)),
+                Times.Once);
         }
 
         [Fact]
@@ -161,76 +174,131 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
 
             await CreateHandler().HandleAsync(evt, CancellationToken.None);
 
-            _sqs.Verify(s => s.AdicionarMensagemFilaNormal(
-                    It.Is<SendMessageRequest>(r =>
-                        IsProductsPageProcessed(r, 0, 5, 1, "key", new List<ProdutoResponse> { simples }))), Times.Once);
+            _dispatcher.Verify(d => d.DispatchAsync(
+                    It.Is<BaseEvent>(e => IsCriarProdutosSimples(
+                        e,
+                        "key",
+                        0,
+                        5,
+                        1,
+                        new List<ProdutoResponse> { simples })),
+                    It.Is<CancellationToken>(c => c == CancellationToken.None)),
+                Times.Once);
 
-            _sqs.Verify(s => s.AdicionarMensagemFilaNormal(
-                    It.Is<SendMessageRequest>(r =>
-                        IsKitsProcessed(r, 0, 5, 1, "key", new List<ProdutoResponse> { kit }))), Times.Once);
+            _dispatcher.Verify(d => d.DispatchAsync(
+                    It.Is<BaseEvent>(e => IsCriarProdutosKits(
+                        e,
+                        "key",
+                        5,
+                        5,
+                        1,
+                        new List<ProdutoResponse> { kit })),
+                    It.Is<CancellationToken>(c => c == CancellationToken.None)),
+                Times.Once);
         }
 
-        private bool IsProductsPageProcessed(
-            SendMessageRequest request,
+        [Fact]
+        public async Task HandleAsync_WhenConfiguraveisExist_ShouldDispatchConfiguraveisEvent()
+        {
+            var evt = new ProductsRequested
+            {
+                HubKey = "key",
+                Quantidade = 3
+            };
+
+            var integration = new IntegrationDto { Token = "token" };
+            _integrationService.Setup(s => s.GetIntegrationByKeyAsync("key"))
+                .ReturnsAsync(new Response<IntegrationDto>(integration));
+
+            var configuravel = new ProdutoResponse
+            {
+                Id = 10,
+                MercadoriaBase = true
+            };
+
+            var page = new List<ProdutoResponse> { configuravel };
+
+            _apiService.Setup(a => a.GetProdutosAsync("token", It.IsAny<ProdutoRequest>()))
+                .ReturnsAsync(new Response<List<ProdutoResponse>>(page));
+
+            await CreateHandler().HandleAsync(evt, CancellationToken.None);
+
+            _dispatcher.Verify(d => d.DispatchAsync(
+                    It.Is<BaseEvent>(e => IsCriarProdutosConfiguraveis(
+                        e,
+                        "key",
+                        1,
+                        new List<ProdutoResponse> { configuravel })),
+                    It.Is<CancellationToken>(c => c == CancellationToken.None)),
+                Times.Once);
+
+            _dispatcher.Verify(d => d.DispatchAsync(
+                    It.Is<BaseEvent>(e => e is CriarProdutosSimples),
+                    It.IsAny<CancellationToken>()),
+                Times.Never);
+
+            _dispatcher.Verify(d => d.DispatchAsync(
+                    It.Is<BaseEvent>(e => e is CriarProdutosKits),
+                    It.IsAny<CancellationToken>()),
+                Times.Never);
+        }
+
+        private static bool IsCriarProdutosSimples(
+            BaseEvent @event,
+            string expectedHubKey,
             int expectedStart,
             int expectedPageSize,
             int expectedProcessedCount,
-            string expectedHubKey,
-            List<ProdutoResponse> expectedProdutos)
-        {
-            var baseEvent = JsonSerializer.Deserialize<BaseEvent>(
-                request.MessageBody,
-                new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }
-            );
-            if (baseEvent is CriarProdutosSimples p)
-            {
-                return p.Start == expectedStart
-                    && p.PageSize == expectedPageSize
-                    && p.ProcessedCount == expectedProcessedCount
-                    && p.HubKey == expectedHubKey
-                    && p.Produtos is IEnumerable<ProdutoResponse> produtos
-                    && ProdutosAreEqual(produtos, expectedProdutos);
-            }
-            return false;
-        }
+            IEnumerable<ProdutoResponse> expectedProdutos) =>
+            @event is CriarProdutosSimples produtosSimples
+            && produtosSimples.HubKey == expectedHubKey
+            && produtosSimples.Start == expectedStart
+            && produtosSimples.PageSize == expectedPageSize
+            && produtosSimples.ProcessedCount == expectedProcessedCount
+            && ProdutosAreEqual(produtosSimples.Produtos, expectedProdutos);
 
-        private bool IsKitsProcessed(
-            SendMessageRequest request,
+        private static bool IsCriarProdutosKits(
+            BaseEvent @event,
+            string expectedHubKey,
             int expectedStart,
             int expectedPageSize,
             int expectedProcessedCount,
-            string expectedHubKey,
-            List<ProdutoResponse> expectedProdutos)
-        {
-            var baseEvent = JsonSerializer.Deserialize<BaseEvent>(
-                request.MessageBody,
-                new JsonSerializerOptions { Converters = { new BaseEventJsonConverter() } }
-            );
-            if (baseEvent is CriarProdutosKits p)
-            {
-                return p.Start == expectedStart
-                    && p.PageSize == expectedPageSize
-                    && p.ProcessedCount == expectedProcessedCount
-                    && p.HubKey == expectedHubKey
-                    && p.Produtos is IEnumerable<ProdutoResponse> produtos
-                    && ProdutosAreEqual(produtos, expectedProdutos);
-            }
-            return false;
-        }
+            IEnumerable<ProdutoResponse> expectedProdutos) =>
+            @event is CriarProdutosKits produtosKits
+            && produtosKits.HubKey == expectedHubKey
+            && produtosKits.Start == expectedStart
+            && produtosKits.PageSize == expectedPageSize
+            && produtosKits.ProcessedCount == expectedProcessedCount
+            && ProdutosAreEqual(produtosKits.Produtos, expectedProdutos);
 
-        private bool ProdutosAreEqual(IEnumerable<ProdutoResponse> a, IEnumerable<ProdutoResponse> b)
+        private static bool IsCriarProdutosConfiguraveis(
+            BaseEvent @event,
+            string expectedHubKey,
+            int expectedProcessedCount,
+            IEnumerable<ProdutoResponse> expectedProdutos) =>
+            @event is CriarProdutosConfiguraveis produtosConfiguraveis
+            && produtosConfiguraveis.HubKey == expectedHubKey
+            && produtosConfiguraveis.ProcessedCount == expectedProcessedCount
+            && ProdutosAreEqual(produtosConfiguraveis.Produtos, expectedProdutos);
+
+        private static bool ProdutosAreEqual(
+            IEnumerable<ProdutoResponse>? actual,
+            IEnumerable<ProdutoResponse> expected)
         {
-            var aList = a.ToList();
-            var bList = b.ToList();
-            if (aList.Count != bList.Count)
+            if (actual is null)
+            {
+                return !expected.Any();
+            }
+
+            var actualList = actual.ToList();
+            var expectedList = expected.ToList();
+
+            if (actualList.Count != expectedList.Count)
+            {
                 return false;
-
-            for (int i = 0; i < aList.Count; i++)
-            {
-                if (aList[i].Id != bList[i].Id)
-                    return false;
             }
-            return true;
+
+            return !actualList.Where((t, i) => t.Id != expectedList[i].Id).Any();
         }
     }
 }
