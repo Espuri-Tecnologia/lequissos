@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Lexos.Hub.Sync.Models.Produto;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto;
@@ -9,6 +10,25 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
     public class ProdutoViewMapperTests
     {
         private readonly ProdutoViewMapper _mapper = new();
+
+        private static ProdutoResponse CreateProdutoResponse(Action<ProdutoResponse>? configure = null)
+        {
+            var response = new ProdutoResponse
+            {
+                Id = 1,
+                Descricao = "Produto",
+                CodigoSku = "SKU",
+                CodigoSistema = "SKU",
+                Ativo = true,
+                Preco = 10m,
+                DadosPorEntidade = new List<DadosPorEntidadeResponse>(),
+                Categorias = new List<CategoriaResponse>(),
+                ValorAtributos = new List<ValorAtributoResponse>()
+            };
+
+            configure?.Invoke(response);
+            return response;
+        }
 
         [Fact]
         public void Map_ShouldReturnNull_WhenSourceIsNull()
@@ -22,17 +42,17 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
         {
             var source = new List<ProdutoResponse>
             {
-                new ProdutoResponse
+                CreateProdutoResponse(p =>
                 {
-                    Id = 5,
-                    Descricao = "Produto",
-                    DescricaoSimplificada = "Prod",
-                    CodigoBarras = "111",
-                    Peso = 1.1m,
-                    Comprimento = 2.2m,
-                    Largura = 3.3m,
-                    Altura = 4.4m
-                }
+                    p.Id = 5;
+                    p.Descricao = "Produto";
+                    p.DescricaoSimplificada = "Prod";
+                    p.CodigoBarras = "111";
+                    p.Peso = 1.1m;
+                    p.Comprimento = 2.2m;
+                    p.Largura = 3.3m;
+                    p.Altura = 4.4m;
+                })
             };
 
             var result = _mapper.MapSimples(source);
@@ -52,12 +72,15 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
         [Fact]
         public void Map_ShouldInitializeLists_WhenSourceListsAreNull()
         {
-            var source = new ProdutoResponse
+            var source = CreateProdutoResponse(p =>
             {
-                Id = 1,
-                Descricao = "Produto",
-                CodigoSku = "SKU"
-            };
+                p.Preco = null;
+                p.CodigosBarraAdicionais = null;
+                p.DadosPorEntidade = null;
+                p.Categorias = null;
+                p.Componentes = null;
+                p.PrecosPorTabelas = null;
+            });
 
             var result = _mapper.MapSimples(source)!;
 
@@ -83,12 +106,13 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
         public void Map_ShouldTrimSkuAndLimitLength()
         {
             var sku = new string('a', 55);
-            var source = new ProdutoResponse
+            var source = CreateProdutoResponse(p =>
             {
-                Id = 2,
-                Descricao = "Desc",
-                CodigoSku = "  " + sku + "  "
-            };
+                p.Id = 2;
+                p.Descricao = "Desc";
+                p.CodigoSistema = null;
+                p.CodigoSku = "  " + sku + "  ";
+            });
 
             var result = _mapper.MapSimples(source)!;
 
@@ -100,16 +124,16 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
         [Fact]
         public void Map_ShouldHandleNullAndNegativeNumericFields()
         {
-            var source = new ProdutoResponse
+            var source = CreateProdutoResponse(p =>
             {
-                Id = 3,
-                Descricao = "P",
-                CodigoSku = "S",
-                Peso = -1,
-                Altura = null,
-                Comprimento = -2,
-                Largura = null
-            };
+                p.Id = 3;
+                p.Descricao = "P";
+                p.CodigoSku = "S";
+                p.Peso = -1;
+                p.Altura = null;
+                p.Comprimento = -2;
+                p.Largura = null;
+            });
 
             var result = _mapper.MapSimples(source)!;
 
@@ -122,14 +146,14 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
         [Fact]
         public void Map_ShouldReturnNull_WhenConfiguravelWithoutVariacoes()
         {
-            var source = new ProdutoResponse
+            var source = CreateProdutoResponse(p =>
             {
-                Id = 4,
-                Descricao = "Produto",
-                CodigoSku = "SKU",
-                Classificacao = "configuravel",
-                ValorAtributos = new List<ValorAtributoResponse>()
-            };
+                p.Id = 4;
+                p.Descricao = "Produto";
+                p.CodigoSku = "SKU";
+                p.Classificacao = "configuravel";
+                p.ValorAtributos = new List<ValorAtributoResponse>();
+            });
 
             var result = _mapper.MapSimples(source);
 
@@ -143,14 +167,14 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
             var longEan = new string('e', 60);
             var longDesc = new string('d', 300);
 
-            var source = new ProdutoResponse
+            var source = CreateProdutoResponse(p =>
             {
-                Id = 5,
-                Descricao = longName,
-                DescricaoSimplificada = longDesc,
-                CodigoSku = "sku",
-                CodigoBarras = longEan
-            };
+                p.Id = 5;
+                p.Descricao = longName;
+                p.DescricaoSimplificada = longDesc;
+                p.CodigoSku = "sku";
+                p.CodigoBarras = longEan;
+            });
 
             var result = _mapper.MapSimples(source)!;
 
@@ -162,13 +186,13 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
         [Fact]
         public void Map_ShouldHandleNullCategorias()
         {
-            var source = new ProdutoResponse
+            var source = CreateProdutoResponse(p =>
             {
-                Id = 6,
-                Descricao = "Prod",
-                CodigoSku = "S",
-                Categorias = null
-            };
+                p.Id = 6;
+                p.Descricao = "Prod";
+                p.CodigoSku = "S";
+                p.Categorias = null;
+            });
 
             var result = _mapper.MapSimples(source)!;
 
@@ -179,12 +203,14 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Mappers
         [Fact]
         public void Map_ShouldMapDefaultValuesWhenPropertiesMissing()
         {
-            var source = new ProdutoResponse
+            var source = CreateProdutoResponse(p =>
             {
-                Id = 7,
-                Descricao = "  Produto  ",
-                CodigoSku = "  SKU  "
-            };
+                p.Id = 7;
+                p.Descricao = "  Produto  ";
+                p.CodigoSistema = null;
+                p.CodigoSku = "  SKU  ";
+                p.Preco = null;
+            });
 
             var result = _mapper.MapSimples(source)!;
 

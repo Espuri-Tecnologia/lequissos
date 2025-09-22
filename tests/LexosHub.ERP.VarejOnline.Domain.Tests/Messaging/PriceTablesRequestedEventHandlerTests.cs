@@ -85,8 +85,14 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
             var dispatchedEvents = new List<PriceTablePageProcessed>();
 
             _dispatcher
-                .Setup(d => d.DispatchAsync(It.IsAny<PriceTablePageProcessed>(), It.IsAny<CancellationToken>()))
-                .Callback((PriceTablePageProcessed e, CancellationToken _) => dispatchedEvents.Add(e))
+                .Setup(d => d.DispatchAsync(It.IsAny<BaseEvent>(), It.IsAny<CancellationToken>()))
+                .Callback<BaseEvent, CancellationToken>((evt, _) =>
+                {
+                    if (evt is PriceTablePageProcessed processed)
+                    {
+                        dispatchedEvents.Add(processed);
+                    }
+                })
                 .Returns(Task.CompletedTask);
 
             await CreateHandler().HandleAsync(evt, CancellationToken.None);
