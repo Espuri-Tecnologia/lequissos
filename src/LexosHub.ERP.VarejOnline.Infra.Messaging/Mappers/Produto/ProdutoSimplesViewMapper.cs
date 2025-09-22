@@ -1,10 +1,8 @@
-using Amazon.Auth.AccessControlPolicy;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Lexos.Hub.Sync.Models.Produto;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
-using System;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
 {
@@ -21,11 +19,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
             return value.Length <= maxLength ? value : value.Substring(0, maxLength);
         }
 
-        private static decimal GetNonNegative(decimal? value)
-        {
-            decimal result = value ?? 0m;
-            return result < 0 ? 0 : result;
-        }
+        private static decimal GetNonNegative(decimal? value) => Math.Max(value ?? 0m, 0m);
         public static ProdutoView? Map(this ProdutoResponse? source)
         {
             if (source == null)
@@ -33,42 +27,44 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                 return null;
             }
 
-            if (source.Classificacao != null &&
+            if (!string.IsNullOrWhiteSpace(source.Classificacao) &&
                 source.Classificacao.Equals("configuravel", StringComparison.OrdinalIgnoreCase) &&
-                (source.ValorAtributos == null || !source.ValorAtributos.Any()))
+                !(source.ValorAtributos?.Any() ?? false))
             {
                 return null;
             }
 
-            decimal peso = GetNonNegative(source.Peso);
-            decimal comprimento = GetNonNegative(source.Comprimento);
-            decimal largura = GetNonNegative(source.Largura);
-            decimal altura = GetNonNegative(source.Altura);
+            var sku = Trim(source.CodigoSistema, 50) ?? Trim(source.CodigoSku, 50) ?? string.Empty;
+            var descricao = Trim(source.Descricao, 255);
+            var descricaoSimplificada = Trim(source.DescricaoSimplificada, 255);
 
             return new ProdutoView
             {
-                ProdutoTipoId = source.MercadoriaBase == true ? Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL : Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
-                Nome = Trim(source.Descricao, 255),
-                Descricao = Trim(source.Descricao, 255),
-                DescricaoMarketplace = Trim(source.Descricao, 255),
-                DescricaoResumida = Trim(source.DescricaoSimplificada ?? $"{source.Descricao} - {source.CodigoSku}", 255),
+                ProdutoIdGlobal = source.Id,
+                ProdutoTipoId = source.MercadoriaBase == true
+                    ? Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL
+                    : Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
+                Nome = descricao,
+                Descricao = descricao,
+                DescricaoMarketplace = descricao,
+                DescricaoResumida = descricaoSimplificada ?? Trim($"{source.Descricao} - {source.CodigoSku}", 255),
                 Ean = Trim(source.CodigoBarras, 50),
-                Sku = Trim(source.CodigoSistema, 50),
-                Peso = peso,
-                Comprimento = comprimento,
-                Largura = largura,
-                Altura = altura,
+                Sku = sku,
+                Peso = GetNonNegative(source.Peso),
+                Comprimento = GetNonNegative(source.Comprimento),
+                Largura = GetNonNegative(source.Largura),
+                Altura = GetNonNegative(source.Altura),
                 IsNew = true,
                 Unidade = Trim(source.Unidade, 10),
                 Deleted = !source.Ativo,
                 Classificacao = source.Classificacao,
                 Precos = source.MapToProdutoPrecoView(),
-                Estoques = source.DadosPorEntidade?.MapEstoques(source.CodigoSistema!),
+                Estoques = source.DadosPorEntidade.MapEstoques(sku),
                 ImagensCadastradas = source.MapImagensCadastradas(),
-                Marca = source.Categorias?.FirstOrDefault(x => x.Nivel == "MARCA")?.Nome,
-                Modelo = source.Categorias?.FirstOrDefault(x => x.Nivel == "COLEÇÃO")?.Nome,
-                Setor = source.Categorias?.FirstOrDefault(x => x.Nivel == "DEPARTAMENTO")?.Nome,
-                CategoriaERP = source.Categorias?.FirstOrDefault(x => x.Nivel == "TRIBUTAÇÃO")?.Nome,
+                Marca = GetCategoriaNome(source.Categorias, "MARCA"),
+                Modelo = GetCategoriaNome(source.Categorias, "COLEÇÃO"),
+                Setor = GetCategoriaNome(source.Categorias, "DEPARTAMENTO"),
+                CategoriaERP = GetCategoriaNome(source.Categorias, "TRIBUTAÇÃO"),
                 MetaTitle = Trim(source.Descricao, 60),
                 MetaDescription = Trim(source.DescricaoSimplificada ?? source.Descricao, 160),
                 Composicao = ProdutoKitViewMapper.Map(source.Componentes),
@@ -82,18 +78,42 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
             };
         }
 
-        public static List<ProdutoEstoqueView> MapEstoques(this List<DadosPorEntidadeResponse> estoquesEntidades, string sku)
+        private static string? GetCategoriaNome(IEnumerable<CategoriaResponse>? categorias, string nivel)
         {
-            return estoquesEntidades.Select(estoque => estoque.MapEstoque(sku)).ToList();
+            return categorias?
+                .FirstOrDefault(x => string.Equals(x?.Nivel, nivel, StringComparison.OrdinalIgnoreCase))?
+                .Nome;
         }
 
-        public static ProdutoEstoqueView MapEstoque(this DadosPorEntidadeResponse estoqueEntidade, string sku)
+        public static List<ProdutoEstoqueView> MapEstoques(this IEnumerable<DadosPorEntidadeResponse>? estoquesEntidades, string sku)
         {
-            return new ProdutoEstoqueView()
+            if (estoquesEntidades == null)
+            {
+                return new List<ProdutoEstoqueView>();
+            }
+
+            return estoquesEntidades
+                .Select(estoque => estoque.MapEstoque(sku))
+                .ToList();
+        }
+
+        public static ProdutoEstoqueView MapEstoque(this DadosPorEntidadeResponse? estoqueEntidade, string sku)
+        {
+            if (estoqueEntidade == null)
+            {
+                return new ProdutoEstoqueView
+                {
+                    LojaIdGlobal = 0,
+                    Sku = sku,
+                    Quantidade = 0
+                };
+            }
+
+            return new ProdutoEstoqueView
             {
                 LojaIdGlobal = (int)estoqueEntidade.Entidade,
                 Sku = sku,
-                Quantidade = estoqueEntidade.EstoqueMaximo               
+                Quantidade = estoqueEntidade.EstoqueMaximo
             };
         }
 
@@ -110,7 +130,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
                         Url = produto.UrlsFotosProduto[i],
                         IsThumbnail = (i == 0),
                         Position = (short)(i + 1),
-                        SkuVariacao = produto.CodigoSistema
+                        SkuVariacao = produto.CodigoSistema ?? string.Empty
                     });
                 }
             }
@@ -119,51 +139,69 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
             {
                 Imagens = imagens,
                 Sku = produto.CodigoSku,
-                TipoProdutoId = produto.MercadoriaBase == true ? Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL : Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
+                TipoProdutoId = produto.MercadoriaBase == true
+                    ? Lexos.Hub.Sync.Constantes.Produto.CONFIGURAVEL
+                    : Lexos.Hub.Sync.Constantes.Produto.SIMPLES,
             };
         }
 
-        public static List<ProdutoImagemCadastradaView> MapImagensCadastradas(this ProdutoResponse produto)
+        public static List<ProdutoImagemCadastradaView> MapImagensCadastradas(this ProdutoResponse? produto)
         {
-            if (produto.UrlsFotosProduto == null)
+            if (produto?.UrlsFotosProduto == null)
             {
                 return new List<ProdutoImagemCadastradaView>();
             }
 
-            return produto.UrlsFotosProduto.Select(u => new ProdutoImagemCadastradaView()
-            {
+            return produto.UrlsFotosProduto
+                .Where(url => !string.IsNullOrWhiteSpace(url))
+                .Select(u => new ProdutoImagemCadastradaView
+                {
                     Url = u,
                     Ordem = 0
-            }).ToList();
+                })
+                .ToList();
         }
 
         public static List<ProdutoPrecoView> MapToProdutoPrecoView(this ProdutoResponse? produto, string produtoTipoId = Lexos.Hub.Sync.Constantes.Produto.SIMPLES)
         {
-            List<ProdutoPrecoView> produtoPrecoViewList = new();
+            if (produto == null)
+            {
+                return new List<ProdutoPrecoView>();
+            }
 
-            if (produto.PrecosPorTabelas is null || !produto.PrecosPorTabelas.Any())
-                return new List<ProdutoPrecoView> { 
-                    new ProdutoPrecoView { 
-                        Preco = produto.Preco.Value, 
+            var sku = produto.CodigoSistema ?? string.Empty;
+
+            if (produto.PrecosPorTabelas == null || !produto.PrecosPorTabelas.Any())
+            {
+                if (!produto.Preco.HasValue)
+                {
+                    return new List<ProdutoPrecoView>();
+                }
+
+                return new List<ProdutoPrecoView>
+                {
+                    new ProdutoPrecoView
+                    {
+                        Preco = GetNonNegative(produto.Preco),
                         Codigo = $"{CodigoProdutoPrecoTabela}{produto.Id}",
-                        Sku = produto.CodigoSistema,
-                    } 
+                        Sku = sku
+                    }
                 };
+            }
 
-            foreach (TabelaPrecoResponse priceResponse in produto.PrecosPorTabelas)
-                produtoPrecoViewList.Add(priceResponse.NewProdutoPrecoView(produto.CodigoSistema, produtoTipoId: produtoTipoId, codigo: CodigoProdutoPrecoTabela));
-
-            return produtoPrecoViewList;
+            return produto.PrecosPorTabelas
+                .Where(priceResponse => priceResponse != null)
+                .Select(priceResponse => priceResponse.NewProdutoPrecoView(sku, produtoTipoId, CodigoProdutoPrecoTabela))
+                .ToList();
         }
         private static ProdutoPrecoView NewProdutoPrecoView(this TabelaPrecoResponse precoPorTabelaResponse, string sku, string produtoTipoId, string codigo)
         {
-            ProdutoPrecoView produtoPrecoView = new()
+            return new ProdutoPrecoView
             {
-                Preco = precoPorTabelaResponse.Preco,
+                Preco = GetNonNegative(precoPorTabelaResponse?.Preco),
                 Sku = sku,
-                Codigo = $"{codigo}{precoPorTabelaResponse.IdTabelaPreco.ToString()}"
+                Codigo = $"{codigo}{precoPorTabelaResponse?.IdTabelaPreco.ToString()}"
             };
-            return produtoPrecoView;
         }
         public static List<ProdutoView> Map(this List<ProdutoResponse> source)
         {
