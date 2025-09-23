@@ -12,8 +12,9 @@ using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Request;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Responses.Clientes;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using RestSharp;
-using System.Text.Json;
+
 
 namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
 {
@@ -28,10 +29,11 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         private string _oAuthUrl;
         private string _webHookEnpoint;
 
-        private static readonly JsonSerializerOptions DefaultJsonOptions = new()
+        private static readonly JsonSerializerSettings DefaultJsonSettings = new JsonSerializerSettings
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            PropertyNameCaseInsensitive = true
+            ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
+            MissingMemberHandling = MissingMemberHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
         };
 
         public VarejOnlineApiService(IOptions<VarejOnlineApiSettings> erpApiSettings)
@@ -52,26 +54,25 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
         }
 
         #region Auth
-        public async Task<Response<TokenResponse?>> ExchangeCodeForTokenAsync(string code)
+        public async Task<Response<TokenResponse>> ExchangeCodeForTokenAsync(string code)
         {
             _client = new RestClient(_oAuthGetTokenUrl);
-
-            var request = new RestRequest("/apps/oauth/token", Method.Post)
-                .AddHeader("Content-Type", "application/json");
-
-            var tokenRequest = new TokenRequest
+            var tokenRequest = new
             {
-                ClientId = _clientId,
-                ClientSecret = _clientSecret,
-                RedirectUri = _oAuthRedirectUrl,
-                Code = code
+                grant_type = "authorization_code",
+                client_id = _clientId,
+                client_secret = _clientSecret,
+                redirect_uri = _oAuthRedirectUrl,
+                code = code
             };
 
-            request.AddJsonBody(tokenRequest);
+            var request = new RestRequest("apps/oauth/token", Method.Post)
+                .AddHeader("Content-Type", "application/json")
+                .AddHeader("Cookie", "LB=erp01")
+                .AddJsonBody(tokenRequest);
 
-            return await ExecuteAsync<TokenResponse?>(request);
+            return await ExecuteAsync<TokenResponse>(request);
         }
-
         public Task<string> GetAuthUrl()
         {
             return Task.FromResult($"{_erpApiSettings.BaseUrl}{_oAuthUrl}client_id={_clientId}&redirect_uri={_oAuthRedirectUrl}");
@@ -311,7 +312,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
                     if (!content.TrimStart().StartsWith("["))
                     {
                         var itemType = type.GetGenericArguments()[0];
-                        var singleItem = JsonSerializer.Deserialize(content, itemType, DefaultJsonOptions);
+                        var singleItem = JsonConvert.DeserializeObject(content, itemType, DefaultJsonSettings);
 
                         var list = (System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType))!;
                         if (singleItem != null)
@@ -320,7 +321,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
                         return new Response<T>((T)list) { StatusCode = response.StatusCode };
                     }
                 }
-                var result = JsonSerializer.Deserialize<T>(content, DefaultJsonOptions);
+                var result = JsonConvert.DeserializeObject<T>(content);
                 return new Response<T>(result!) { StatusCode = response.StatusCode };
             }
             catch (Exception ex)
@@ -328,13 +329,11 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
                 return new Response<T> { Error = new ErrorResult($"{ex.Message}") };
             }
         }
-
-
         private ErrorResult GetErrorMessageResponse(RestResponse response)
         {
             try
             {
-                var badRequestResponse = JsonSerializer.Deserialize<BadRequestResponse>(response.Content!, DefaultJsonOptions);
+                var badRequestResponse = JsonConvert.DeserializeObject<BadRequestResponse>(response.Content!);
 
                 if (badRequestResponse != null)
                 {

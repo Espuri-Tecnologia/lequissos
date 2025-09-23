@@ -25,7 +25,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
             return ProdutoConfiguravelViewMapper.Map(produtoBase, variacoes);
         }
 
-        public ProdutoView? MapKit(ProdutoResponse? produtoBase)
+        public ProdutoView? MapKit(ProdutoResponse produtoBase)
         {
             var produto = ProdutoSimplesViewMapper.Map(produtoBase);
 
@@ -35,8 +35,8 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto
             }
 
             produto.ProdutoTipoId = Lexos.Hub.Sync.Constantes.Produto.COMPOSTO;
-            produto.Composicao = ProdutoKitViewMapper.Map(produtoBase?.Componentes);
-            produto.Sku = produtoBase?.CodigoSistema ?? produto.Sku ?? string.Empty;
+            produto.Composicao = ProdutoKitViewMapper.Map(produtoBase.Componentes);
+            produto.Sku = produtoBase.CodigoSistema;
 
             return produto;
         }

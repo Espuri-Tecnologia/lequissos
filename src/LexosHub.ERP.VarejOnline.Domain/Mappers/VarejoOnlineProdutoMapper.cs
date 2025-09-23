@@ -22,14 +22,13 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
 
                 var mapped = new VarejOnlineProduto
                 {
-                    ProdutoIdGlobal = item.id,
-                    Nome = item.descricao?.Trim(),
-                    DescricaoResumida = item.descricaoSimplificada?.Trim(),
-                    Ean = item.codigoBarras?.Trim(),
-                    Peso = item.peso ?? 0,
-                    Comprimento = item.comprimento ?? 0,
-                    Largura = item.largura ?? 0,
-                    Altura = item.altura ?? 0
+                    Nome = item.descricao,
+                    DescricaoResumida = item.descricaoSimplificada,
+                    Ean = item.codigoBarras,
+                    Peso = item.peso,
+                    Comprimento = item.comprimento,
+                    Largura = item.largura,
+                    Altura = item.altura
                 };
 
                 result.Add(mapped);

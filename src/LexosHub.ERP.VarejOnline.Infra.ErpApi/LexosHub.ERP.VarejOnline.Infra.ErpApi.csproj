@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -13,5 +13,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LexosHub.ERP.VarejOnline.Infra.CrossCutting\LexosHub.ERP.VarejOnline.Infra.CrossCutting.csproj" />
+  </ItemGroup>  
+
+  <ItemGroup>
+    <Folder Include="Request\NovaPasta\" />
   </ItemGroup>  
 </Project>
