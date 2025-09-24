@@ -99,6 +99,7 @@ try
     builder.Services.AddTransient<IEventHandler<StocksRequested>, StocksRequestedEventHandler>();
     builder.Services.AddTransient<IEventHandler<CriarProdutosSimples>, CriarProdutosSimplesEventHandler>();
     builder.Services.AddTransient<IEventHandler<OrderCreated>, OrderCreatedEventHandler>();
+    builder.Services.AddTransient<IEventHandler<OrderCancelled>, OrderCancelledEventHandler>();
     builder.Services.AddTransient<IEventHandler<OrderShipped>, OrderShippedEventHandler>();
     builder.Services.AddTransient<IEventHandler<OrderDelivered>, OrderDeliveredEventHandler>();
     builder.Services.AddTransient<IEventHandler<CriarProdutosConfiguraveis>, CriarProdutosConfiguraveisEventHandler>();

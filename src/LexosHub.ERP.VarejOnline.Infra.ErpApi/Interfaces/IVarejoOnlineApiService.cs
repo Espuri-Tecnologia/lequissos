@@ -26,4 +26,5 @@ public interface IVarejOnlineApiService
     Task<Response<List<TerceiroResponse>>> GetTerceirosAsync(string token, TerceiroQueryRequest request);
     Task<Response<OperationResponse>> CreateTerceiroAsync(string token, TerceiroRequest request);
     Task<Response<OperationResponse>> AlterarStatusPedidoAsync(string token, AlterarStatusPedidoRequest request);
+    Task<Response<OperationResponse>> CancelarPedidoAsync(string token, long pedidoErpId);
 }
