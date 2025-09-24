@@ -8,9 +8,8 @@ using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Clientes;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses;
-using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
-using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
+using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers.Pedido;
 using Lexos.SQS.Interface;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -28,7 +27,6 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
     public class OrderCreatedEventHandlerTests
     {
         private readonly Mock<ILogger<OrderCreatedEventHandler>> _logger = new();
-        private readonly Mock<IEventDispatcher> _dispatcher = new();
         private readonly Mock<IIntegrationService> _integrationService = new();
         private readonly Mock<IVarejOnlineApiService> _apiService = new();
         private readonly Mock<ISqsRepository> _sqsRepository = new();
@@ -40,7 +38,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Tests.Messaging
         });
 
         private OrderCreatedEventHandler CreateHandler() =>
-            new(_logger.Object, _dispatcher.Object, _integrationService.Object, _apiService.Object, _sqsRepository.Object, _syncInOptions);
+            new(_logger.Object, _integrationService.Object, _apiService.Object, _sqsRepository.Object, _syncInOptions);
 
         [Fact]
         public async Task HandleAsync_ShouldCreateTerceiroSendOrderAndPublishNotification()

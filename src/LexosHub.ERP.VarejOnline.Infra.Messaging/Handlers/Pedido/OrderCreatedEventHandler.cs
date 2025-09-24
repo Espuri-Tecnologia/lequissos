@@ -1,58 +1,48 @@
-﻿using Amazon.Runtime.Internal;
-using Lexos.Hub.Sync;
-using Lexos.Hub.Sync.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Lexos.Hub.Sync.Models.Pedido;
 using Lexos.SQS.Interface;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Domain.Mappers;
-using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Default;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Clientes;
 using LexosHub.ERP.VarejOnline.Infra.ErpApi.Request.Pedido;
-using LexosHub.ERP.VarejOnline.Infra.ErpApi.Responses;
-using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System.Net;
 
-namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
+namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers.Pedido
 {
-    public class OrderCreatedEventHandler : IEventHandler<OrderCreated>
+    public class OrderCreatedEventHandler : PedidoEventHandlerBase, IEventHandler<OrderCreated>
     {
         private readonly ILogger<OrderCreatedEventHandler> _logger;
         private readonly IIntegrationService _integrationService;
         private readonly IVarejOnlineApiService _apiService;
-        private readonly IEventDispatcher _dispatcher;
-        private readonly ISqsRepository _syncInSqsRepository;
 
-        public OrderCreatedEventHandler(ILogger<OrderCreatedEventHandler> logger, 
-            IEventDispatcher dispatcher, 
-            IIntegrationService integrationService, 
-            IVarejOnlineApiService apiService, 
+        public OrderCreatedEventHandler(
+            ILogger<OrderCreatedEventHandler> logger,
+            IIntegrationService integrationService,
+            IVarejOnlineApiService apiService,
             ISqsRepository syncOutSqsRepository,
             IOptions<SyncInConfig> syncInSqsConfig)
+            : base(syncOutSqsRepository, syncInSqsConfig)
         {
             _logger = logger;
-            _dispatcher = dispatcher;
             _integrationService = integrationService;
             _apiService = apiService;
-            _syncInSqsRepository = syncOutSqsRepository;
-            var syncInConfig = syncInSqsConfig.Value;
-            _syncInSqsRepository.IniciarFila($"{syncInConfig.SQSBaseUrl}{syncInConfig.SQSAccessKeyId}/{syncInConfig.SQSName}");
         }
 
         public async Task HandleAsync(OrderCreated @event, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Pedido criado: {@event.HubKey}");
-            if (@event != null && @event.Pedido != null)
+            if (@event?.Pedido is PedidoView pedidoView)
             {
                 var hubKey = @event.HubKey;
-                var pedidoView = @event.Pedido;
 
                 var integration = await _integrationService.GetIntegrationByKeyAsync(hubKey);
-
                 var token = integration.Result!.Token ?? string.Empty;
 
                 long terceiroId = 0;
@@ -88,23 +78,14 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
 
                 var operacaoResponse = await _apiService.PostPedidoAsync(token, request);
 
-                if (pedidoView is not null && operacaoResponse.IsSuccess && operacaoResponse.Result is { } pedidoResponse)
+                if (operacaoResponse.IsSuccess)
                 {
-                    var retorno = BuildPedidoRetornoView(pedidoView, operacaoResponse.Result.IdRecurso);
-                    var notificacao = new NotificacaoAtualizacaoModel
-                    {
-                        Chave = hubKey ?? string.Empty,
-                        DataHora = DateTime.UtcNow,
-                        Json = JsonConvert.SerializeObject(retorno),
-                        TipoProcesso = TipoProcessoAtualizacao.Pedido,
-                        PlataformaId = pedidoView.CanalId
-                    };
-
-                    _syncInSqsRepository.AdicionarMensagemFilaFifo(notificacao, $"notificacao-syncin-{notificacao.Chave}");
+                    var retorno = BuildPedidoRetornoView(pedidoView, operacaoResponse.Result?.IdRecurso, pedidoIncluido: true);
+                    PublishPedidoRetorno(hubKey ?? string.Empty, pedidoView.CanalId, retorno);
                 }
             }
-            return;
         }
+
         private static TerceiroRequest BuildTerceiroRequest(PedidoView pedidoView)
         {
             var contato = pedidoView.Contatos?.FirstOrDefault();
@@ -120,39 +101,14 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers
                     {
                         Tipo = "OUTROS",
                         TipoEndereco = "ENDERECO_COBRANCA",
-                        Logradouro = endereco.Endereco,
-                        Cep = endereco.Cep,
-                        Bairro = endereco.Bairro,
-                        Uf = endereco.Uf,
-                        Complemento = endereco.Complemento,
-                        Numero = endereco.Numero
+                        Logradouro = endereco?.Endereco,
+                        Cep = endereco?.Cep,
+                        Bairro = endereco?.Bairro,
+                        Uf = endereco?.Uf,
+                        Complemento = endereco?.Complemento,
+                        Numero = endereco?.Numero
                     }
                 }
-            };
-        }
-
-        private static PedidoRetornoView BuildPedidoRetornoView(PedidoView pedido, string id)
-        {
-            if (pedido is null) throw new ArgumentNullException(nameof(pedido));
-
-            var statusId = pedido.PedidoStatusERPId.HasValue
-                ? pedido.PedidoStatusERPId.Value > int.MaxValue
-                    ? int.MaxValue
-                    : (int)pedido.PedidoStatusERPId.Value
-                : 0;
-
-            return new PedidoRetornoView
-            {
-                PedidoId = pedido.PedidoId,
-                PedidoERPId = id ?? pedido.PedidoERPId ?? string.Empty,
-                PedidoERPStatusId = statusId,
-                NomePlataformaERP = pedido.Plataforma ?? string.Empty,
-                PedidoCancelado = pedido.PedidoCancelado,
-                PedidoIncluido = true,
-                PedidoAlterado = false,
-                PedidoIgnorado = false,
-                Erro = false,
-                Mensagem = string.Empty
             };
         }
     }
