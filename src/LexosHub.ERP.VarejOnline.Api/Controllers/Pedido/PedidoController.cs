@@ -60,6 +60,21 @@ namespace LexosHub.ERP.VarejOnline.Api.Controllers.Pedido
             await _dispatcher.DispatchAsync(orderCreatedEvent, new CancellationToken());
             return Ok();
         }
+
+        [HttpPost("{erpPedidoId:long}/cancelar")]
+        public async Task<IActionResult> CancelarPedido(long erpPedidoId, string hubKey)
+        {
+            if (string.IsNullOrWhiteSpace(hubKey)) throw new ArgumentNullException(nameof(hubKey));
+
+            var orderCancelledEvent = new OrderCancelled
+            {
+                HubKey = hubKey,
+                PedidoERPId = erpPedidoId
+            };
+
+            await _dispatcher.DispatchAsync(orderCancelledEvent, new CancellationToken());
+            return Ok();
+        }
     }
 }
 

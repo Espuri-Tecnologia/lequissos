@@ -270,10 +270,18 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
             var resource = $"apps/api/pedidos/alterar-status";
             var restRequest = new RestRequest(resource, Method.Post)
                                 .AddHeader("Content-Type", "application/json")
-                                .AddJsonBody(request);            
+                                .AddJsonBody(request);
             var operationRespnse = await ExecuteAsync<OperationResponse>(restRequest, token);
 
             return operationRespnse;
+        }
+
+        public async Task<Response<OperationResponse>> CancelarPedidoAsync(string token, long pedidoErpId)
+        {
+            var resource = $"apps/api/pedidos/{pedidoErpId}/cancelar";
+            var restRequest = new RestRequest(resource, Method.Post);
+
+            return await ExecuteAsync<OperationResponse>(restRequest, token);
         }
 
         #endregion

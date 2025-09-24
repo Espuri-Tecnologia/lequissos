@@ -20,6 +20,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher
             { nameof(StocksRequested), typeof(StocksRequested) },
             { nameof(InvoicesRequested), typeof(InvoicesRequested) },
             { nameof(OrderCreated), typeof(OrderCreated) },
+            { nameof(OrderCancelled), typeof(OrderCancelled) },
             { nameof(OrderDelivered), typeof(OrderDelivered) },
             { nameof(OrderShipped), typeof(OrderShipped) },
             { nameof(InitialSync), typeof(InitialSync) }
