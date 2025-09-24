@@ -1,8 +1,11 @@
-﻿namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Events.Pedido
+using Lexos.Hub.Sync.Models.Pedido;
+
+namespace LexosHub.ERP.VarejOnline.Infra.Messaging.Events.Pedido
 {
     public class OrderDelivered : BaseEvent
     {
         public string HubKey { get; set; } = null!;
-        public long PedidoERPId { get; set; }  
+        public long PedidoERPId { get; set; }
+        public PedidoView Pedido { get; set; } = null!;
     }
 }

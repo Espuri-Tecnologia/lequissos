@@ -34,42 +34,48 @@ namespace LexosHub.ERP.VarejOnline.Api.Controllers.Pedido
         }
 
         [HttpPut("/alterar-status-entregue")]
-        public async Task<IActionResult> AlterarStatusPedidoEntregue(string hubKey, long erpPedidoId)
+        public async Task<IActionResult> AlterarStatusPedidoEntregue(string hubKey, long erpPedidoId, [FromBody] PedidoView pedido)
         {
             if (string.IsNullOrWhiteSpace(hubKey)) throw new ArgumentNullException(nameof(hubKey));
+            if (pedido == null) throw new ArgumentNullException(nameof(pedido));
 
             var orderCreatedEvent = new OrderDelivered
             {
                 HubKey = hubKey,
-                PedidoERPId = erpPedidoId
+                PedidoERPId = erpPedidoId,
+                Pedido = pedido
             };
             await _dispatcher.DispatchAsync(orderCreatedEvent, new CancellationToken());
             return Ok();
         }
 
         [HttpPut("/alterar-status-enviado")]
-        public async Task<IActionResult> AlterarStatusPedidoEnviado(string hubKey, long erpPedidoId)
+        public async Task<IActionResult> AlterarStatusPedidoEnviado(string hubKey, long erpPedidoId, [FromBody] PedidoView pedido)
         {
             if (string.IsNullOrWhiteSpace(hubKey)) throw new ArgumentNullException(nameof(hubKey));
+            if (pedido == null) throw new ArgumentNullException(nameof(pedido));
 
             var orderCreatedEvent = new OrderShipped
             {
                 HubKey = hubKey,
-                PedidoERPId = erpPedidoId
+                PedidoERPId = erpPedidoId,
+                Pedido = pedido
             };
             await _dispatcher.DispatchAsync(orderCreatedEvent, new CancellationToken());
             return Ok();
         }
 
         [HttpPost("{erpPedidoId:long}/cancelar")]
-        public async Task<IActionResult> CancelarPedido(long erpPedidoId, string hubKey)
+        public async Task<IActionResult> CancelarPedido(long erpPedidoId, string hubKey, [FromBody] PedidoView pedido)
         {
             if (string.IsNullOrWhiteSpace(hubKey)) throw new ArgumentNullException(nameof(hubKey));
+            if (pedido == null) throw new ArgumentNullException(nameof(pedido));
 
             var orderCancelledEvent = new OrderCancelled
             {
                 HubKey = hubKey,
-                PedidoERPId = erpPedidoId
+                PedidoERPId = erpPedidoId,
+                Pedido = pedido
             };
 
             await _dispatcher.DispatchAsync(orderCancelledEvent, new CancellationToken());
