@@ -22,7 +22,8 @@
         PublicarAnuncioEmMassaProdutos = 18,
         CriarCargasEstoques = 19,
         AdicionarListaSeparacao = 20,
-        AtualizarProdutosEmMassa = 21
+        AtualizarProdutosEmMassa = 21,
+        NotaFiscal = 22
     }
 }
 
