@@ -27,4 +27,5 @@ public interface IVarejOnlineApiService
     Task<Response<OperationResponse>> CreateTerceiroAsync(string token, TerceiroRequest request);
     Task<Response<OperationResponse>> AlterarStatusPedidoAsync(string token, AlterarStatusPedidoRequest request);
     Task<Response<OperationResponse>> CancelarPedidoAsync(string token, long pedidoErpId);
+    Task<Response<string>> GetInvoiceXmlAsync(string token, long invoiceId, CancellationToken cancellationToken = default);
 }

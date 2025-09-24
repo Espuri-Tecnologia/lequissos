@@ -286,6 +286,16 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
 
         #endregion
 
+        #region Invoice
+        public async Task<Response<string>> GetInvoiceXmlAsync(string token, long invoiceId, CancellationToken cancellationToken = default)
+        {
+            var resource = $"apps/api/notas-mercadoria/xml/{invoiceId}";
+            var restRequest = new RestRequest(resource, Method.Get);
+
+            return await ExecuteRawAsync(restRequest, token, cancellationToken);
+        }
+        #endregion
+
         #region WebhookRegister
         public async Task<Response<OperationResponse>> RegisterWebhookAsync(string token, WebhookRequest payload, CancellationToken cancellationToken = default)
         {
@@ -335,6 +345,27 @@ namespace LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services
             catch (Exception ex)
             {
                 return new Response<T> { Error = new ErrorResult($"{ex.Message}") };
+            }
+        }
+        private async Task<Response<string>> ExecuteRawAsync(RestRequest request, string? token = null, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                request.AddHeader("Content-Type", "application/json");
+
+                if (!string.IsNullOrWhiteSpace(token))
+                    request.AddQueryParameter("token", token);
+
+                var response = await _client.ExecuteAsync(request, cancellationToken);
+
+                if (!response.IsSuccessStatusCode)
+                    return new Response<string> { Error = GetErrorMessageResponse(response), StatusCode = response.StatusCode };
+
+                return new Response<string>(response.Content ?? string.Empty) { StatusCode = response.StatusCode };
+            }
+            catch (Exception ex)
+            {
+                return new Response<string> { Error = new ErrorResult($"{ex.Message}") };
             }
         }
         private ErrorResult GetErrorMessageResponse(RestResponse response)
