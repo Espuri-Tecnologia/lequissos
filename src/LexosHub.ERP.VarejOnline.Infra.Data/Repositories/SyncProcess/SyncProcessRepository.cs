@@ -97,5 +97,29 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Repositories.SyncProcess
                 throw;
             }
         }
+
+        public async Task UpdateProgressAsync(Guid id, int page, int pageSize)
+        {
+            try
+            {
+                await _writeDbConnection.ExecuteAsync(
+                    sql: @"UPDATE [SyncProcess]
+                           SET [Page] = @Page,
+                               [PageSize] = @PageSize,
+                               [UpdatedDate] = GETDATE()
+                           WHERE [Id] = @Id;",
+                    param: new
+                    {
+                        Id = id,
+                        Page = page,
+                        PageSize = pageSize
+                    });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("----- SyncProcessRepository -> Error on UpdateProgressAsync {error} ----", e.Message);
+                throw;
+            }
+        }
     }
 }

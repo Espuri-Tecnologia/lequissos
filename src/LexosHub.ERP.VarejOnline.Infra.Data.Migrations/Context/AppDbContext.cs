@@ -4,10 +4,12 @@ using LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Models.Webhook;
 using LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Models.SyncProcess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Reflection;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting;
+using System.Linq;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Context
 {
@@ -26,6 +28,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Context
         public DbSet<Integration> Integration => Set<Integration>();
         public DbSet<Webhook> Webhook => Set<Webhook>();
         public DbSet<SyncProcess> SyncProcess => Set<SyncProcess>();
+        public DbSet<SyncProcessItem> SyncProcessItem => Set<SyncProcessItem>();
         public IDbConnection Connection => Database.GetDbConnection();
 
         public IConfiguration _configuration;
@@ -46,6 +49,15 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Context
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            foreach (var property in builder.Model.GetEntityTypes()
+                         .SelectMany(entity => entity.GetProperties())
+                         .Where(property => property.ClrType == typeof(string)))
+            {
+                property.SetColumnType("varchar(1024)");
+                property.SetMaxLength(1024);
+                property.SetIsUnicode(false);
+            }
 
             base.OnModelCreating(builder);
         }
