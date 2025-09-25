@@ -26,6 +26,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Context
         public DbSet<Integration> Integration => Set<Integration>();
         public DbSet<Webhook> Webhook => Set<Webhook>();
         public DbSet<SyncProcess> SyncProcess => Set<SyncProcess>();
+        public DbSet<SyncProcessItem> SyncProcessItem => Set<SyncProcessItem>();
         public IDbConnection Connection => Database.GetDbConnection();
 
         public IConfiguration _configuration;
