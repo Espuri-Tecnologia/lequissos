@@ -4,8 +4,10 @@ using LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Models.Webhook;
 using LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Models.SyncProcess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using LexosHub.ERP.VarejOnline.Infra.CrossCutting;
 
@@ -47,6 +49,15 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Context
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            foreach (var property in builder.Model.GetEntityTypes()
+                         .SelectMany(entityType => entityType.GetProperties())
+                         .Where(property => property.ClrType == typeof(string)))
+            {
+                property.SetIsUnicode(false);
+                property.SetMaxLength(1024);
+                property.SetColumnType("varchar(1024)");
+            }
 
             base.OnModelCreating(builder);
         }

@@ -13,7 +13,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "Cnpj",
                 table: "Integration",
-                type: "nvarchar(max)",
+                type: "varchar(1024)",
                 nullable: true);
         }
 
