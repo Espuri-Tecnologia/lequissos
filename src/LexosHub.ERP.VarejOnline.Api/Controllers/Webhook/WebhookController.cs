@@ -12,16 +12,19 @@ public class WebhookController : ControllerBase
 {
     private readonly IWebhookService _webhookService;
     private readonly ISqslEventPublisher _publisher;
+    private readonly IEventDispatcher _dispatcher;
     private readonly ILogger<WebhookController> _logger;
 
     public WebhookController(
         ISqslEventPublisher publisher,
         ILogger<WebhookController> logger,
-        IWebhookService webhookService)
+        IWebhookService webhookService,
+        IEventDispatcher dispatcher)
     {
         _publisher = publisher;
         _logger = logger;
         _webhookService = webhookService;
+        _dispatcher = dispatcher;
     }
 
     [HttpPost]
@@ -120,20 +123,18 @@ public class WebhookController : ControllerBase
         using var scope = _logger.BeginScope("Webhook NotaFiscal | Hub: {hubkey}", hubkey);
         _logger.LogInformation("Recebido payload: {@Payload}", notification);
 
-        long? numeroNota = ExtractObjectId(notification.Object);
+        long? erpNotaFiscalId = ExtractObjectId(notification.Object);
 
-        if (numeroNota == null)
-            return BadRequest(new { error = "Número da nota fiscal inválido na notificação" });
+        if (erpNotaFiscalId == null)
+            return BadRequest(new { error = "Id da nota fiscal não enviado na Notificação" });
 
         var evt = new InvoicesRequested
         {
             HubKey = hubkey,
-            Number = numeroNota.Value
+            Number = erpNotaFiscalId.Value
         };
 
-        await _publisher.DispatchAsync(evt, cancellationToken);
-
-        _logger.LogInformation("Evento InvoicesRequested disparado para numeroNota={NumeroNota}", numeroNota);
+        await _dispatcher.DispatchAsync(evt, cancellationToken);
 
         return Ok(new { message = "Notificação de nota fiscal processada com sucesso." });
     }

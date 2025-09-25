@@ -26,7 +26,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
 
             var request = new PedidoRequest
             {
-                NumeroPedidoCliente = source.Codigo,
+                NumeroPedidoCliente = source.PedidoId.ToString(),
                 Data = source.Data.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture),
                 Horario = source.Data.ToString("HH:mm:ss", CultureInfo.InvariantCulture),
                 Entidade = montaEntidade(source),

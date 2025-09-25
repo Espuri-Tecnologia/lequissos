@@ -24,6 +24,8 @@ using LexosHub.ERP.VarejOnline.Infra.Messaging.Events.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Handlers.Pedido;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Mappers.Produto;
+using LexosHub.ERP.VarejOnline.Infra.SyncIn.Interfaces;
+using LexosHub.ERP.VarejOnline.Infra.SyncIn.Services;
 using LexosHub.ERP.VarejOnline.Infra.SyncOut.Interfaces;
 using LexosHub.ERP.VarejOnline.Infra.SyncOut.Services;
 using LexosHub.ERP.VarejOnline.Infra.VarejOnlineApi.Services;
@@ -77,6 +79,7 @@ try
     builder.Services.AddScoped<StockSyncJobService>();
     builder.Services.AddTransient<IWebhookService, WebhookService>();
     builder.Services.AddTransient<ISyncOutApiService, SyncOutApiService>();
+    builder.Services.AddTransient<ISyncInApiService, SyncInApiService>();
     builder.Services.AddTransient<ProdutoViewMapper>();
     builder.Services.AddHttpClient();
 
