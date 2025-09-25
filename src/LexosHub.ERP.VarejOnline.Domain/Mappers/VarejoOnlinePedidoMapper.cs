@@ -35,7 +35,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Mappers
                 ValorDesconto = source.Desconto,
                 ValorFrete = source.Frete,
                 ValorOutros = source.Acrescimo,
-                Observacao = source.Observacao,
+                Observacao = $"Pedido Marketplace: {source.Codigo} | Plataforma: {PedidoViewModel.CodigoPlataforma}",//source.Observacao,
                 Itens = MapItens(source.Itens),
                 EmitirNotaFiscal = source.IsFulfillment ? false : true,
                 Pagamento = MapPagamento(source.ComposicaoPagamento),
