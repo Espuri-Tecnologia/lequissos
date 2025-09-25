@@ -7,6 +7,7 @@ namespace LexosHub.ERP.VarejOnline.Domain.Enums
         Products = 3,
         Stock = 4,
         Prices = 5,
-        Other = 6
+        Other = 6,
+        Sku = 7
     }
 }

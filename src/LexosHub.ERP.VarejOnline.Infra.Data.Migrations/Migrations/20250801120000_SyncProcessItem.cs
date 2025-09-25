@@ -1,0 +1,53 @@
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
+{
+    /// <inheritdoc />
+    public partial class SyncProcessItem : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "SyncProcessItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SyncProcessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TypeId = table.Column<int>(type: "int", nullable: false),
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExternalErpId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AdditionalInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    JobId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SyncProcessItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SyncProcessItem_SyncProcess_SyncProcessId",
+                        column: x => x.SyncProcessId,
+                        principalTable: "SyncProcess",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SyncProcessItem_SyncProcessId",
+                table: "SyncProcessItem",
+                column: "SyncProcessId");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "SyncProcessItem");
+        }
+    }
+}

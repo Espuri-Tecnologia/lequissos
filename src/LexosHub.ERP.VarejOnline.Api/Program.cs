@@ -8,6 +8,7 @@ using LexosHub.ERP.VarejOnline.Api.Jobs;
 using LexosHub.ERP.VarejOnline.Domain.DTOs.Integration;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Persistence;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Repositories.Integration;
+using LexosHub.ERP.VarejOnline.Domain.Interfaces.Repositories.SyncProcess;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Repositories.Webhook;
 using LexosHub.ERP.VarejOnline.Domain.Interfaces.Services;
 using LexosHub.ERP.VarejOnline.Domain.Services;
@@ -17,6 +18,7 @@ using LexosHub.ERP.VarejOnline.Infra.CrossCutting.Settings;
 using LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Context;
 using LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Integration;
 using LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Persistence;
+using LexosHub.ERP.VarejOnline.Infra.Data.Repositories.SyncProcess;
 using LexosHub.ERP.VarejOnline.Infra.Data.Repositories.Webhook;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Dispatcher;
 using LexosHub.ERP.VarejOnline.Infra.Messaging.Events;
@@ -72,6 +74,7 @@ try
 
     builder.Services.AddTransient<IIntegrationService, IntegrationService>();
     builder.Services.AddTransient<IAuthService, AuthService>();
+    builder.Services.AddTransient<ISyncProcessService, SyncProcessService>();
     builder.Services.AddTransient<IVarejOnlineApiService, VarejOnlineApiService>();
     builder.Services.AddTransient<ISqsRepository, SqsRepository>();
     builder.Services.AddScoped<StockSyncJobService>();
@@ -82,6 +85,8 @@ try
 
     builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
     builder.Services.AddScoped<IWebhookRepository, WebhookRepository>();
+    builder.Services.AddScoped<ISyncProcessRepository, SyncProcessRepository>();
+    builder.Services.AddScoped<ISyncProcessItemRepository, SyncProcessItemRepository>();
 
     builder.Services.AddScoped<IApplicationWriteDbConnection, ApplicationWriteDbConnection>();
     builder.Services.AddScoped<IApplicationReadDbConnection, ApplicationReadDbConnection>();
