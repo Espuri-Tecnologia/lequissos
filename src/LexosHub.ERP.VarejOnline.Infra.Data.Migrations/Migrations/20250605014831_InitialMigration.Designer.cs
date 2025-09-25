@@ -43,7 +43,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("HubKey")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -52,10 +52,10 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<string>("Settings")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<int>("TenantId")
                         .HasColumnType("int");
@@ -64,10 +64,10 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<string>("Token")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.HasKey("Id");
 

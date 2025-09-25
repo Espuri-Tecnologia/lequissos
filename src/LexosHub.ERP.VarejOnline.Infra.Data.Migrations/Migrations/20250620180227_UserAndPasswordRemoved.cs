@@ -25,13 +25,13 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "Password",
                 table: "Integration",
-                type: "nvarchar(max)",
+                type: "varchar(1024)",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "User",
                 table: "Integration",
-                type: "nvarchar(max)",
+                type: "varchar(1024)",
                 nullable: true);
         }
     }

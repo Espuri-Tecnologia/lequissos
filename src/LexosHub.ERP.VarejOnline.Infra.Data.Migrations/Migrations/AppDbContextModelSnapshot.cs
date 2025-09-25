@@ -31,7 +31,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Cnpj")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -43,7 +43,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("HubKey")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -52,22 +52,22 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<string>("Settings")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<int>("TenantId")
                         .HasColumnType("int");
 
                     b.Property<string>("Token")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.HasKey("Id");
 
@@ -81,7 +81,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AdditionalInfo")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -127,21 +127,21 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AdditionalInfo")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<string>("ExternalErpId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<string>("JobId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
@@ -175,24 +175,24 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Migrations
 
                     b.Property<string>("Event")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<int>("IntegrationId")
                         .HasColumnType("int");
 
                     b.Property<string>("Types")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.Property<string>("Uuid")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(1024)");
 
                     b.HasKey("Id");
 
