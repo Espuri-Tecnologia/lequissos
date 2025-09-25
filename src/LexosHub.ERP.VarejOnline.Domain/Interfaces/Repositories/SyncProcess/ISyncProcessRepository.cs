@@ -7,5 +7,6 @@ namespace LexosHub.ERP.VarejOnline.Domain.Interfaces.Repositories.SyncProcess
     {
         Task AddAsync(SyncProcessDto process);
         Task UpdateStatusAsync(Guid id, SyncProcessStatusEnum status, string? info);
+        Task UpdateProgressAsync(Guid id, int page, int pageSize);
     }
 }

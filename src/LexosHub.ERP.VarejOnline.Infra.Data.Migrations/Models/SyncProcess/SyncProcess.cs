@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Models.Base;
 
 namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Models.SyncProcess
@@ -14,5 +15,7 @@ namespace LexosHub.ERP.VarejOnline.Infra.Data.Migrations.Models.SyncProcess
         public int StatusId { get; set; }
         public Guid? ParentId { get; set; }
         public string? AdditionalInfo { get; set; }
+
+        public ICollection<SyncProcessItem> SyncProcessItems { get; set; } = new HashSet<SyncProcessItem>();
     }
 }
