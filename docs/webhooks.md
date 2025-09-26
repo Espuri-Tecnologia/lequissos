@@ -1,10 +1,10 @@
-# Webhooks do LexosHub Varejo Online
+# Webhooks do LexosHub VarejOnline
 
-Este documento descreve como o LexosHub integra-se com o ERP Varejo Online através de webhooks: quais eventos são assinados automaticamente, como a API do hub expõe os endpoints públicos e qual o formato esperado das notificações.
+Este documento descreve como o LexosHub integra-se com o ERP VarejOnline através de webhooks: quais eventos são assinados automaticamente, como a API do hub expõe os endpoints públicos e qual o formato esperado das notificações.
 
 ## Registro automático de webhooks
 
-Durante o processo de sincronização inicial do hub, o evento `RegisterDefaultWebhooks` é disparado. O *handler* `RegisterDefaultWebhooksEventHandler` registra automaticamente, para cada hub, três eventos padrão do ERP Varejo Online (`PRODUTOS`, `TABELAPRECOPRODUTO` e `NOTAFISCAL`). Cada evento é cadastrado aceitando os métodos `POST` e `PUT`, com a URL padronizada `https://api-varejoonline.lexoshub.com/{hubKey}/{evento}`.【F:docs/event-handlers-flow.md†L49-L55】【F:src/LexosHub.ERP.VarejOnline.Infra.Messaging/Handlers/Webhook/RegisterDefaultWebhooksEventHandler.cs†L21-L37】
+Durante o processo de sincronização inicial do hub, o evento `RegisterDefaultWebhooks` é disparado. O *handler* `RegisterDefaultWebhooksEventHandler` registra automaticamente, para cada hub, três eventos padrão do ERP VarejOnline (`PRODUTOS`, `TABELAPRECOPRODUTO` e `NOTAFISCAL`). Cada evento é cadastrado aceitando os métodos `POST` e `PUT`, com a URL padronizada `https://api-varejoonline.lexoshub.com/{hubKey}/{evento}`.【F:docs/event-handlers-flow.md†L49-L55】【F:src/LexosHub.ERP.VarejOnline.Infra.Messaging/Handlers/Webhook/RegisterDefaultWebhooksEventHandler.cs†L21-L37】
 
 O registro usa o serviço de domínio `WebhookService`. Ele consulta o token da integração correspondente ao `hubKey`, monta o `WebhookRequest` com o evento, URL e métodos configurados e chama o serviço remoto do ERP via `RegisterWebhookAsync`. Quando o ERP confirma a criação (retornando o `IdRecurso`), o LexosHub persiste o *webhook* em sua base de dados.【F:src/LexosHub.ERP.VarejOnline.Domain/Services/WebhookService.cs†L19-L70】
 
@@ -49,4 +49,4 @@ Ao concluir o registro junto ao ERP, o LexosHub salva um `WebhookRecordDto` cont
 4. O ERP passa a chamar os endpoints públicos do LexosHub quando os eventos configurados ocorrerem.
 5. Cada endpoint valida a notificação, emite os eventos internos (`ProductsRequested`, `PriceTablesRequested`, `InvoicesRequested`) e confirma o processamento via HTTP 200.
 
-Esse fluxo garante que o LexosHub esteja sempre apto a receber notificações do ERP Varejo Online e transformar essas notificações em eventos internos para processamento assíncrono.
+Esse fluxo garante que o LexosHub esteja sempre apto a receber notificações do ERP VarejOnline e transformar essas notificações em eventos internos para processamento assíncrono.
